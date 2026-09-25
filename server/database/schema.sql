@@ -41,3 +41,24 @@ CREATE TABLE IF NOT EXISTS user_profiles (
     FOREIGN KEY (user_id) REFERENCES users(id)
     ON DELETE CASCADE
 );
+
+USE eatwise;
+
+CREATE TABLE IF NOT EXISTS user_preferences (
+  user_id INT UNSIGNED PRIMARY KEY,
+  diet_type ENUM(
+    'omnivore',
+    'vegetarian',
+    'vegan',
+    'pescatarian'
+  ) NOT NULL,
+  allergies JSON NOT NULL,
+  avoided_foods JSON NOT NULL,
+  daily_budget_lkr DECIMAL(10,2) NULL,
+  meals_per_day TINYINT UNSIGNED NOT NULL,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_preferences_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE CASCADE
+);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import ProfileForm from './ProfileForm.jsx'
 import './AccountPanel.css'
-
+import PreferencesForm from './PreferencesForm.jsx'
 const API_URL = (
   import.meta.env.VITE_API_URL || 'http://localhost:5000'
 ).replace(/\/$/, '')
@@ -204,6 +204,7 @@ export default function AccountPanel() {
             <p className="account-email">{user.email}</p>
 
             <ProfileForm key={user.id} />
+            <PreferencesForm key={user.id} />
 
             {error && (
               <p
