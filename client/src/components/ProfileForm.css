@@ -1,0 +1,94 @@
+.profile-section {
+  margin-top: 28px;
+  padding-top: 26px;
+  border-top: 1px solid #e1e8dc;
+}
+
+.profile-section h3 {
+  font-size: 21px;
+}
+
+.profile-description {
+  margin-top: 10px;
+  color: #68776c;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.profile-fields {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+  margin: 24px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.profile-legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.profile-section select {
+  width: 100%;
+  min-width: 0;
+  padding: 13px 10px;
+  color: #183c30;
+  background: #fbfcf9;
+  border: 1px solid #d7e0d3;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.profile-section select:focus {
+  outline: 2px solid #34835a;
+  outline-offset: 2px;
+}
+
+.profile-note {
+  color: #68776c;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.profile-save {
+  width: 100%;
+  padding: 14px 20px;
+  border: 0;
+  border-radius: 10px;
+  background: #214f38;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.profile-save:hover {
+  background: #307349;
+}
+
+.profile-save:disabled,
+.profile-fields:disabled .profile-save {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.profile-section > .profile-save {
+  margin-top: 16px;
+}
+
+@media (max-width: 420px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+}

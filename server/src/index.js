@@ -7,6 +7,7 @@ import {
   sessionMiddleware,
   sessionStore,
 } from './config/session.js'
+import profileRoutes from './routes/profileRoutes.js'
 
 const app = express()
 const PORT = Number(process.env.PORT) || 5000
@@ -24,6 +25,7 @@ app.use(express.json({ limit: '100kb' }))
 app.use(sessionMiddleware)
 
 app.use('/api/auth', authRoutes)
+app.use('/api/profile', profileRoutes)
 
 app.get('/api/health', async (req, res) => {
   try {

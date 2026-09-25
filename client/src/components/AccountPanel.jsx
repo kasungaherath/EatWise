@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import ProfileForm from './ProfileForm.jsx'
 import './AccountPanel.css'
 
 const API_URL = (
@@ -18,13 +19,18 @@ async function authRequest(path, options = {}) {
     })
   } catch (error) {
     if (error.name === 'AbortError') throw error
-    throw new Error('Cannot connect to EatWise. Check that the backend is running.')
+
+    throw new Error(
+      'Cannot connect to EatWise. Check that the backend is running.'
+    )
   }
 
   const data = await response.json().catch(() => null)
 
   if (!response.ok) {
-    const error = new Error(data?.message || 'Request failed. Please try again.')
+    const error = new Error(
+      data?.message || 'Request failed. Please try again.'
+    )
     error.status = response.status
     throw error
   }
@@ -62,10 +68,7 @@ export default function AccountPanel() {
           setUser(data.user)
         }
       } catch (error) {
-        if (
-          !controller.signal.aborted &&
-          error.status !== 401
-        ) {
+        if (!controller.signal.aborted && error.status !== 401) {
           setError(error.message)
         }
       } finally {
@@ -82,14 +85,23 @@ export default function AccountPanel() {
 
   function updateField(event) {
     const { name, value } = event.target
-    setForm((current) => ({ ...current, [name]: value }))
+
+    setForm((current) => ({
+      ...current,
+      [name]: value,
+    }))
   }
 
   function switchMode() {
-    setMode((current) => current === 'login' ? 'register' : 'login')
+    setMode((current) => (
+      current === 'login' ? 'register' : 'login'
+    ))
     setError('')
     setNotice('')
-    setForm((current) => ({ ...current, password: '' }))
+    setForm((current) => ({
+      ...current,
+      password: '',
+    }))
   }
 
   async function handleSubmit(event) {
@@ -117,7 +129,10 @@ export default function AccountPanel() {
         body: JSON.stringify(payload),
       })
 
-      setForm((current) => ({ ...current, password: '' }))
+      setForm((current) => ({
+        ...current,
+        password: '',
+      }))
 
       if (mode === 'register') {
         setMode('login')
@@ -133,15 +148,24 @@ export default function AccountPanel() {
   }
 
   async function handleLogout() {
+    if (busy) return
+
     setBusy(true)
     setError('')
     setNotice('')
 
     try {
-      await authRequest('/logout', { method: 'POST' })
+      await authRequest('/logout', {
+        method: 'POST',
+      })
+
       setUser(null)
       setMode('login')
-      setForm({ name: '', email: '', password: '' })
+      setForm({
+        name: '',
+        email: '',
+        password: '',
+      })
       setNotice('You have been logged out.')
     } catch (error) {
       setError(error.message)
@@ -154,10 +178,17 @@ export default function AccountPanel() {
     <section className="account-section" id="account">
       <div className="account-intro">
         <span className="eyebrow">YOUR EATWISE ACCOUNT</span>
-        <h2>Your next chapter starts here.</h2>
+
+        <h2>
+          {user
+            ? 'Your goals. Your starting point.'
+            : 'Your next chapter starts here.'}
+        </h2>
+
         <p>
-          Create your account to get started with EatWise.
-          Already registered? Welcome back.
+          {user
+            ? 'Keep your profile up to date so your meal plans can reflect your needs and goals.'
+            : 'Create your account to get started with EatWise. Already registered? Welcome back.'}
         </p>
       </div>
 
@@ -167,16 +198,18 @@ export default function AccountPanel() {
         ) : user ? (
           <>
             <span className="account-badge">SIGNED IN</span>
+
             <h3>Welcome, {user.name}</h3>
+
             <p className="account-email">{user.email}</p>
 
-            <p className="account-description">
-              Your account is ready. Personal profile setup is coming
-              in our next development step.
-            </p>
+            <ProfileForm key={user.id} />
 
             {error && (
-              <p className="account-message account-error" role="alert">
+              <p
+                className="account-message account-error"
+                role="alert"
+              >
                 {error}
               </p>
             )}
@@ -193,7 +226,9 @@ export default function AccountPanel() {
         ) : (
           <>
             <h3>
-              {mode === 'login' ? 'Welcome back' : 'Create your account'}
+              {mode === 'login'
+                ? 'Welcome back'
+                : 'Create your account'}
             </h3>
 
             <p className="account-description">
@@ -203,22 +238,34 @@ export default function AccountPanel() {
             </p>
 
             {error && (
-              <p className="account-message account-error" role="alert">
+              <p
+                className="account-message account-error"
+                role="alert"
+              >
                 {error}
               </p>
             )}
 
             {notice && (
-              <p className="account-message account-success" role="status">
+              <p
+                className="account-message account-success"
+                role="status"
+              >
                 {notice}
               </p>
             )}
 
             <form onSubmit={handleSubmit}>
-              <fieldset className="account-fields" disabled={busy}>
+              <fieldset
+                className="account-fields"
+                disabled={busy}
+              >
                 {mode === 'register' && (
                   <div className="account-field">
-                    <label htmlFor="account-name">Full name</label>
+                    <label htmlFor="account-name">
+                      Full name
+                    </label>
+
                     <input
                       id="account-name"
                       name="name"
@@ -234,7 +281,10 @@ export default function AccountPanel() {
                 )}
 
                 <div className="account-field">
-                  <label htmlFor="account-email">Email address</label>
+                  <label htmlFor="account-email">
+                    Email address
+                  </label>
+
                   <input
                     id="account-email"
                     name="email"
@@ -248,7 +298,10 @@ export default function AccountPanel() {
                 </div>
 
                 <div className="account-field">
-                  <label htmlFor="account-password">Password</label>
+                  <label htmlFor="account-password">
+                    Password
+                  </label>
+
                   <input
                     id="account-password"
                     name="password"
@@ -260,9 +313,13 @@ export default function AccountPanel() {
                     }
                     value={form.password}
                     onChange={updateField}
-                    minLength={mode === 'register' ? 12 : undefined}
+                    minLength={
+                      mode === 'register' ? 12 : undefined
+                    }
                     aria-describedby={
-                      mode === 'register' ? 'password-hint' : undefined
+                      mode === 'register'
+                        ? 'password-hint'
+                        : undefined
                     }
                     required
                   />
@@ -274,7 +331,10 @@ export default function AccountPanel() {
                   )}
                 </div>
 
-                <button className="account-submit" type="submit">
+                <button
+                  className="account-submit"
+                  type="submit"
+                >
                   {busy
                     ? 'Please wait…'
                     : mode === 'login'
@@ -294,7 +354,9 @@ export default function AccountPanel() {
                 onClick={switchMode}
                 disabled={busy}
               >
-                {mode === 'login' ? 'Create account' : 'Log in'}
+                {mode === 'login'
+                  ? 'Create account'
+                  : 'Log in'}
               </button>
             </p>
           </>
