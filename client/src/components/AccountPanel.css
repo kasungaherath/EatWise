@@ -1,0 +1,176 @@
+.account-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  gap: 70px;
+  padding: 65px 0;
+  border-top: 1px solid #e2e8df;
+  scroll-margin-top: 24px;
+}
+
+.account-intro h2 {
+  max-width: 380px;
+  margin-top: 18px;
+  font-size: clamp(28px, 3vw, 38px);
+  line-height: 1.25;
+  letter-spacing: -1px;
+}
+
+.account-intro p {
+  max-width: 370px;
+  margin-top: 18px;
+  color: #68776c;
+  line-height: 1.8;
+}
+
+.account-card {
+  min-width: 0;
+  padding: 32px;
+  background: white;
+  border: 1px solid #e1e8dc;
+  border-radius: 22px;
+  box-shadow: 0 12px 40px rgb(32 63 39 / 4%);
+}
+
+.account-card h3 {
+  font-size: 25px;
+  letter-spacing: -0.7px;
+  overflow-wrap: anywhere;
+}
+
+.account-description,
+.account-email {
+  margin-top: 12px;
+  color: #68776c;
+  font-size: 14px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.account-fields {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+  margin: 26px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.account-field {
+  display: grid;
+  gap: 8px;
+}
+
+.account-field label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.account-field input {
+  width: 100%;
+  min-width: 0;
+  padding: 13px 14px;
+  color: #183c30;
+  background: #fbfcf9;
+  border: 1px solid #d7e0d3;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.account-field input:focus {
+  outline: 2px solid #34835a;
+  outline-offset: 2px;
+}
+
+.account-field small {
+  color: #68776c;
+  line-height: 1.5;
+}
+
+.account-submit {
+  width: 100%;
+  padding: 14px 20px;
+  border: 0;
+  border-radius: 10px;
+  background: #214f38;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.account-submit:hover {
+  background: #307349;
+}
+
+.account-card > .account-submit {
+  margin-top: 24px;
+}
+
+.account-submit:disabled,
+.account-fields:disabled .account-submit,
+.account-switch button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.account-switch {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+  color: #68776c;
+  font-size: 13px;
+}
+
+.account-switch button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #23764f;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.account-message {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.account-error {
+  color: #922d2d;
+  background: #fff0ee;
+}
+
+.account-success {
+  color: #245e3d;
+  background: #edf6ec;
+}
+
+.account-badge {
+  display: inline-block;
+  margin-bottom: 18px;
+  padding: 7px 12px;
+  border-radius: 20px;
+  background: #edf6ec;
+  color: #245e3d;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 700px) {
+  .account-section {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 40px 0;
+  }
+
+  .account-card {
+    padding: 24px;
+  }
+}

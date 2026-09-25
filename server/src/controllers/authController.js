@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import validator from 'validator'
 import pool from '../config/db.js'
+import { cookieOptions } from '../config/session.js'
 
 export async function register(req, res) {
   const { name, email, password } = req.body || {}
@@ -79,4 +80,124 @@ export async function register(req, res) {
       message: 'Unable to create your account. Please try again',
     })
   }
+}
+
+export async function login(req, res, next) {
+  const { email, password } = req.body || {}
+
+  if (typeof email !== 'string' || typeof password !== 'string') {
+    return res.status(400).json({
+      success: false,
+      message: 'Email and password are required',
+    })
+  }
+
+  const cleanEmail = email.trim().toLowerCase()
+
+  if (
+    cleanEmail.length > 254 ||
+    !validator.isEmail(cleanEmail) ||
+    password.length === 0 ||
+    bcrypt.truncates(password)
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: 'Enter a valid email and password',
+    })
+  }
+
+  try {
+    const [users] = await pool.execute(
+      `SELECT id, name, email, password_hash
+       FROM users
+       WHERE email = ?
+       LIMIT 1`,
+      [cleanEmail]
+    )
+
+    const user = users[0]
+
+    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+      return res.status(401).json({
+        success: false,
+        message: 'Incorrect email or password',
+      })
+    }
+
+    req.session.regenerate((error) => {
+      if (error) return next(error)
+
+      req.session.userId = user.id
+
+      req.session.save((saveError) => {
+        if (saveError) return next(saveError)
+
+        res.set('Cache-Control', 'no-store')
+
+        return res.json({
+          success: true,
+          message: 'Logged in successfully',
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+          },
+        })
+      })
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function getCurrentUser(req, res, next) {
+  res.set('Cache-Control', 'no-store')
+
+  if (!req.session.userId) {
+    return res.status(401).json({
+      success: false,
+      message: 'Please log in',
+    })
+  }
+
+  try {
+    const [users] = await pool.execute(
+      'SELECT id, name, email FROM users WHERE id = ?',
+      [req.session.userId]
+    )
+
+    if (!users.length) {
+      return req.session.destroy((error) => {
+        if (error) return next(error)
+
+        res.clearCookie('eatwise.sid', cookieOptions)
+
+        return res.status(401).json({
+          success: false,
+          message: 'Please log in again',
+        })
+      })
+    }
+
+    return res.json({
+      success: true,
+      user: users[0],
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export function logout(req, res, next) {
+  req.session.destroy((error) => {
+    if (error) return next(error)
+
+    res.clearCookie('eatwise.sid', cookieOptions)
+    res.set('Cache-Control', 'no-store')
+
+    return res.json({
+      success: true,
+      message: 'Logged out successfully',
+    })
+  })
 }

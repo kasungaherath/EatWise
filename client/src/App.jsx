@@ -1,3 +1,4 @@
+import AccountPanel from './components/AccountPanel.jsx'
 import './App.css'
 
 function App() {
@@ -31,8 +32,8 @@ function App() {
               your next meal.
             </p>
 
-            <a className="primary-button" href="#how-it-works">
-              Explore EatWise <span aria-hidden="true">↗</span>
+            <a className="primary-button" href="#account">
+              Get started <span aria-hidden="true">↗</span>
             </a>
 
             <p className="hero-note">
@@ -42,11 +43,14 @@ function App() {
 
           <div className="meal-preview">
             <div className="preview-header">
-              <span className="preview-label">A TASTE OF YOUR PLAN</span>
+              <span className="preview-label">
+                A TASTE OF YOUR PLAN
+              </span>
               <span className="example-badge">Example</span>
             </div>
 
             <h2>A little balance, every day.</h2>
+
             <p className="preview-description">
               Simple ingredients. Meals worth looking forward to.
             </p>
@@ -54,6 +58,7 @@ function App() {
             <div className="meal-list">
               <article className="meal">
                 <span className="meal-number">01</span>
+
                 <div>
                   <span className="meal-time">BREAKFAST</span>
                   <h3>Oats & fresh fruit</h3>
@@ -63,6 +68,7 @@ function App() {
 
               <article className="meal">
                 <span className="meal-number">02</span>
+
                 <div>
                   <span className="meal-time">LUNCH</span>
                   <h3>Rice & chicken bowl</h3>
@@ -72,6 +78,7 @@ function App() {
 
               <article className="meal">
                 <span className="meal-number">03</span>
+
                 <div>
                   <span className="meal-time">DINNER</span>
                   <h3>Lentil & vegetable curry</h3>
@@ -86,8 +93,11 @@ function App() {
           </div>
         </section>
 
+        <AccountPanel />
+
         <section className="how-section" id="how-it-works">
           <span className="eyebrow">MADE FOR YOUR EVERYDAY</span>
+
           <h2>A simpler way to plan your meals.</h2>
 
           <div className="features">
@@ -101,7 +111,9 @@ function App() {
             </article>
 
             <article className="feature">
-              <span className="feature-number">02 / YOUR PREFERENCES</span>
+              <span className="feature-number">
+                02 / YOUR PREFERENCES
+              </span>
               <h3>Make it personal</h3>
               <p>
                 Choose the foods you enjoy, your dietary preferences,
