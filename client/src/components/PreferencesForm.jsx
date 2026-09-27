@@ -5,7 +5,7 @@ const API_URL = (
   import.meta.env.VITE_API_URL || 'http://localhost:5000'
 ).replace(/\/$/, '')
 
-const emptyForm = {
+const emptyPreferences = {
   dietType: '',
   allergies: '',
   avoidedFoods: '',
@@ -15,21 +15,42 @@ const emptyForm = {
 
 function toForm(preferences) {
   return {
-    dietType: preferences.dietType,
-    allergies: preferences.allergies.join(', '),
-    avoidedFoods: preferences.avoidedFoods.join(', '),
-    dailyBudgetLkr: preferences.dailyBudgetLkr ?? '',
-    mealsPerDay: String(preferences.mealsPerDay),
+    dietType: preferences.dietType ?? '',
+    allergies: Array.isArray(preferences.allergies)
+      ? preferences.allergies.join(', ')
+      : '',
+    avoidedFoods: Array.isArray(preferences.avoidedFoods)
+      ? preferences.avoidedFoods.join(', ')
+      : '',
+    dailyBudgetLkr:
+      preferences.dailyBudgetLkr == null
+        ? ''
+        : String(preferences.dailyBudgetLkr),
+    mealsPerDay: String(preferences.mealsPerDay ?? 3),
   }
 }
 
-function toFoodList(text) {
-  return [...new Set(
-    text
-      .split(',')
-      .map((item) => item.trim().toLowerCase())
-      .filter(Boolean)
-  )]
+function parseList(value, label) {
+  const items = [
+    ...new Set(
+      value
+        .split(',')
+        .map((item) => item.trim().toLowerCase())
+        .filter(Boolean)
+    ),
+  ]
+
+  if (items.length > 30) {
+    throw new Error(`${label} can contain up to 30 items.`)
+  }
+
+  if (items.some((item) => item.length > 80)) {
+    throw new Error(
+      `Each item in ${label.toLowerCase()} must be 80 characters or fewer.`
+    )
+  }
+
+  return items
 }
 
 async function preferencesRequest(options = {}) {
@@ -39,32 +60,49 @@ async function preferencesRequest(options = {}) {
     response = await fetch(`${API_URL}/api/preferences/me`, {
       ...options,
       credentials: 'include',
+      cache: 'no-store',
+      headers: {
+        ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+        ...options.headers,
+      },
     })
   } catch (error) {
-    if (error.name === 'AbortError') throw error
+    if (error.name === 'AbortError') {
+      throw error
+    }
 
     throw new Error(
       'Cannot connect to EatWise. Check that the backend is running.'
     )
   }
 
-  const data = await response.json().catch(() => null)
+  let data
 
-  if (!response.ok) {
+  try {
+    data = await response.json()
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw error
+    }
+
+    throw new Error('The server returned an unexpected response.')
+  }
+
+  if (!response.ok || data.success === false) {
     throw new Error(
-      data?.message || 'Unable to process your preferences'
+      data.message || 'Unable to process your food preferences.'
     )
   }
 
-  if (!data) {
-    throw new Error('Unexpected server response. Please try again.')
+  if (!Object.hasOwn(data, 'preferences')) {
+    throw new Error('The server returned incomplete preference data.')
   }
 
   return data
 }
 
-export default function PreferencesForm() {
-  const [form, setForm] = useState({ ...emptyForm })
+export default function PreferencesForm({ onSaved }) {
+  const [form, setForm] = useState({ ...emptyPreferences })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [loadFailed, setLoadFailed] = useState(false)
@@ -89,7 +127,7 @@ export default function PreferencesForm() {
           setForm(
             data.preferences
               ? toForm(data.preferences)
-              : { ...emptyForm }
+              : { ...emptyPreferences }
           )
         }
       } catch (error) {
@@ -123,60 +161,88 @@ export default function PreferencesForm() {
 
   async function handleSave(event) {
     event.preventDefault()
+
     if (saving) return
 
+    setSaving(true)
     setError('')
     setNotice('')
 
-    const allergies = toFoodList(form.allergies)
-    const avoidedFoods = toFoodList(form.avoidedFoods)
-
-    if (
-      [allergies, avoidedFoods].some(
-        (list) =>
-          list.length > 30 ||
-          list.some((item) => item.length > 80)
-      )
-    ) {
-      setError(
-        'Use up to 30 items per list, with no more than 80 characters per item.'
-      )
-      return
-    }
-
-    setSaving(true)
-
     try {
+      const validDiets = [
+        'omnivore',
+        'vegetarian',
+        'vegan',
+        'pescatarian',
+      ]
+
+      if (!validDiets.includes(form.dietType)) {
+        throw new Error('Select a valid diet type.')
+      }
+
+      const mealsPerDay = Number(form.mealsPerDay)
+
+      if (
+        !Number.isInteger(mealsPerDay) ||
+        mealsPerDay < 2 ||
+        mealsPerDay > 6
+      ) {
+        throw new Error('Select between 2 and 6 meals per day.')
+      }
+
+      const dailyBudgetLkr =
+        form.dailyBudgetLkr.trim() === ''
+          ? null
+          : Number(form.dailyBudgetLkr)
+
+      if (
+        dailyBudgetLkr !== null &&
+        (
+          !Number.isFinite(dailyBudgetLkr) ||
+          dailyBudgetLkr < 1 ||
+          dailyBudgetLkr > 100000
+        )
+      ) {
+        throw new Error(
+          'Enter a daily budget between LKR 1 and 100,000, or leave it empty.'
+        )
+      }
+
+      const payload = {
+        dietType: form.dietType,
+        allergies: parseList(form.allergies, 'Allergies'),
+        avoidedFoods: parseList(form.avoidedFoods, 'Avoided foods'),
+        dailyBudgetLkr,
+        mealsPerDay,
+      }
+
       const data = await preferencesRequest({
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          dietType: form.dietType,
-          allergies,
-          avoidedFoods,
-          dailyBudgetLkr:
-            form.dailyBudgetLkr === ''
-              ? null
-              : Number(form.dailyBudgetLkr),
-          mealsPerDay: Number(form.mealsPerDay),
-        }),
+        body: JSON.stringify(payload),
       })
+
+      if (!data.preferences) {
+        throw new Error(
+          'The server did not return your saved preferences.'
+        )
+      }
 
       setForm(toForm(data.preferences))
       setNotice('Your food preferences have been saved.')
     } catch (error) {
       setError(error.message)
+      return
     } finally {
       setSaving(false)
     }
+
+    onSaved?.()
   }
 
   if (loading) {
     return (
       <div className="profile-section">
-        <p role="status">Loading food preferences…</p>
+        <p role="status">Loading your food preferences…</p>
       </div>
     )
   }
@@ -204,20 +270,21 @@ export default function PreferencesForm() {
       className="profile-section"
       aria-labelledby="preferences-heading"
     >
-      <h3 id="preferences-heading">Your food preferences</h3>
+      <h3 id="preferences-heading">Food preferences</h3>
 
       <p className="profile-description">
-        Tell us what you enjoy, what to avoid, and what fits your day.
+        Choose your diet and save your food preferences.
+        You can update these details anytime.
       </p>
 
-      <form onSubmit={handleSave}>
+      <form onSubmit={handleSave} aria-busy={saving}>
         <fieldset className="profile-fields" disabled={saving}>
           <legend className="profile-legend">
-            Diet, food exclusions, and budget
+            Diet and meal preferences
           </legend>
 
           <div className="account-field">
-            <label htmlFor="preferences-diet">Diet preference</label>
+            <label htmlFor="preferences-diet">Diet type</label>
 
             <select
               id="preferences-diet"
@@ -226,19 +293,11 @@ export default function PreferencesForm() {
               onChange={updateField}
               required
             >
-              <option value="">Select your diet preference</option>
-              <option value="omnivore">
-                Omnivore — plant and animal foods
-              </option>
-              <option value="vegetarian">
-                Vegetarian — no meat or fish
-              </option>
-              <option value="vegan">
-                Vegan — plant foods only
-              </option>
-              <option value="pescatarian">
-                Pescatarian — fish, but no other meat
-              </option>
+              <option value="">Select your diet type</option>
+              <option value="omnivore">Omnivore</option>
+              <option value="vegetarian">Vegetarian</option>
+              <option value="vegan">Vegan</option>
+              <option value="pescatarian">Pescatarian</option>
             </select>
           </div>
 
@@ -251,36 +310,36 @@ export default function PreferencesForm() {
               id="preferences-allergies"
               name="allergies"
               type="text"
-              placeholder="For example: peanuts, milk, eggs"
               value={form.allergies}
               onChange={updateField}
-              maxLength={2500}
-              aria-describedby="allergies-hint"
+              placeholder="For example: egg, milk, peanuts"
+              aria-describedby="preferences-allergies-hint"
             />
 
-            <small id="allergies-hint">
-              Separate each allergy with a comma. Leave blank if none.
+            <small id="preferences-allergies-hint">
+              Separate items with commas. Leave empty if you have
+              none. Allergy filtering is not available yet.
             </small>
           </div>
 
           <div className="account-field">
             <label htmlFor="preferences-avoided">
-              Other foods to avoid
+              Foods you prefer to avoid
             </label>
 
             <input
               id="preferences-avoided"
               name="avoidedFoods"
               type="text"
-              placeholder="For example: mushrooms, beef"
               value={form.avoidedFoods}
               onChange={updateField}
-              maxLength={2500}
-              aria-describedby="avoided-hint"
+              placeholder="For example: mushrooms, broccoli"
+              aria-describedby="preferences-avoided-hint"
             />
 
-            <small id="avoided-hint">
-              Add dislikes or other food restrictions, separated by commas.
+            <small id="preferences-avoided-hint">
+              Separate items with commas. These preferences are
+              saved, but avoided-food filtering is not available yet.
             </small>
           </div>
 
@@ -296,14 +355,15 @@ export default function PreferencesForm() {
               min="1"
               max="100000"
               step="0.01"
-              placeholder="For example: 1500"
               value={form.dailyBudgetLkr}
               onChange={updateField}
-              aria-describedby="budget-hint"
+              placeholder="Optional"
+              aria-describedby="preferences-budget-hint"
             />
 
-            <small id="budget-hint">
-              Optional. Leave blank if you have no set budget.
+            <small id="preferences-budget-hint">
+              Leave empty if you do not want to set a budget.
+              Budget matching is not available yet.
             </small>
           </div>
 
@@ -328,7 +388,7 @@ export default function PreferencesForm() {
           </div>
 
           <button className="profile-save" type="submit">
-            {saving ? 'Saving…' : 'Save food preferences'}
+            {saving ? 'Saving…' : 'Save preferences'}
           </button>
         </fieldset>
 

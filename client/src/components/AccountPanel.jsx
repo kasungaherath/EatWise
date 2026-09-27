@@ -24,7 +24,9 @@ async function authRequest(path, options = {}) {
       credentials: 'include',
       cache: 'no-store',
       headers: {
-        ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+        ...(options.body
+          ? { 'Content-Type': 'application/json' }
+          : {}),
         ...options.headers,
       },
     })
@@ -54,9 +56,9 @@ async function authRequest(path, options = {}) {
     throw responseError
   }
 
-  if (!response.ok || data.success === false) {
+  if (!response.ok || data?.success === false) {
     const error = new Error(
-      data.message || 'Unable to complete your request.'
+      data?.message || 'Unable to complete your request.'
     )
     error.status = response.status
     throw error
@@ -66,8 +68,10 @@ async function authRequest(path, options = {}) {
 }
 
 function requireUser(data) {
-  if (!data.user || data.user.id == null) {
-    throw new Error('The server returned incomplete account information.')
+  if (!data?.user || data.user.id == null) {
+    throw new Error(
+      'The server returned incomplete account information.'
+    )
   }
 
   return data.user
@@ -82,6 +86,7 @@ export default function AccountPanel() {
   const [notice, setNotice] = useState('')
   const [form, setForm] = useState({ ...emptyForm })
   const [profileRevision, setProfileRevision] = useState(0)
+  const [preferencesRevision, setPreferencesRevision] = useState(0)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -158,14 +163,20 @@ export default function AccountPanel() {
         const name = form.name.trim()
 
         if (name.length < 2) {
-          throw new Error('Enter a name with at least 2 characters.')
+          throw new Error(
+            'Enter a name with at least 2 characters.'
+          )
         }
 
         if (form.password.length < 12) {
-          throw new Error('Use a password with at least 12 characters.')
+          throw new Error(
+            'Use a password with at least 12 characters.'
+          )
         }
 
-        if (new TextEncoder().encode(form.password).length > 72) {
+        if (
+          new TextEncoder().encode(form.password).length > 72
+        ) {
           throw new Error(
             'Your password is too long. Use fewer characters.'
           )
@@ -186,7 +197,9 @@ export default function AccountPanel() {
           email,
           password: '',
         })
-        setNotice('Your account has been created. Please log in.')
+        setNotice(
+          'Your account has been created. Please log in.'
+        )
       } else {
         const data = await authRequest('/login', {
           method: 'POST',
@@ -199,6 +212,7 @@ export default function AccountPanel() {
         setUser(requireUser(data))
         setForm({ ...emptyForm })
         setProfileRevision(0)
+        setPreferencesRevision(0)
       }
     } catch (error) {
       setError(error.message)
@@ -223,6 +237,7 @@ export default function AccountPanel() {
       setMode('login')
       setForm({ ...emptyForm })
       setProfileRevision(0)
+      setPreferencesRevision(0)
       setNotice('You have been logged out.')
     } catch (error) {
       setError(error.message)
@@ -240,7 +255,9 @@ export default function AccountPanel() {
       aria-labelledby="account-heading"
     >
       <div className="account-intro">
-        <span className="account-badge">YOUR EATWISE ACCOUNT</span>
+        <span className="account-badge">
+          YOUR EATWISE ACCOUNT
+        </span>
 
         <h2 id="account-heading">
           {user
@@ -249,8 +266,8 @@ export default function AccountPanel() {
         </h2>
 
         <p>
-          Save your profile, set your goals, and tell us which foods
-          work for you.
+          Save your profile, set your goals, and tell us
+          which foods work for you.
         </p>
       </div>
 
@@ -279,10 +296,16 @@ export default function AccountPanel() {
 
             <PreferencesForm
               key={`preferences-${user.id}`}
+              onSaved={() =>
+                setPreferencesRevision(
+                  (current) => current + 1
+                )
+              }
             />
 
             <RecipeList
               key={`recipes-${user.id}`}
+              refreshKey={preferencesRevision}
             />
 
             {error && (
@@ -306,7 +329,9 @@ export default function AccountPanel() {
         ) : (
           <>
             <h3>
-              {isRegister ? 'Create your account' : 'Welcome back'}
+              {isRegister
+                ? 'Create your account'
+                : 'Welcome back'}
             </h3>
 
             <p className="account-description">
@@ -333,10 +358,15 @@ export default function AccountPanel() {
               </p>
             )}
 
-            <form onSubmit={handleSubmit} aria-busy={busy}>
+            <form
+              onSubmit={handleSubmit}
+              aria-busy={busy}
+            >
               {isRegister && (
                 <div className="account-field">
-                  <label htmlFor="account-name">Full name</label>
+                  <label htmlFor="account-name">
+                    Full name
+                  </label>
 
                   <input
                     id="account-name"
@@ -354,7 +384,9 @@ export default function AccountPanel() {
               )}
 
               <div className="account-field">
-                <label htmlFor="account-email">Email address</label>
+                <label htmlFor="account-email">
+                  Email address
+                </label>
 
                 <input
                   id="account-email"
@@ -370,20 +402,26 @@ export default function AccountPanel() {
               </div>
 
               <div className="account-field">
-                <label htmlFor="account-password">Password</label>
+                <label htmlFor="account-password">
+                  Password
+                </label>
 
                 <input
                   id="account-password"
                   name="password"
                   type="password"
                   autoComplete={
-                    isRegister ? 'new-password' : 'current-password'
+                    isRegister
+                      ? 'new-password'
+                      : 'current-password'
                   }
                   value={form.password}
                   onChange={updateField}
                   minLength={isRegister ? 12 : undefined}
                   aria-describedby={
-                    isRegister ? 'account-password-hint' : undefined
+                    isRegister
+                      ? 'account-password-hint'
+                      : undefined
                   }
                   disabled={busy}
                   required
