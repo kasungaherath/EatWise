@@ -25,7 +25,8 @@ function validNumber(value, min, max) {
 
 function formatProfile(row) {
   return {
-    age: row.age,
+    age: Number(row.age),
+    sexForCalculation: row.sex_for_calculation ?? null,
     heightCm: Number(row.height_cm),
     weightKg: Number(row.weight_kg),
     activityLevel: row.activity_level,
@@ -33,20 +34,32 @@ function formatProfile(row) {
   }
 }
 
+async function readProfile(userId) {
+  const [rows] = await pool.execute(
+    `SELECT age, sex_for_calculation, height_cm, weight_kg,
+            activity_level, goal
+     FROM user_profiles
+     WHERE user_id = ?`,
+    [userId]
+  )
+
+  return rows.length ? formatProfile(rows[0]) : null
+}
+
 export async function getProfile(req, res, next) {
   res.set('Cache-Control', 'no-store')
 
   try {
-    const [rows] = await pool.execute(
-      `SELECT age, height_cm, weight_kg, activity_level, goal
-       FROM user_profiles
-       WHERE user_id = ?`,
-      [req.session.userId]
+    const profile = await readProfile(req.session.userId)
+
+    console.log(
+      '[Profile GET] sexForCalculation:',
+      profile?.sexForCalculation
     )
 
     return res.json({
       success: true,
-      profile: rows.length ? formatProfile(rows[0]) : null,
+      profile,
     })
   } catch (error) {
     next(error)
@@ -54,13 +67,35 @@ export async function getProfile(req, res, next) {
 }
 
 export async function saveProfile(req, res, next) {
+  res.set('Cache-Control', 'no-store')
+
   const {
     age,
+    sexForCalculation,
     heightCm,
     weightKg,
     activityLevel,
     goal,
   } = req.body || {}
+
+  if (sexForCalculation === undefined) {
+    return res.status(400).json({
+      success: false,
+      message:
+        'The form did not send sexForCalculation. Save the updated ProfileForm.jsx and reload the website.',
+    })
+  }
+
+  if (
+    sexForCalculation !== null &&
+    sexForCalculation !== 'male' &&
+    sexForCalculation !== 'female'
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: 'Select Male, Female, or Prefer not to specify',
+    })
+  }
 
   if (!Number.isInteger(age) || age < 18 || age > 120) {
     return res.status(400).json({
@@ -97,29 +132,24 @@ export async function saveProfile(req, res, next) {
     })
   }
 
-  const profile = {
+  const values = [
     age,
-    heightCm: Number(heightCm.toFixed(2)),
-    weightKg: Number(weightKg.toFixed(2)),
+    sexForCalculation,
+    Number(heightCm.toFixed(2)),
+    Number(weightKg.toFixed(2)),
     activityLevel,
     goal,
-  }
-
-  const values = [
-    profile.age,
-    profile.heightCm,
-    profile.weightKg,
-    profile.activityLevel,
-    profile.goal,
   ]
 
   try {
     await pool.execute(
       `INSERT INTO user_profiles
-        (user_id, age, height_cm, weight_kg, activity_level, goal)
-       VALUES (?, ?, ?, ?, ?, ?)
+        (user_id, age, sex_for_calculation, height_cm,
+         weight_kg, activity_level, goal)
+       VALUES (?, ?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
          age = ?,
+         sex_for_calculation = ?,
          height_cm = ?,
          weight_kg = ?,
          activity_level = ?,
@@ -127,12 +157,28 @@ export async function saveProfile(req, res, next) {
       [req.session.userId, ...values, ...values]
     )
 
-    res.set('Cache-Control', 'no-store')
+    const savedProfile = await readProfile(req.session.userId)
+
+    console.log('[Profile SAVE]', {
+      received: sexForCalculation,
+      stored: savedProfile?.sexForCalculation,
+    })
+
+    if (
+      !savedProfile ||
+      savedProfile.sexForCalculation !== sexForCalculation
+    ) {
+      return res.status(500).json({
+        success: false,
+        message:
+          'The database returned a different sex selection after saving. Check the backend terminal.',
+      })
+    }
 
     return res.json({
       success: true,
       message: 'Profile saved successfully',
-      profile,
+      profile: savedProfile,
     })
   } catch (error) {
     next(error)

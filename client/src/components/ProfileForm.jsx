@@ -7,14 +7,69 @@ const API_URL = (
 
 const emptyProfile = {
   age: '',
+  sexForCalculation: '',
   heightCm: '',
   weightKg: '',
   activityLevel: '',
   goal: '',
 }
 
-export default function ProfileForm() {
-  const [form, setForm] = useState(emptyProfile)
+function toForm(profile) {
+  return {
+    age: profile.age ?? '',
+    sexForCalculation: profile.sexForCalculation ?? '',
+    heightCm: profile.heightCm ?? '',
+    weightKg: profile.weightKg ?? '',
+    activityLevel: profile.activityLevel ?? '',
+    goal: profile.goal ?? '',
+  }
+}
+
+async function profileRequest(options = {}) {
+  let response
+
+  try {
+    response = await fetch(`${API_URL}/api/profile/me`, {
+      ...options,
+      credentials: 'include',
+      cache: 'no-store',
+    })
+  } catch (error) {
+    if (error.name === 'AbortError') throw error
+
+    throw new Error(
+      'Cannot connect to EatWise. Check that the backend is running.'
+    )
+  }
+
+  const data = await response.json().catch(() => null)
+
+  if (!response.ok) {
+    throw new Error(
+      data?.message || 'Unable to process your profile'
+    )
+  }
+
+  if (!data || !Object.hasOwn(data, 'profile')) {
+    throw new Error('Unexpected profile response from the backend.')
+  }
+
+  if (
+    data.profile &&
+    ![null, 'male', 'female'].includes(
+      data.profile.sexForCalculation
+    )
+  ) {
+    throw new Error(
+      'The backend returned a missing or invalid sex field. Restart the backend with the updated profileController.js.'
+    )
+  }
+
+  return data
+}
+
+export default function ProfileForm({ onSaved }) {
+  const [form, setForm] = useState({ ...emptyProfile })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [loadFailed, setLoadFailed] = useState(false)
@@ -29,30 +84,24 @@ export default function ProfileForm() {
       setLoading(true)
       setLoadFailed(false)
       setError('')
+      setNotice('')
 
       try {
-        const response = await fetch(`${API_URL}/api/profile/me`, {
-          credentials: 'include',
+        const data = await profileRequest({
           signal: controller.signal,
         })
 
-        const data = await response.json()
-
-        if (!response.ok) {
-          throw new Error(data.message || 'Unable to load your profile')
-        }
-
         if (!controller.signal.aborted) {
-          setForm(data.profile || { ...emptyProfile })
+          setForm(
+            data.profile
+              ? toForm(data.profile)
+              : { ...emptyProfile }
+          )
         }
       } catch (error) {
         if (!controller.signal.aborted) {
           setLoadFailed(true)
-          setError(
-            error instanceof TypeError
-              ? 'Cannot connect to EatWise. Check your connection and try again.'
-              : error.message
-          )
+          setError(error.message)
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -74,8 +123,8 @@ export default function ProfileForm() {
       [name]: value,
     }))
 
-    setNotice('')
     setError('')
+    setNotice('')
   }
 
   async function handleSave(event) {
@@ -86,34 +135,55 @@ export default function ProfileForm() {
     setError('')
     setNotice('')
 
+    const payload = {
+      age: Number(form.age),
+      sexForCalculation: form.sexForCalculation || null,
+      heightCm: Number(form.heightCm),
+      weightKg: Number(form.weightKg),
+      activityLevel: form.activityLevel,
+      goal: form.goal,
+    }
+
+    let saveAccepted = false
+
     try {
-      const response = await fetch(`${API_URL}/api/profile/me`, {
+      const saved = await profileRequest({
         method: 'PUT',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          age: Number(form.age),
-          heightCm: Number(form.heightCm),
-          weightKg: Number(form.weightKg),
-          activityLevel: form.activityLevel,
-          goal: form.goal,
-        }),
+        body: JSON.stringify(payload),
       })
 
-      const data = await response.json()
+      saveAccepted = true
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Unable to save your profile')
+      if (
+        !saved.profile ||
+        saved.profile.sexForCalculation !== payload.sexForCalculation
+      ) {
+        throw new Error(
+          'The save response contains a different sex selection.'
+        )
       }
 
-      setForm(data.profile)
-      setNotice('Your profile has been saved.')
+      const loaded = await profileRequest()
+
+      if (
+        !loaded.profile ||
+        loaded.profile.sexForCalculation !== payload.sexForCalculation
+      ) {
+        throw new Error(
+          'Reloading the profile returned a different sex selection. Check the backend terminal.'
+        )
+      }
+
+      setForm(toForm(loaded.profile))
+      setNotice('Your profile has been saved and verified.')
+      onSaved?.()
     } catch (error) {
       setError(
-        error instanceof TypeError
-          ? 'Cannot connect to EatWise. Please try again.'
+        saveAccepted
+          ? `The save request succeeded, but verification failed: ${error.message}`
           : error.message
       )
     } finally {
@@ -148,12 +218,15 @@ export default function ProfileForm() {
   }
 
   return (
-    <section className="profile-section" aria-labelledby="profile-heading">
+    <section
+      className="profile-section"
+      aria-labelledby="profile-heading"
+    >
       <h3 id="profile-heading">Your personal profile</h3>
 
       <p className="profile-description">
         Tell us about yourself and what you want to achieve.
-        You can update these details anytime.
+        Click Save profile after making changes.
       </p>
 
       <form onSubmit={handleSave}>
@@ -165,6 +238,7 @@ export default function ProfileForm() {
           <div className="profile-grid">
             <div className="account-field">
               <label htmlFor="profile-age">Age</label>
+
               <input
                 id="profile-age"
                 name="age"
@@ -180,6 +254,7 @@ export default function ProfileForm() {
 
             <div className="account-field">
               <label htmlFor="profile-height">Height (cm)</label>
+
               <input
                 id="profile-height"
                 name="heightCm"
@@ -195,6 +270,7 @@ export default function ProfileForm() {
 
             <div className="account-field">
               <label htmlFor="profile-weight">Weight (kg)</label>
+
               <input
                 id="profile-weight"
                 name="weightKg"
@@ -210,7 +286,32 @@ export default function ProfileForm() {
           </div>
 
           <div className="account-field">
+            <label htmlFor="profile-sex">
+              Sex used for calorie estimation
+            </label>
+
+            <select
+              id="profile-sex"
+              name="sexForCalculation"
+              value={form.sexForCalculation}
+              onChange={updateField}
+              aria-describedby="profile-sex-hint"
+            >
+              <option value="">Prefer not to specify</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+
+            <small id="profile-sex-hint">
+              The estimation formula uses this parameter.
+              Leave it unset if you prefer not to specify.
+              Automatic calorie estimates will then be unavailable.
+            </small>
+          </div>
+
+          <div className="account-field">
             <label htmlFor="profile-activity">Activity level</label>
+
             <select
               id="profile-activity"
               name="activityLevel"
@@ -239,6 +340,7 @@ export default function ProfileForm() {
 
           <div className="account-field">
             <label htmlFor="profile-goal">Your main goal</label>
+
             <select
               id="profile-goal"
               name="goal"

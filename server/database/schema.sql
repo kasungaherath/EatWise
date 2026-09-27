@@ -20,6 +20,7 @@ USE eatwise;
 CREATE TABLE IF NOT EXISTS user_profiles (
   user_id INT UNSIGNED PRIMARY KEY,
   age TINYINT UNSIGNED NOT NULL,
+  sex_for_calculation ENUM('male', 'female') NULL,
   height_cm DECIMAL(5,2) NOT NULL,
   weight_kg DECIMAL(5,2) NOT NULL,
   activity_level ENUM(

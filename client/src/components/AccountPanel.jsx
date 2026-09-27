@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import ProfileForm from './ProfileForm.jsx'
 import './AccountPanel.css'
 import PreferencesForm from './PreferencesForm.jsx'
+import NutritionSummary from './NutritionSummary.jsx'
 const API_URL = (
   import.meta.env.VITE_API_URL || 'http://localhost:5000'
 ).replace(/\/$/, '')
@@ -49,6 +50,7 @@ export default function AccountPanel() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [profileRevision, setProfileRevision] = useState(0)
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -203,8 +205,17 @@ export default function AccountPanel() {
 
             <p className="account-email">{user.email}</p>
 
-            <ProfileForm key={user.id} />
-            <PreferencesForm key={user.id} />
+    <ProfileForm
+  key={`profile-${user.id}`}
+  onSaved={() => setProfileRevision((current) => current + 1)}
+/>
+
+<NutritionSummary
+  key={`nutrition-${user.id}`}
+  refreshKey={profileRevision}
+/>
+
+<PreferencesForm key={`preferences-${user.id}`} />
 
             {error && (
               <p
