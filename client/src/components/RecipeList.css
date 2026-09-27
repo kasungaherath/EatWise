@@ -1,0 +1,147 @@
+.recipe-section {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid #dce6dc;
+}
+
+.recipe-section h3 {
+  margin: 0;
+  color: #173e30;
+  font-size: 1.2rem;
+}
+
+.recipe-intro,
+.recipe-description,
+.recipe-yield {
+  color: #617168;
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+.recipe-card {
+  margin-top: 18px;
+  padding: 20px;
+  border: 1px solid #dce6dc;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.recipe-type {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #edf4ee;
+  color: #365b44;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.recipe-card h4 {
+  margin: 14px 0 8px;
+  color: #173e30;
+  font-size: 1.1rem;
+}
+
+.recipe-description {
+  margin: 0;
+}
+
+.recipe-calories {
+  margin: 18px 0;
+  color: #617168;
+  font-size: 0.85rem;
+}
+
+.recipe-calories strong {
+  color: #204c39;
+  font-size: 1.8rem;
+}
+
+.recipe-macros {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.recipe-macros div {
+  padding: 12px;
+  border-radius: 10px;
+  background: #f3f7f2;
+}
+
+.recipe-macros dt {
+  color: #617168;
+  font-size: 0.75rem;
+}
+
+.recipe-macros dd {
+  margin: 6px 0 0;
+  color: #204c39;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.recipe-details {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e5ece3;
+}
+
+.recipe-details summary {
+  color: #204c39;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.recipe-details h5 {
+  margin: 18px 0 10px;
+  color: #173e30;
+  font-size: 0.9rem;
+}
+
+.recipe-details ul,
+.recipe-details ol {
+  padding-left: 20px;
+  color: #52675a;
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+
+.recipe-details li {
+  margin-bottom: 10px;
+  overflow-wrap: anywhere;
+}
+
+.recipe-details small {
+  display: block;
+  color: #65746b;
+}
+
+.recipe-retry {
+  padding: 10px 16px;
+  border: 1px solid #b8cdbd;
+  border-radius: 10px;
+  background: #fff;
+  color: #204c39;
+  font: inherit;
+  cursor: pointer;
+}
+
+.recipe-retry:hover {
+  background: #edf4ee;
+}
+
+.recipe-retry:focus-visible,
+.recipe-details summary:focus-visible {
+  outline: 3px solid #7fa98b;
+  outline-offset: 4px;
+}
+
+@media (max-width: 400px) {
+  .recipe-macros {
+    grid-template-columns: 1fr;
+  }
+}

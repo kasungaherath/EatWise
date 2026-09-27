@@ -1,11 +1,19 @@
 import { useEffect, useState } from 'react'
 import ProfileForm from './ProfileForm.jsx'
-import './AccountPanel.css'
 import PreferencesForm from './PreferencesForm.jsx'
 import NutritionSummary from './NutritionSummary.jsx'
+import RecipeList from './RecipeList.jsx'
+import './AccountPanel.css'
+
 const API_URL = (
   import.meta.env.VITE_API_URL || 'http://localhost:5000'
 ).replace(/\/$/, '')
+
+const emptyForm = {
+  name: '',
+  email: '',
+  password: '',
+}
 
 async function authRequest(path, options = {}) {
   let response
@@ -14,33 +22,55 @@ async function authRequest(path, options = {}) {
     response = await fetch(`${API_URL}/api/auth${path}`, {
       ...options,
       credentials: 'include',
+      cache: 'no-store',
       headers: {
-        'Content-Type': 'application/json',
+        ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+        ...options.headers,
       },
     })
   } catch (error) {
-    if (error.name === 'AbortError') throw error
+    if (error.name === 'AbortError') {
+      throw error
+    }
 
     throw new Error(
       'Cannot connect to EatWise. Check that the backend is running.'
     )
   }
 
-  const data = await response.json().catch(() => null)
+  let data
 
-  if (!response.ok) {
+  try {
+    data = await response.json()
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw error
+    }
+
+    const responseError = new Error(
+      'The server returned an unexpected response.'
+    )
+    responseError.status = response.status
+    throw responseError
+  }
+
+  if (!response.ok || data.success === false) {
     const error = new Error(
-      data?.message || 'Request failed. Please try again.'
+      data.message || 'Unable to complete your request.'
     )
     error.status = response.status
     throw error
   }
 
-  if (!data) {
-    throw new Error('Unexpected server response. Please try again.')
+  return data
+}
+
+function requireUser(data) {
+  if (!data.user || data.user.id == null) {
+    throw new Error('The server returned incomplete account information.')
   }
 
-  return data
+  return data.user
 }
 
 export default function AccountPanel() {
@@ -50,12 +80,8 @@ export default function AccountPanel() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [form, setForm] = useState({ ...emptyForm })
   const [profileRevision, setProfileRevision] = useState(0)
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    password: '',
-  })
 
   useEffect(() => {
     const controller = new AbortController()
@@ -67,10 +93,13 @@ export default function AccountPanel() {
         })
 
         if (!controller.signal.aborted) {
-          setUser(data.user)
+          setUser(requireUser(data))
         }
       } catch (error) {
-        if (!controller.signal.aborted && error.status !== 401) {
+        if (
+          !controller.signal.aborted &&
+          error.status !== 401
+        ) {
           setError(error.message)
         }
       } finally {
@@ -92,22 +121,30 @@ export default function AccountPanel() {
       ...current,
       [name]: value,
     }))
+
+    setError('')
+    setNotice('')
   }
 
   function switchMode() {
-    setMode((current) => (
+    if (busy) return
+
+    setMode((current) =>
       current === 'login' ? 'register' : 'login'
-    ))
-    setError('')
-    setNotice('')
+    )
+
     setForm((current) => ({
       ...current,
       password: '',
     }))
+
+    setError('')
+    setNotice('')
   }
 
   async function handleSubmit(event) {
     event.preventDefault()
+
     if (busy) return
 
     setBusy(true)
@@ -115,32 +152,53 @@ export default function AccountPanel() {
     setNotice('')
 
     try {
-      const payload = mode === 'register'
-        ? {
-            name: form.name.trim(),
-            email: form.email.trim(),
-            password: form.password,
-          }
-        : {
-            email: form.email.trim(),
-            password: form.password,
-          }
-
-      const data = await authRequest(`/${mode}`, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      })
-
-      setForm((current) => ({
-        ...current,
-        password: '',
-      }))
+      const email = form.email.trim()
 
       if (mode === 'register') {
+        const name = form.name.trim()
+
+        if (name.length < 2) {
+          throw new Error('Enter a name with at least 2 characters.')
+        }
+
+        if (form.password.length < 12) {
+          throw new Error('Use a password with at least 12 characters.')
+        }
+
+        if (new TextEncoder().encode(form.password).length > 72) {
+          throw new Error(
+            'Your password is too long. Use fewer characters.'
+          )
+        }
+
+        await authRequest('/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            name,
+            email,
+            password: form.password,
+          }),
+        })
+
         setMode('login')
-        setNotice('Account created. Log in with your new password.')
+        setForm({
+          name: '',
+          email,
+          password: '',
+        })
+        setNotice('Your account has been created. Please log in.')
       } else {
-        setUser(data.user)
+        const data = await authRequest('/login', {
+          method: 'POST',
+          body: JSON.stringify({
+            email,
+            password: form.password,
+          }),
+        })
+
+        setUser(requireUser(data))
+        setForm({ ...emptyForm })
+        setProfileRevision(0)
       }
     } catch (error) {
       setError(error.message)
@@ -163,11 +221,8 @@ export default function AccountPanel() {
 
       setUser(null)
       setMode('login')
-      setForm({
-        name: '',
-        email: '',
-        password: '',
-      })
+      setForm({ ...emptyForm })
+      setProfileRevision(0)
       setNotice('You have been logged out.')
     } catch (error) {
       setError(error.message)
@@ -176,21 +231,26 @@ export default function AccountPanel() {
     }
   }
 
-  return (
-    <section className="account-section" id="account">
-      <div className="account-intro">
-        <span className="eyebrow">YOUR EATWISE ACCOUNT</span>
+  const isRegister = mode === 'register'
 
-        <h2>
+  return (
+    <section
+      id="account"
+      className="account-section"
+      aria-labelledby="account-heading"
+    >
+      <div className="account-intro">
+        <span className="account-badge">YOUR EATWISE ACCOUNT</span>
+
+        <h2 id="account-heading">
           {user
-            ? 'Your goals. Your starting point.'
-            : 'Your next chapter starts here.'}
+            ? 'Your next step towards eating well.'
+            : 'Make healthy eating personal.'}
         </h2>
 
         <p>
-          {user
-            ? 'Keep your profile up to date so your meal plans can reflect your needs and goals.'
-            : 'Create your account to get started with EatWise. Already registered? Welcome back.'}
+          Save your profile, set your goals, and tell us which foods
+          work for you.
         </p>
       </div>
 
@@ -205,17 +265,25 @@ export default function AccountPanel() {
 
             <p className="account-email">{user.email}</p>
 
-    <ProfileForm
-  key={`profile-${user.id}`}
-  onSaved={() => setProfileRevision((current) => current + 1)}
-/>
+            <ProfileForm
+              key={`profile-${user.id}`}
+              onSaved={() =>
+                setProfileRevision((current) => current + 1)
+              }
+            />
 
-<NutritionSummary
-  key={`nutrition-${user.id}`}
-  refreshKey={profileRevision}
-/>
+            <NutritionSummary
+              key={`nutrition-${user.id}`}
+              refreshKey={profileRevision}
+            />
 
-<PreferencesForm key={`preferences-${user.id}`} />
+            <PreferencesForm
+              key={`preferences-${user.id}`}
+            />
+
+            <RecipeList
+              key={`recipes-${user.id}`}
+            />
 
             {error && (
               <p
@@ -238,15 +306,13 @@ export default function AccountPanel() {
         ) : (
           <>
             <h3>
-              {mode === 'login'
-                ? 'Welcome back'
-                : 'Create your account'}
+              {isRegister ? 'Create your account' : 'Welcome back'}
             </h3>
 
             <p className="account-description">
-              {mode === 'login'
-                ? 'Log in to your EatWise account.'
-                : 'Start with a few simple details.'}
+              {isRegister
+                ? 'Get started with your EatWise profile.'
+                : 'Log in to your EatWise account.'}
             </p>
 
             {error && (
@@ -267,108 +333,96 @@ export default function AccountPanel() {
               </p>
             )}
 
-            <form onSubmit={handleSubmit}>
-              <fieldset
-                className="account-fields"
+            <form onSubmit={handleSubmit} aria-busy={busy}>
+              {isRegister && (
+                <div className="account-field">
+                  <label htmlFor="account-name">Full name</label>
+
+                  <input
+                    id="account-name"
+                    name="name"
+                    type="text"
+                    autoComplete="name"
+                    value={form.name}
+                    onChange={updateField}
+                    minLength={2}
+                    maxLength={100}
+                    disabled={busy}
+                    required
+                  />
+                </div>
+              )}
+
+              <div className="account-field">
+                <label htmlFor="account-email">Email address</label>
+
+                <input
+                  id="account-email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  value={form.email}
+                  onChange={updateField}
+                  maxLength={254}
+                  disabled={busy}
+                  required
+                />
+              </div>
+
+              <div className="account-field">
+                <label htmlFor="account-password">Password</label>
+
+                <input
+                  id="account-password"
+                  name="password"
+                  type="password"
+                  autoComplete={
+                    isRegister ? 'new-password' : 'current-password'
+                  }
+                  value={form.password}
+                  onChange={updateField}
+                  minLength={isRegister ? 12 : undefined}
+                  aria-describedby={
+                    isRegister ? 'account-password-hint' : undefined
+                  }
+                  disabled={busy}
+                  required
+                />
+
+                {isRegister && (
+                  <small id="account-password-hint">
+                    Use at least 12 characters.
+                  </small>
+                )}
+              </div>
+
+              <button
+                className="account-submit"
+                type="submit"
                 disabled={busy}
               >
-                {mode === 'register' && (
-                  <div className="account-field">
-                    <label htmlFor="account-name">
-                      Full name
-                    </label>
-
-                    <input
-                      id="account-name"
-                      name="name"
-                      type="text"
-                      autoComplete="name"
-                      value={form.name}
-                      onChange={updateField}
-                      minLength={2}
-                      maxLength={100}
-                      required
-                    />
-                  </div>
-                )}
-
-                <div className="account-field">
-                  <label htmlFor="account-email">
-                    Email address
-                  </label>
-
-                  <input
-                    id="account-email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    value={form.email}
-                    onChange={updateField}
-                    maxLength={254}
-                    required
-                  />
-                </div>
-
-                <div className="account-field">
-                  <label htmlFor="account-password">
-                    Password
-                  </label>
-
-                  <input
-                    id="account-password"
-                    name="password"
-                    type="password"
-                    autoComplete={
-                      mode === 'register'
-                        ? 'new-password'
-                        : 'current-password'
-                    }
-                    value={form.password}
-                    onChange={updateField}
-                    minLength={
-                      mode === 'register' ? 12 : undefined
-                    }
-                    aria-describedby={
-                      mode === 'register'
-                        ? 'password-hint'
-                        : undefined
-                    }
-                    required
-                  />
-
-                  {mode === 'register' && (
-                    <small id="password-hint">
-                      Use at least 12 characters.
-                    </small>
-                  )}
-                </div>
-
-                <button
-                  className="account-submit"
-                  type="submit"
-                >
-                  {busy
-                    ? 'Please wait…'
-                    : mode === 'login'
-                      ? 'Log in'
-                      : 'Create account'}
-                </button>
-              </fieldset>
+                {busy
+                  ? isRegister
+                    ? 'Creating account…'
+                    : 'Logging in…'
+                  : isRegister
+                    ? 'Create account'
+                    : 'Log in'}
+              </button>
             </form>
 
             <p className="account-switch">
-              {mode === 'login'
-                ? 'New to EatWise?'
-                : 'Already have an account?'}
+              {isRegister
+                ? 'Already have an account? '
+                : 'New to EatWise? '}
 
               <button
+                className="account-switch-button"
                 type="button"
                 onClick={switchMode}
                 disabled={busy}
               >
-                {mode === 'login'
-                  ? 'Create account'
-                  : 'Log in'}
+                {isRegister ? 'Log in' : 'Create account'}
               </button>
             </p>
           </>
