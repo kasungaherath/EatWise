@@ -5,8 +5,18 @@ const API_URL = (
   import.meta.env.VITE_API_URL || 'http://localhost:5000'
 ).replace(/\/$/, '')
 
+const goalLabels = {
+  lose_weight: 'Lose weight',
+  maintain_weight: 'Maintain weight',
+  gain_muscle: 'Gain muscle',
+}
+
+const numberFormat = new Intl.NumberFormat('en', {
+  maximumFractionDigits: 1,
+})
+
 export default function NutritionSummary({ refreshKey = 0 }) {
-  const [estimate, setEstimate] = useState(null)
+  const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retry, setRetry] = useState(0)
@@ -14,36 +24,50 @@ export default function NutritionSummary({ refreshKey = 0 }) {
   useEffect(() => {
     const controller = new AbortController()
 
-    async function loadEstimate() {
+    async function loadNutrition() {
       setLoading(true)
       setError('')
-      setEstimate(null)
+      setResult(null)
 
       try {
-        const response = await fetch(`${API_URL}/api/nutrition/me`, {
-          credentials: 'include',
-          cache: 'no-store',
-          signal: controller.signal,
-        })
+        const response = await fetch(
+          `${API_URL}/api/nutrition/me`,
+          {
+            credentials: 'include',
+            cache: 'no-store',
+            signal: controller.signal,
+          }
+        )
 
-        const data = await response.json().catch(() => null)
+        const data = await response.json()
 
         if (!response.ok) {
           throw new Error(
-            data?.message || 'Unable to load your energy estimates.'
+            data.message || 'Unable to load your nutrition estimates.'
           )
         }
 
+        const values = [
+          data.estimate?.restingCalories,
+          data.estimate?.maintenanceCalories,
+          data.targets?.targetCalories,
+          data.targets?.macros?.proteinGrams,
+          data.targets?.macros?.carbohydrateGrams,
+          data.targets?.macros?.fatGrams,
+        ]
+
         if (
-          !data?.estimate ||
-          !Number.isFinite(data.estimate.restingCalories) ||
-          !Number.isFinite(data.estimate.maintenanceCalories)
+          values.some(
+            (value) => !Number.isFinite(value) || value <= 0
+          )
         ) {
-          throw new Error('The server returned an invalid estimate.')
+          throw new Error(
+            'The server returned incomplete nutrition estimates.'
+          )
         }
 
         if (!controller.signal.aborted) {
-          setEstimate(data.estimate)
+          setResult(data)
         }
       } catch (error) {
         if (!controller.signal.aborted) {
@@ -60,10 +84,13 @@ export default function NutritionSummary({ refreshKey = 0 }) {
       }
     }
 
-    loadEstimate()
+    loadNutrition()
 
     return () => controller.abort()
   }, [refreshKey, retry])
+
+  const estimate = result?.estimate
+  const targets = result?.targets
 
   return (
     <section
@@ -71,84 +98,127 @@ export default function NutritionSummary({ refreshKey = 0 }) {
       aria-labelledby="nutrition-heading"
       aria-busy={loading}
     >
-      <div className="nutrition-heading">
-        <h3 id="nutrition-heading">Your energy estimates</h3>
-        <span className="nutrition-badge">ESTIMATED</span>
+      <div className="nutrition-heading-row">
+        <h3 id="nutrition-heading">Your nutrition estimates</h3>
+        <span className="nutrition-badge">Estimated</span>
       </div>
 
       <p className="nutrition-description">
-        Based on your last saved profile and activity level.
+        Based on your last saved profile and selected goal.
       </p>
 
-      {loading ? (
-        <p className="nutrition-status" role="status">
-          Calculating your estimates…
+      {loading && <p role="status">Calculating your estimates…</p>}
+
+      {error && (
+        <p className="account-message account-error" role="alert">
+          {error}
         </p>
-      ) : error ? (
+      )}
+
+      {!loading && !error && result && (
         <>
-          <p className="account-message account-error" role="alert">
-            {error}
-          </p>
+          <div className="nutrition-energy-grid">
+            <div className="nutrition-stat">
+              <span className="nutrition-label">
+                Resting energy
+              </span>
+              <strong>
+                {numberFormat.format(estimate.restingCalories)}
+              </strong>
+              <span className="nutrition-unit">kcal/day</span>
+            </div>
 
-          <button
-            className="nutrition-refresh"
-            type="button"
-            onClick={() => setRetry((current) => current + 1)}
-          >
-            Try again
-          </button>
-        </>
-      ) : estimate ? (
-        <>
-          <div className="nutrition-grid">
-            <article className="nutrition-stat">
-              <h4>At rest</h4>
+            <div className="nutrition-stat">
+              <span className="nutrition-label">
+                Estimated maintenance
+              </span>
+              <strong>
+                {numberFormat.format(estimate.maintenanceCalories)}
+              </strong>
+              <span className="nutrition-unit">kcal/day</span>
+            </div>
+          </div>
 
-              <p className="nutrition-value">
-                {estimate.restingCalories.toLocaleString()}
-              </p>
+          <div className="nutrition-target">
+            <div className="nutrition-target-top">
+              <span className="nutrition-label">
+                Goal calorie estimate
+              </span>
+              <span className="nutrition-goal">
+                {goalLabels[targets.goal] || 'Your goal'}
+              </span>
+            </div>
 
-              <span className="nutrition-unit">kcal / day</span>
+            <p className="nutrition-target-value">
+              {numberFormat.format(targets.targetCalories)}
+              <span> kcal/day</span>
+            </p>
 
-              <p className="nutrition-explanation">
-                Estimated energy your body uses at rest.
-              </p>
-            </article>
+            <p className="nutrition-adjustment">
+              {targets.calorieAdjustmentPercent === 0
+                ? 'Matches your estimated maintenance energy.'
+                : `${Math.abs(targets.calorieAdjustmentPercent)}% ${
+                    targets.calorieAdjustmentPercent < 0
+                      ? 'below'
+                      : 'above'
+                  } your estimated maintenance energy.`}
+            </p>
+          </div>
 
-            <article className="nutrition-stat nutrition-stat-accent">
-              <h4>Maintenance</h4>
+          <h4 className="nutrition-macro-heading">
+            Estimated daily macros
+          </h4>
 
-              <p className="nutrition-value">
-                {estimate.maintenanceCalories.toLocaleString()}
-              </p>
+          <div className="nutrition-macro-grid">
+            <div className="nutrition-stat">
+              <span className="nutrition-label">Protein</span>
+              <strong>
+                {numberFormat.format(targets.macros.proteinGrams)}
+                <span className="nutrition-inline-unit"> g</span>
+              </strong>
+            </div>
 
-              <span className="nutrition-unit">kcal / day</span>
+            <div className="nutrition-stat">
+              <span className="nutrition-label">Carbohydrates</span>
+              <strong>
+                {numberFormat.format(
+                  targets.macros.carbohydrateGrams
+                )}
+                <span className="nutrition-inline-unit"> g</span>
+              </strong>
+            </div>
 
-              <p className="nutrition-explanation">
-                Estimated daily energy use including activity.
-              </p>
-            </article>
+            <div className="nutrition-stat">
+              <span className="nutrition-label">Fat</span>
+              <strong>
+                {numberFormat.format(targets.macros.fatGrams)}
+                <span className="nutrition-inline-unit"> g</span>
+              </strong>
+            </div>
           </div>
 
           <p className="nutrition-note">
-            These estimates are not yet adjusted for your weight
-            or muscle-gain goal. Actual needs vary.
+            These estimates use adjustable app defaults and are
+            not individualized nutrition prescriptions. Suitability
+            needs to be checked before generating a meal plan.
           </p>
 
           <p className="nutrition-note">
-            Not designed for pregnancy, breastfeeding, or medical
-            nutrition needs.
+            This feature is not designed for pregnancy,
+            breastfeeding, or medical nutrition needs.
           </p>
-
-          <button
-            className="nutrition-refresh"
-            type="button"
-            onClick={() => setRetry((current) => current + 1)}
-          >
-            Refresh estimates
-          </button>
         </>
-      ) : null}
+      )}
+
+      {!loading && (
+        <button
+          className="nutrition-refresh"
+          type="button"
+          onClick={() => setRetry((current) => current + 1)}
+        >
+          {error ? 'Try again' : 'Refresh estimates'}
+        </button>
+      )}
     </section>
   )
 }

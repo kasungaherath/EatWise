@@ -1,10 +1,10 @@
 .nutrition-section {
   margin-top: 28px;
-  padding-top: 26px;
-  border-top: 1px solid #e1e8dc;
+  padding-top: 28px;
+  border-top: 1px solid #dce6dc;
 }
 
-.nutrition-heading {
+.nutrition-heading-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -12,100 +12,155 @@
   gap: 12px;
 }
 
-.nutrition-heading h3 {
-  font-size: 21px;
+.nutrition-heading-row h3 {
+  margin: 0;
+  color: #173e30;
+  font-size: 1.2rem;
 }
 
 .nutrition-badge {
-  padding: 6px 9px;
-  border-radius: 20px;
-  background: #edf6ec;
-  color: #245e3d;
-  font-size: 9px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #edf4ee;
+  color: #365b44;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.nutrition-description,
-.nutrition-status {
-  margin-top: 12px;
-  color: #68776c;
-  font-size: 14px;
-  line-height: 1.7;
-}
-
-.nutrition-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 22px;
-}
-
-.nutrition-stat {
-  padding: 20px 16px;
-  border: 1px solid #e1e8dc;
-  border-radius: 14px;
-  background: #f6f8f2;
-}
-
-.nutrition-stat-accent {
-  background: #eaf3e7;
-  border-color: #d3e5cd;
-}
-
-.nutrition-stat h4 {
-  margin: 0;
-  color: #365a40;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.nutrition-value {
-  margin-top: 12px;
-  color: #183c30;
-  font-size: clamp(26px, 3vw, 34px);
-  font-weight: 800;
-  letter-spacing: -1px;
-}
-
-.nutrition-unit {
-  display: block;
-  margin-top: 3px;
-  color: #52664f;
-  font-size: 11px;
-}
-
-.nutrition-explanation {
-  margin-top: 14px;
-  color: #52664f;
-  font-size: 12px;
+.nutrition-description {
+  margin: 10px 0 20px;
+  color: #617168;
+  font-size: 0.9rem;
   line-height: 1.6;
 }
 
+.nutrition-energy-grid,
+.nutrition-macro-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.nutrition-energy-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.nutrition-macro-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.nutrition-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #dce6dc;
+  border-radius: 14px;
+  background: #f8faf7;
+}
+
+.nutrition-label {
+  color: #52675a;
+  font-size: 0.8rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.nutrition-stat strong {
+  color: #204c39;
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.nutrition-unit,
+.nutrition-inline-unit {
+  color: #65746b;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.nutrition-target {
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px solid #cbded0;
+  border-radius: 16px;
+  background: #edf5ee;
+}
+
+.nutrition-target-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.nutrition-goal {
+  color: #28563c;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.nutrition-target-value {
+  margin: 14px 0 8px;
+  color: #173e30;
+  font-size: 2.2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.nutrition-target-value span {
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.nutrition-adjustment {
+  margin: 0;
+  color: #52675a;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.nutrition-macro-heading {
+  margin: 22px 0 12px;
+  color: #173e30;
+  font-size: 0.95rem;
+}
+
 .nutrition-note {
-  margin-top: 14px;
-  color: #68776c;
-  font-size: 12px;
+  margin: 16px 0 0;
+  color: #65746b;
+  font-size: 0.8rem;
   line-height: 1.7;
 }
 
 .nutrition-refresh {
   margin-top: 18px;
-  padding: 10px 14px;
-  border: 1px solid #cadbc5;
-  border-radius: 9px;
-  background: white;
-  color: #245e3d;
+  padding: 10px 16px;
+  border: 1px solid #b8cdbd;
+  border-radius: 10px;
+  background: #fff;
+  color: #204c39;
+  font: inherit;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
 }
 
 .nutrition-refresh:hover {
-  background: #edf6ec;
+  background: #edf5ee;
 }
 
-@media (max-width: 420px) {
-  .nutrition-grid {
+.nutrition-refresh:focus-visible {
+  outline: 3px solid #7fa98b;
+  outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .nutrition-energy-grid,
+  .nutrition-macro-grid {
     grid-template-columns: 1fr;
   }
 }
