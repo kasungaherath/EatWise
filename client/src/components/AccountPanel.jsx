@@ -4,7 +4,7 @@ import PreferencesForm from './PreferencesForm.jsx'
 import NutritionSummary from './NutritionSummary.jsx'
 import RecipeList from './RecipeList.jsx'
 import './AccountPanel.css'
-
+import FoodList from './FoodList'
 const API_URL = (
   import.meta.env.VITE_API_URL || 'http://localhost:5000'
 ).replace(/\/$/, '')
@@ -307,6 +307,10 @@ export default function AccountPanel() {
               key={`recipes-${user.id}`}
               refreshKey={preferencesRevision}
             />
+            <FoodList
+              key={`foods-${user.id}`}
+              refreshKey={preferencesRevision}
+/>
 
             {error && (
               <p

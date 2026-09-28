@@ -12,6 +12,7 @@ import preferencesRoutes from './routes/preferencesRoutes.js'
 import nutritionRoutes from './routes/nutritionRoutes.js'
 import recipeRoutes from './routes/recipeRoutes.js'
 import foodRoutes from './routes/foodRoutes.js'
+import foodSuggestionRoutes from './routes/foodSuggestionRoutes.js'
 const app = express()
 const PORT = Number(process.env.PORT) || 5000
 
@@ -33,6 +34,7 @@ app.use('/api/preferences', preferencesRoutes)
 app.use('/api/nutrition', nutritionRoutes)
 app.use('/api/recipes', recipeRoutes)
 app.use('/api/foods', foodRoutes)
+app.use('/api/food-suggestions', foodSuggestionRoutes)
 app.get('/api/health', async (req, res) => {
   try {
     await pool.query('SELECT 1')
