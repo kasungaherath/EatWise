@@ -27,7 +27,7 @@ async function main() {
     },
     body: JSON.stringify({
       query,
-      dataType: ['Foundation', 'SR Legacy'],
+      dataType: ['SR Legacy'],
       pageSize: 10,
     }),
     signal: AbortSignal.timeout(15000),
@@ -54,6 +54,7 @@ async function main() {
   }
 
   console.log(`\nSearch: ${query}`)
+  console.log('Data type: SR Legacy')
   console.log(`Total matches: ${data.totalHits ?? 'Unknown'}\n`)
 
   if (data.foods.length === 0) {

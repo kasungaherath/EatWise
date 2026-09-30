@@ -26,6 +26,11 @@ const aliases = new Map([
   ['tree nut', 'tree_nut'],
   ['tree nuts', 'tree_nut'],
   ['olive oil', 'olive_oil'],
+  ['chickpea', 'chickpea'],
+  ['chickpeas', 'chickpea'],
+  ['garbanzo bean', 'chickpea'],
+  ['garbanzo beans', 'chickpea'],
+  ['bengal gram', 'chickpea'],
 ])
 
 // Explicit classifications for the imported USDA records.
@@ -39,6 +44,7 @@ const foodTags = new Map([
   ['172475', ['tofu', 'soy']],
   ['170567', ['almond', 'tree_nut']],
   ['171413', ['olive_oil']],
+  ['173757', ['chickpea']],
 ])
 
 function normalize(value) {
