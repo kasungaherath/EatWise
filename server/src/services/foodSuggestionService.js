@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai'
 import { calculateFoodPortions } from './foodPortionService.js'
+import { assessNutritionMatch } from './nutritionMatchService.js'
 
 function suggestionError(message, status = 502) {
   const error = new Error(message)
@@ -7,8 +8,115 @@ function suggestionError(message, status = 502) {
   return error
 }
 
-function round(value) {
-  return Math.round(value * 100) / 100
+function matchScore(assessment) {
+  return Object.values(assessment.comparison).reduce(
+    (sum, row) => {
+      const distance =
+        Math.abs(row.actual - row.target) / row.target
+
+      const excess = Math.max(
+        0,
+        distance - row.tolerancePercent / 100
+      )
+
+      return sum + excess ** 2 + 0.001 * distance ** 2
+    },
+    0
+  )
+}
+
+function adjustQuantities(items, targets) {
+  let current = items.map((item) => ({ ...item }))
+  let calculation = calculateFoodPortions(current)
+  let assessment = assessNutritionMatch(
+    calculation.totals,
+    targets
+  )
+
+  let bestScore = matchScore(assessment)
+
+  // Search bounds only: these are not validated serving limits.
+  // Never increase a quantity beyond twice the AI proposal.
+  const maxima = current.map((item) =>
+    Math.min(
+      item.quantity * 2,
+      Math.floor(
+        (10000 * item.portion.amount) /
+          item.portion.gram_weight
+      )
+    )
+  )
+
+  const result = () => ({
+    calculation,
+    ...assessment,
+    adjusted: current.some(
+      (item, index) => item.quantity !== items[index].quantity
+    ),
+  })
+
+  // Coarse adjustments first, then progressively smaller changes.
+  // Counts and gram quantities remain whole numbers.
+  for (const step of [100, 25, 5, 1]) {
+    for (let pass = 0; pass < 80; pass++) {
+      if (
+        assessment.targetMatch.status === 'within_tolerance'
+      ) {
+        return result()
+      }
+
+      let improved = false
+
+      for (let index = 0; index < current.length; index++) {
+        for (const direction of [-1, 1]) {
+          const quantity =
+            current[index].quantity + step * direction
+
+          if (quantity < 1 || quantity > maxima[index]) {
+            continue
+          }
+
+          const candidate = current.map((item, itemIndex) =>
+            itemIndex === index
+              ? { ...item, quantity }
+              : item
+          )
+
+          const nextCalculation =
+            calculateFoodPortions(candidate)
+
+          const nextAssessment = assessNutritionMatch(
+            nextCalculation.totals,
+            targets
+          )
+
+          const nextScore = matchScore(nextAssessment)
+          const matches =
+            nextAssessment.targetMatch.status ===
+            'within_tolerance'
+
+          if (
+            matches ||
+            nextScore < bestScore - 1e-12
+          ) {
+            current = candidate
+            calculation = nextCalculation
+            assessment = nextAssessment
+            bestScore = nextScore
+            improved = true
+
+            if (matches) {
+              return result()
+            }
+          }
+        }
+      }
+
+      if (!improved) break
+    }
+  }
+
+  return result()
 }
 
 export async function generateFoodSuggestion(context) {
@@ -22,14 +130,18 @@ export async function generateFoodSuggestion(context) {
     )
   }
 
-  if (!context?.foods?.length) {
-    throw suggestionError('No eligible foods are available.', 422)
+  if (!Array.isArray(context?.foods) || !context.foods.length) {
+    throw suggestionError(
+      'No eligible foods are available.',
+      422
+    )
   }
 
   const targets = {
     calories: context.targets?.targetCalories,
     proteinGrams: context.targets?.macros?.proteinGrams,
-    carbohydrateGrams: context.targets?.macros?.carbohydrateGrams,
+    carbohydrateGrams:
+      context.targets?.macros?.carbohydrateGrams,
     fatGrams: context.targets?.macros?.fatGrams,
   }
 
@@ -41,14 +153,34 @@ export async function generateFoodSuggestion(context) {
         value <= 0
     )
   ) {
-    throw suggestionError('Nutrition targets are unavailable.', 422)
+    throw suggestionError(
+      'Nutrition targets are unavailable.',
+      422
+    )
   }
 
   const portionsById = new Map()
 
   for (const food of context.foods) {
+    if (!Array.isArray(food.portions)) {
+      throw suggestionError(
+        'The food catalogue contains invalid portion data.',
+        422
+      )
+    }
+
     for (const portion of food.portions) {
-      portionsById.set(portion.portionId, { food, portion })
+      if (portionsById.has(portion.portionId)) {
+        throw suggestionError(
+          'The food catalogue contains duplicate portion IDs.',
+          422
+        )
+      }
+
+      portionsById.set(portion.portionId, {
+        food,
+        portion,
+      })
     }
   }
 
@@ -76,12 +208,15 @@ Alternatively, if you cannot propose a reasonable combination, return:
 
 Rules:
 - Propose totals for ONE DAY, not quantities per meal.
-- Aim close to the supplied calories, protein, carbohydrates, and fat.
+- Aim close to ALL supplied targets: calories, protein, carbohydrates, and fat.
+- Do not focus only on matching calories.
 - Do not invent foods, portion IDs, nutrition values, or target values.
 - Choose at most one portion per food.
+- Choose no more than 50 foods.
 - Quantity means units, not multiples of the portion label.
 - grams = quantity / portion.amount * portion.gramWeight.
-- For a portion with amount=100 and gramWeight=100, quantity=150 means 150 g.
+- For amount=100 and gramWeight=100, quantity=150 means 150 g.
+- Use positive whole-number quantities.
 - Use whole grams for gram portions.
 - Use whole counts for eggs or bananas.
 - Oil is an ingredient to distribute across food, not a standalone meal.
@@ -103,31 +238,75 @@ ${JSON.stringify({
       model,
       input,
     })
-  } catch {
+  } catch (error) {
+    const status =
+      Number(error?.status ?? error?.statusCode) || null
+
+    console.error('Gemini request failed:', {
+      status,
+      errorType: error?.name ?? 'UnknownError',
+      model,
+    })
+
+    let message = 'The AI provider request failed.'
+
+    if (status === 400) {
+      message =
+        'Gemini rejected the request. Check the API configuration.'
+    } else if (status === 401 || status === 403) {
+      message =
+        'Gemini access was denied. Check the API key and project permissions.'
+    } else if (status === 404) {
+      message =
+        'The configured Gemini model or endpoint was not found.'
+    } else if (status === 429) {
+      message =
+        'Gemini quota or rate limit reached. Check your Google AI Studio usage.'
+    } else if (status >= 500) {
+      message =
+        'Gemini is temporarily unavailable. Please try again later.'
+    }
+
     throw suggestionError(
-      'The AI provider could not generate a suggestion. Please try again.'
+      `${message}${status ? ` (Provider HTTP ${status})` : ''}`
+    )
+  }
+
+  const responseText = result?.output_text
+
+  if (
+    typeof responseText !== 'string' ||
+    responseText.trim().length === 0
+  ) {
+    throw suggestionError(
+      'The AI returned no text response.'
     )
   }
 
   let proposal
 
   try {
-    proposal = JSON.parse(result.output_text)
+    proposal = JSON.parse(responseText)
   } catch {
-    throw suggestionError('The AI returned an invalid response.')
+    throw suggestionError(
+      'The AI returned invalid JSON. Please generate again.'
+    )
   }
 
   if (
     !proposal ||
     typeof proposal !== 'object' ||
+    Array.isArray(proposal) ||
     !Array.isArray(proposal.items)
   ) {
-    throw suggestionError('The AI returned an invalid suggestion.')
+    throw suggestionError(
+      'The AI returned an invalid suggestion.'
+    )
   }
 
   if (proposal.status === 'insufficient_catalogue') {
     throw suggestionError(
-      'The AI could not propose a suitable combination from the available foods. The catalogue may need more variety.',
+      'The AI could not propose a combination from the available foods. The catalogue may need more variety.',
       422
     )
   }
@@ -135,9 +314,11 @@ ${JSON.stringify({
   if (
     proposal.status !== 'candidate' ||
     proposal.items.length === 0 ||
-    proposal.items.length > context.foods.length
+    proposal.items.length > Math.min(context.foods.length, 50)
   ) {
-    throw suggestionError('The AI returned an invalid food selection.')
+    throw suggestionError(
+      'The AI returned an invalid food selection.'
+    )
   }
 
   const selectedFoods = new Set()
@@ -149,7 +330,9 @@ ${JSON.stringify({
       !Number.isSafeInteger(item.quantity) ||
       item.quantity <= 0
     ) {
-      throw suggestionError('The AI returned an invalid quantity.')
+      throw suggestionError(
+        'The AI returned an invalid quantity.'
+      )
     }
 
     const selected = portionsById.get(item.portionId)
@@ -163,17 +346,39 @@ ${JSON.stringify({
     const { food, portion } = selected
 
     if (selectedFoods.has(food.foodId)) {
-      throw suggestionError('The AI returned a duplicate food.')
+      throw suggestionError(
+        'The AI returned a duplicate food.'
+      )
     }
 
     selectedFoods.add(food.foodId)
 
-    const grams =
-      (item.quantity / portion.amount) * portion.gramWeight
+    const amount = Number(portion.amount)
+    const gramWeight = Number(portion.gramWeight)
 
-    // Technical rejection bound, not a recommended serving limit.
-    if (!Number.isFinite(grams) || grams <= 0 || grams > 10000) {
-      throw suggestionError('The AI returned an invalid food weight.')
+    if (
+      !Number.isFinite(amount) ||
+      amount <= 0 ||
+      !Number.isFinite(gramWeight) ||
+      gramWeight <= 0
+    ) {
+      throw suggestionError(
+        'The selected food has invalid portion data.',
+        422
+      )
+    }
+
+    const grams = (item.quantity / amount) * gramWeight
+
+    // Technical rejection bound, not a serving recommendation.
+    if (
+      !Number.isFinite(grams) ||
+      grams <= 0 ||
+      grams > 10000
+    ) {
+      throw suggestionError(
+        'The AI returned an invalid food weight.'
+      )
     }
 
     return {
@@ -181,18 +386,22 @@ ${JSON.stringify({
         id: food.foodId,
         name: food.name,
         preparation_state: food.preparationState,
-        calories_per_100g: food.nutritionPer100g.calories,
-        protein_per_100g: food.nutritionPer100g.proteinGrams,
+        calories_per_100g:
+          food.nutritionPer100g.calories,
+        protein_per_100g:
+          food.nutritionPer100g.proteinGrams,
         carbohydrate_per_100g:
           food.nutritionPer100g.carbohydrateGrams,
-        fat_per_100g: food.nutritionPer100g.fatGrams,
-        fiber_per_100g: food.nutritionPer100g.fiberGrams,
+        fat_per_100g:
+          food.nutritionPer100g.fatGrams,
+        fiber_per_100g:
+          food.nutritionPer100g.fiberGrams,
       },
       portion: {
         id: portion.portionId,
         food_id: food.foodId,
-        amount: portion.amount,
-        gram_weight: portion.gramWeight,
+        amount,
+        gram_weight: gramWeight,
         unit_singular: portion.unitSingular,
         unit_plural: portion.unitPlural,
       },
@@ -200,31 +409,15 @@ ${JSON.stringify({
     }
   })
 
-  const calculation = calculateFoodPortions(calculationItems)
+  const {
+    calculation,
+    comparison,
+    targetMatch,
+    adjusted,
+  } = adjustQuantities(calculationItems, targets)
 
-  const comparison = Object.fromEntries(
-    Object.entries(targets).map(([nutrient, target]) => {
-      const actual = calculation.totals[nutrient]
-
-      if (typeof actual !== 'number' || !Number.isFinite(actual)) {
-        throw suggestionError(
-          'The suggested nutrition could not be calculated.'
-        )
-      }
-
-      return [
-        nutrient,
-        {
-          target,
-          actual,
-          difference: round(actual - target),
-          differencePercent: round(
-            ((actual - target) / target) * 100
-          ),
-        },
-      ]
-    })
-  )
+  const matched =
+    targetMatch.status === 'within_tolerance'
 
   return {
     status: 'draft',
@@ -233,9 +426,25 @@ ${JSON.stringify({
     scope: 'daily_totals',
     calculation,
     comparison,
+    targetMatch,
+    quantityAdjustment: {
+      method: 'bounded_local_search',
+      applied: adjusted,
+      status: matched
+        ? 'within_tolerance'
+        : 'needs_adjustment',
+      message: matched
+        ? 'The calculated totals meet the configured target tolerances.'
+        : 'The quantity adjustment did not find a match within its search bounds. Different foods or quantities may be needed.',
+    },
     requiresReview: true,
     limitations: [
+      'Gemini selected foods and proposed initial quantities.',
+      'The server searched for improved whole-number quantities.',
       'Nutrition totals were recalculated from the food database.',
+      'Target matching uses configurable prototype tolerances.',
+      'The search does not prove whether a matching combination exists.',
+      'Search bounds are not validated practical serving limits.',
       'Practical serving limits and nutritional completeness have not been validated.',
       'Matching calorie and macro targets does not establish personal suitability.',
       'Budget matching is not available.',

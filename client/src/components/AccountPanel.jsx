@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react'
-import ProfileForm from './ProfileForm.jsx'
-import PreferencesForm from './PreferencesForm.jsx'
-import NutritionSummary from './NutritionSummary.jsx'
-import RecipeList from './RecipeList.jsx'
-import './AccountPanel.css'
+import { useEffect, useRef, useState } from 'react'
+import ProfileForm from './ProfileForm'
+import PreferencesForm from './PreferencesForm'
+import NutritionSummary from './NutritionSummary'
+import FoodSuggestions from './FoodSuggestions'
+import SavedFoodPlans from './SavedFoodPlans'
 import FoodList from './FoodList'
+import RecipeList from './RecipeList'
+import './AccountPanel.css'
+
 const API_URL = (
   import.meta.env.VITE_API_URL || 'http://localhost:5000'
 ).replace(/\/$/, '')
@@ -15,50 +18,30 @@ const emptyForm = {
   password: '',
 }
 
-async function authRequest(path, options = {}) {
-  let response
+async function authRequest(
+  path,
+  { method = 'GET', body, signal } = {}
+) {
+  const response = await fetch(`${API_URL}/api/auth${path}`, {
+    method,
+    credentials: 'include',
+    cache: 'no-store',
+    signal,
+    ...(body !== undefined
+      ? {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+        }
+      : {}),
+  })
 
-  try {
-    response = await fetch(`${API_URL}/api/auth${path}`, {
-      ...options,
-      credentials: 'include',
-      cache: 'no-store',
-      headers: {
-        ...(options.body
-          ? { 'Content-Type': 'application/json' }
-          : {}),
-        ...options.headers,
-      },
-    })
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      throw error
-    }
+  const data = await response.json()
 
-    throw new Error(
-      'Cannot connect to EatWise. Check that the backend is running.'
-    )
-  }
-
-  let data
-
-  try {
-    data = await response.json()
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      throw error
-    }
-
-    const responseError = new Error(
-      'The server returned an unexpected response.'
-    )
-    responseError.status = response.status
-    throw responseError
-  }
-
-  if (!response.ok || data?.success === false) {
+  if (!response.ok) {
     const error = new Error(
-      data?.message || 'Unable to complete your request.'
+      data.message || 'The account request failed.'
     )
     error.status = response.status
     throw error
@@ -68,30 +51,44 @@ async function authRequest(path, options = {}) {
 }
 
 function requireUser(data) {
-  if (!data?.user || data.user.id == null) {
-    throw new Error(
-      'The server returned incomplete account information.'
-    )
+  if (!data.user || data.user.id == null) {
+    throw new Error('The server returned an invalid account response.')
   }
 
   return data.user
+}
+
+function errorMessage(error) {
+  return error instanceof TypeError
+    ? 'Cannot connect to EatWise. Check that the backend is running.'
+    : error.message
 }
 
 export default function AccountPanel() {
   const [mode, setMode] = useState('login')
   const [user, setUser] = useState(null)
   const [checking, setChecking] = useState(true)
+  const [sessionFailed, setSessionFailed] = useState(false)
+  const [sessionRetry, setSessionRetry] = useState(0)
   const [busy, setBusy] = useState(false)
+  const [form, setForm] = useState({ ...emptyForm })
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
-  const [form, setForm] = useState({ ...emptyForm })
+
   const [profileRevision, setProfileRevision] = useState(0)
   const [preferencesRevision, setPreferencesRevision] = useState(0)
+  const [savedPlansRevision, setSavedPlansRevision] = useState(0)
+
+  const submittingRef = useRef(false)
 
   useEffect(() => {
     const controller = new AbortController()
 
     async function checkSession() {
+      setChecking(true)
+      setSessionFailed(false)
+      setError('')
+
       try {
         const data = await authRequest('/me', {
           signal: controller.signal,
@@ -101,11 +98,13 @@ export default function AccountPanel() {
           setUser(requireUser(data))
         }
       } catch (error) {
-        if (
-          !controller.signal.aborted &&
-          error.status !== 401
-        ) {
-          setError(error.message)
+        if (!controller.signal.aborted) {
+          setUser(null)
+
+          if (error.status !== 401) {
+            setSessionFailed(true)
+            setError(errorMessage(error))
+          }
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -117,7 +116,13 @@ export default function AccountPanel() {
     checkSession()
 
     return () => controller.abort()
-  }, [])
+  }, [sessionRetry])
+
+  function resetRevisions() {
+    setProfileRevision(0)
+    setPreferencesRevision(0)
+    setSavedPlansRevision(0)
+  }
 
   function updateField(event) {
     const { name, value } = event.target
@@ -137,12 +142,10 @@ export default function AccountPanel() {
     setMode((current) =>
       current === 'login' ? 'register' : 'login'
     )
-
     setForm((current) => ({
       ...current,
       password: '',
     }))
-
     setError('')
     setNotice('')
   }
@@ -150,45 +153,47 @@ export default function AccountPanel() {
   async function handleSubmit(event) {
     event.preventDefault()
 
-    if (busy) return
+    if (submittingRef.current) return
 
+    const email = form.email.trim()
+    const name = form.name.trim()
+
+    if (!email || !form.password) {
+      setError('Enter your email address and password.')
+      return
+    }
+
+    if (mode === 'register') {
+      if (name.length < 2) {
+        setError('Enter a name with at least 2 characters.')
+        return
+      }
+
+      if (form.password.length < 12) {
+        setError('Use a password with at least 12 characters.')
+        return
+      }
+
+      if (new TextEncoder().encode(form.password).length > 72) {
+        setError('Your password is too long. Use at most 72 bytes.')
+        return
+      }
+    }
+
+    submittingRef.current = true
     setBusy(true)
     setError('')
     setNotice('')
 
     try {
-      const email = form.email.trim()
-
       if (mode === 'register') {
-        const name = form.name.trim()
-
-        if (name.length < 2) {
-          throw new Error(
-            'Enter a name with at least 2 characters.'
-          )
-        }
-
-        if (form.password.length < 12) {
-          throw new Error(
-            'Use a password with at least 12 characters.'
-          )
-        }
-
-        if (
-          new TextEncoder().encode(form.password).length > 72
-        ) {
-          throw new Error(
-            'Your password is too long. Use fewer characters.'
-          )
-        }
-
         await authRequest('/register', {
           method: 'POST',
-          body: JSON.stringify({
+          body: {
             name,
             email,
             password: form.password,
-          }),
+          },
         })
 
         setMode('login')
@@ -197,33 +202,32 @@ export default function AccountPanel() {
           email,
           password: '',
         })
-        setNotice(
-          'Your account has been created. Please log in.'
-        )
+        setNotice('Your account has been created. Please log in.')
       } else {
         const data = await authRequest('/login', {
           method: 'POST',
-          body: JSON.stringify({
+          body: {
             email,
             password: form.password,
-          }),
+          },
         })
 
         setUser(requireUser(data))
         setForm({ ...emptyForm })
-        setProfileRevision(0)
-        setPreferencesRevision(0)
+        resetRevisions()
       }
     } catch (error) {
-      setError(error.message)
+      setError(errorMessage(error))
     } finally {
+      submittingRef.current = false
       setBusy(false)
     }
   }
 
   async function handleLogout() {
-    if (busy) return
+    if (submittingRef.current) return
 
+    submittingRef.current = true
     setBusy(true)
     setError('')
     setNotice('')
@@ -236,239 +240,224 @@ export default function AccountPanel() {
       setUser(null)
       setMode('login')
       setForm({ ...emptyForm })
-      setProfileRevision(0)
-      setPreferencesRevision(0)
+      resetRevisions()
       setNotice('You have been logged out.')
     } catch (error) {
-      setError(error.message)
+      setError(errorMessage(error))
     } finally {
+      submittingRef.current = false
       setBusy(false)
     }
   }
 
-  const isRegister = mode === 'register'
+  if (checking) {
+    return (
+      <section className="account-section">
+        <p role="status">Checking your account…</p>
+      </section>
+    )
+  }
+
+  if (sessionFailed) {
+    return (
+      <section className="account-section">
+        <div className="account-card">
+          <h2>Unable to load your account</h2>
+
+          <p className="account-message account-error" role="alert">
+            {error}
+          </p>
+
+          <button
+            className="account-submit"
+            type="button"
+            onClick={() => setSessionRetry((current) => current + 1)}
+          >
+            Try again
+          </button>
+        </div>
+      </section>
+    )
+  }
+
+  if (user) {
+    return (
+      <section aria-labelledby="account-heading">
+        <div className="account-card">
+          <h2 id="account-heading">
+            Welcome, {user.name || 'EatWise member'}
+          </h2>
+
+          <p>{user.email}</p>
+
+          <button
+            className="account-submit"
+            type="button"
+            onClick={handleLogout}
+            disabled={busy}
+          >
+            {busy ? 'Logging out…' : 'Log out'}
+          </button>
+
+          {error && (
+            <p className="account-message account-error" role="alert">
+              {error}
+            </p>
+          )}
+        </div>
+
+        <ProfileForm
+          key={`profile-${user.id}`}
+          onSaved={() => setProfileRevision((current) => current + 1)}
+        />
+
+        <NutritionSummary
+          key={`nutrition-${user.id}`}
+          refreshKey={profileRevision}
+        />
+
+        <PreferencesForm
+          key={`preferences-${user.id}`}
+          onSaved={() =>
+            setPreferencesRevision((current) => current + 1)
+          }
+        />
+
+        <FoodSuggestions
+          key={`suggestions-${user.id}-${profileRevision}-${preferencesRevision}`}
+          onSaved={() =>
+            setSavedPlansRevision((current) => current + 1)
+          }
+        />
+
+        <SavedFoodPlans
+          key={`saved-plans-${user.id}`}
+          refreshKey={savedPlansRevision}
+        />
+
+        <FoodList
+          key={`foods-${user.id}`}
+          refreshKey={preferencesRevision}
+        />
+
+        <RecipeList
+          key={`recipes-${user.id}`}
+          refreshKey={preferencesRevision}
+        />
+      </section>
+    )
+  }
+
+  const registering = mode === 'register'
 
   return (
-    <section
-      id="account"
-      className="account-section"
-      aria-labelledby="account-heading"
-    >
+    <section className="account-section" aria-labelledby="auth-heading">
       <div className="account-intro">
-        <span className="account-badge">
-          YOUR EATWISE ACCOUNT
-        </span>
-
-        <h2 id="account-heading">
-          {user
-            ? 'Your next step towards eating well.'
-            : 'Make healthy eating personal.'}
-        </h2>
-
+        <span className="account-badge">Your EatWise account</span>
+        <h2>Food planning around your goals</h2>
         <p>
-          Save your profile, set your goals, and tell us
-          which foods work for you.
+          Save your profile, set your food preferences, and explore
+          food quantities with calculated nutrition.
         </p>
       </div>
 
       <div className="account-card">
-        {checking ? (
-          <p role="status">Checking your session…</p>
-        ) : user ? (
-          <>
-            <span className="account-badge">SIGNED IN</span>
+        <h2 id="auth-heading">
+          {registering ? 'Create your account' : 'Welcome back'}
+        </h2>
 
-            <h3>Welcome, {user.name}</h3>
+        <p>
+          {registering
+            ? 'Start your EatWise journey.'
+            : 'Log in to your EatWise account.'}
+        </p>
 
-            <p className="account-email">{user.email}</p>
-
-            <ProfileForm
-              key={`profile-${user.id}`}
-              onSaved={() =>
-                setProfileRevision((current) => current + 1)
-              }
-            />
-
-            <NutritionSummary
-              key={`nutrition-${user.id}`}
-              refreshKey={profileRevision}
-            />
-
-            <PreferencesForm
-              key={`preferences-${user.id}`}
-              onSaved={() =>
-                setPreferencesRevision(
-                  (current) => current + 1
-                )
-              }
-            />
-
-            <RecipeList
-              key={`recipes-${user.id}`}
-              refreshKey={preferencesRevision}
-            />
-            <FoodList
-              key={`foods-${user.id}`}
-              refreshKey={preferencesRevision}
-/>
-
-            {error && (
-              <p
-                className="account-message account-error"
-                role="alert"
-              >
-                {error}
-              </p>
-            )}
-
-            <button
-              className="account-submit"
-              type="button"
-              onClick={handleLogout}
-              disabled={busy}
-            >
-              {busy ? 'Logging out…' : 'Log out'}
-            </button>
-          </>
-        ) : (
-          <>
-            <h3>
-              {isRegister
-                ? 'Create your account'
-                : 'Welcome back'}
-            </h3>
-
-            <p className="account-description">
-              {isRegister
-                ? 'Get started with your EatWise profile.'
-                : 'Log in to your EatWise account.'}
-            </p>
-
-            {error && (
-              <p
-                className="account-message account-error"
-                role="alert"
-              >
-                {error}
-              </p>
-            )}
-
-            {notice && (
-              <p
-                className="account-message account-success"
-                role="status"
-              >
-                {notice}
-              </p>
-            )}
-
-            <form
-              onSubmit={handleSubmit}
-              aria-busy={busy}
-            >
-              {isRegister && (
-                <div className="account-field">
-                  <label htmlFor="account-name">
-                    Full name
-                  </label>
-
-                  <input
-                    id="account-name"
-                    name="name"
-                    type="text"
-                    autoComplete="name"
-                    value={form.name}
-                    onChange={updateField}
-                    minLength={2}
-                    maxLength={100}
-                    disabled={busy}
-                    required
-                  />
-                </div>
-              )}
-
-              <div className="account-field">
-                <label htmlFor="account-email">
-                  Email address
-                </label>
-
-                <input
-                  id="account-email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  value={form.email}
-                  onChange={updateField}
-                  maxLength={254}
-                  disabled={busy}
-                  required
-                />
-              </div>
-
-              <div className="account-field">
-                <label htmlFor="account-password">
-                  Password
-                </label>
-
-                <input
-                  id="account-password"
-                  name="password"
-                  type="password"
-                  autoComplete={
-                    isRegister
-                      ? 'new-password'
-                      : 'current-password'
-                  }
-                  value={form.password}
-                  onChange={updateField}
-                  minLength={isRegister ? 12 : undefined}
-                  aria-describedby={
-                    isRegister
-                      ? 'account-password-hint'
-                      : undefined
-                  }
-                  disabled={busy}
-                  required
-                />
-
-                {isRegister && (
-                  <small id="account-password-hint">
-                    Use at least 12 characters.
-                  </small>
-                )}
-              </div>
-
-              <button
-                className="account-submit"
-                type="submit"
-                disabled={busy}
-              >
-                {busy
-                  ? isRegister
-                    ? 'Creating account…'
-                    : 'Logging in…'
-                  : isRegister
-                    ? 'Create account'
-                    : 'Log in'}
-              </button>
-            </form>
-
-            <p className="account-switch">
-              {isRegister
-                ? 'Already have an account? '
-                : 'New to EatWise? '}
-
-              <button
-                className="account-switch-button"
-                type="button"
-                onClick={switchMode}
-                disabled={busy}
-              >
-                {isRegister ? 'Log in' : 'Create account'}
-              </button>
-            </p>
-          </>
+        {error && (
+          <p className="account-message account-error" role="alert">
+            {error}
+          </p>
         )}
+
+        {notice && (
+          <p className="account-message account-success" role="status">
+            {notice}
+          </p>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          {registering && (
+            <div className="account-field">
+              <label htmlFor="account-name">Name</label>
+              <input
+                id="account-name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                value={form.name}
+                onChange={updateField}
+                minLength={2}
+                required
+                disabled={busy}
+              />
+            </div>
+          )}
+
+          <div className="account-field">
+            <label htmlFor="account-email">Email address</label>
+            <input
+              id="account-email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              value={form.email}
+              onChange={updateField}
+              required
+              disabled={busy}
+            />
+          </div>
+
+          <div className="account-field">
+            <label htmlFor="account-password">Password</label>
+            <input
+              id="account-password"
+              name="password"
+              type="password"
+              autoComplete={
+                registering ? 'new-password' : 'current-password'
+              }
+              value={form.password}
+              onChange={updateField}
+              minLength={registering ? 12 : undefined}
+              required
+              disabled={busy}
+            />
+
+            {registering && (
+              <small>Use at least 12 characters.</small>
+            )}
+          </div>
+
+          <button
+            className="account-submit"
+            type="submit"
+            disabled={busy}
+          >
+            {busy
+              ? registering
+                ? 'Creating account…'
+                : 'Logging in…'
+              : registering
+                ? 'Create account'
+                : 'Log in'}
+          </button>
+        </form>
+
+        <p className="account-switch">
+          {registering ? 'Already have an account? ' : 'New to EatWise? '}
+          <button type="button" onClick={switchMode} disabled={busy}>
+            {registering ? 'Log in' : 'Create account'}
+          </button>
+        </p>
       </div>
     </section>
   )
