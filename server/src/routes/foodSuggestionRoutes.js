@@ -5,6 +5,11 @@ import { calculateEnergy } from '../services/nutritionService.js'
 import { calculateNutritionTargets } from '../services/nutritionTargets.js'
 import { evaluateFoodEligibility } from '../services/foodEligibilityService.js'
 import { generateFoodSuggestion } from '../services/foodSuggestionService.js'
+import {
+  readDailyLimit,
+  maximumWholeQuantity,
+  applyDailyQuantityLimits,
+} from '../services/foodQuantityLimitService.js'
 
 const router = Router()
 const activeRequests = new Set()
@@ -66,25 +71,31 @@ async function loadContext(userId) {
   })
 
   const [foodRows] = await pool.execute(
-    `SELECT id, name, preparation_state, review_status,
-            is_vegan, is_vegetarian, is_pescatarian,
-            allergens, allergen_reviewed_at,
-            source_name, source_reference,
-            calories_per_100g, protein_per_100g,
-            carbohydrate_per_100g, fat_per_100g,
-            fiber_per_100g
-     FROM foods
-     WHERE review_status = 'approved'
-     ORDER BY id`
+    `SELECT
+       f.id, f.name, f.preparation_state, f.review_status,
+       f.is_vegan, f.is_vegetarian, f.is_pescatarian,
+       f.allergens, f.allergen_reviewed_at,
+       f.source_name, f.source_reference,
+       f.calories_per_100g, f.protein_per_100g,
+       f.carbohydrate_per_100g, f.fat_per_100g,
+       f.fiber_per_100g,
+       limits.max_daily_grams,
+       limits.policy_label
+     FROM foods f
+     LEFT JOIN food_quantity_limits limits ON limits.food_id = f.id
+     WHERE f.review_status = 'approved'
+     ORDER BY f.id`
   )
 
   const eligibleFoods = foodRows.filter(
-    (food) => evaluateFoodEligibility(food, preferences).eligible
+    (food) =>
+      evaluateFoodEligibility(food, preferences).eligible &&
+      readDailyLimit(food.max_daily_grams) !== null
   )
 
   if (!eligibleFoods.length) {
     throw requestError(
-      'No approved foods match the supported preference checks. Some foods or exclusions may need review.'
+      'No approved foods match your preferences and have configured daily quantity limits.'
     )
   }
 
@@ -121,27 +132,46 @@ async function loadContext(userId) {
   }
 
   const foods = eligibleFoods
-    .map((food) => ({
-      foodId: Number(food.id),
-      name: food.name,
-      preparationState: food.preparation_state,
-      nutritionPer100g: {
-        calories: Number(food.calories_per_100g),
-        proteinGrams: Number(food.protein_per_100g),
-        carbohydrateGrams: Number(food.carbohydrate_per_100g),
-        fatGrams: Number(food.fat_per_100g),
-        fiberGrams:
-          food.fiber_per_100g == null
-            ? null
-            : Number(food.fiber_per_100g),
-      },
-      portions: portionsByFood.get(Number(food.id)) ?? [],
-    }))
+    .map((food) => {
+      const maxDailyGrams = readDailyLimit(food.max_daily_grams)
+
+      const portions = (
+        portionsByFood.get(Number(food.id)) ?? []
+      )
+        .map((portion) => ({
+          ...portion,
+          maxQuantity: maximumWholeQuantity(
+            maxDailyGrams,
+            portion.amount,
+            portion.gramWeight
+          ),
+        }))
+        .filter((portion) => portion.maxQuantity >= 1)
+
+      return {
+        foodId: Number(food.id),
+        name: food.name,
+        preparationState: food.preparation_state,
+        maxDailyGrams,
+        quantityPolicyLabel: food.policy_label,
+        nutritionPer100g: {
+          calories: Number(food.calories_per_100g),
+          proteinGrams: Number(food.protein_per_100g),
+          carbohydrateGrams: Number(food.carbohydrate_per_100g),
+          fatGrams: Number(food.fat_per_100g),
+          fiberGrams:
+            food.fiber_per_100g == null
+              ? null
+              : Number(food.fiber_per_100g),
+        },
+        portions,
+      }
+    })
     .filter((food) => food.portions.length > 0)
 
   if (!foods.length) {
     throw requestError(
-      'The eligible foods have no approved portions yet.'
+      'The eligible foods have no approved whole-unit portions within their configured limits.'
     )
   }
 
@@ -155,7 +185,7 @@ async function loadContext(userId) {
 }
 
 function handleError(error, res, next) {
-  const status = error.status ?? error.statusCode
+  const status = Number(error.status ?? error.statusCode)
 
   if ([409, 422, 429, 502, 503].includes(status)) {
     return res.status(status).json({
@@ -176,7 +206,9 @@ router.get('/context', async (req, res, next) => {
       context,
       limitations: [
         'Nutrition targets are estimates.',
-        'Food eligibility uses the currently supported preference checks.',
+        'Food eligibility uses the supported preference checks.',
+        'Only foods with configured quantity limits are included.',
+        'Demo quantity limits are not validated dietary guidance.',
         'Budget matching is not available.',
         'Catalogue availability does not guarantee a balanced daily plan.',
       ],
@@ -189,7 +221,6 @@ router.get('/context', async (req, res, next) => {
 router.post('/generate', async (req, res, next) => {
   const userId = req.session.userId
 
-  // Prevent simultaneous generation for this user in this server process.
   if (activeRequests.has(userId)) {
     return res.status(429).json({
       success: false,
@@ -201,14 +232,16 @@ router.post('/generate', async (req, res, next) => {
 
   try {
     const context = await loadContext(userId)
-    const suggestion = await generateFoodSuggestion(context)
+    const generated = await generateFoodSuggestion(context)
 
-    // Recheck eligibility and targets after the AI call.
+    // Enforce configured limits and recalculate before returning.
+    const suggestion = applyDailyQuantityLimits(generated, context)
+
     const latestContext = await loadContext(userId)
 
     if (JSON.stringify(context) !== JSON.stringify(latestContext)) {
       throw requestError(
-        'Your targets or available foods changed during generation. Please generate again.',
+        'Your targets, available foods, or quantity limits changed during generation. Please generate again.',
         409
       )
     }

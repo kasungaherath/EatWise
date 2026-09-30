@@ -4,6 +4,10 @@ import { calculateNutritionTargets } from '../services/nutritionTargets.js'
 import { evaluateFoodEligibility } from '../services/foodEligibilityService.js'
 import { calculateFoodPortions } from '../services/foodPortionService.js'
 import { assessNutritionMatch } from '../services/nutritionMatchService.js'
+import {
+  readDailyLimit,
+  assertDailyQuantity,
+} from '../services/foodQuantityLimitService.js'
 
 function validPlanDate(value) {
   if (
@@ -15,9 +19,7 @@ function validPlanDate(value) {
 
   const year = Number(value.slice(0, 4))
 
-  if (year < 1000 || year > 9999) {
-    return false
-  }
+  if (year < 1000 || year > 9999) return false
 
   const date = new Date(`${value}T00:00:00.000Z`)
 
@@ -44,7 +46,7 @@ function formatDraft(row) {
 }
 
 function handleError(error, res, next) {
-  if (error.status === 422 || error.statusCode === 422) {
+  if (Number(error.status ?? error.statusCode) === 422) {
     return res.status(422).json({
       success: false,
       message: error.message,
@@ -54,7 +56,6 @@ function handleError(error, res, next) {
   return next(error)
 }
 
-// POST /api/food-plans
 export async function saveFoodPlan(req, res, next) {
   res.set('Cache-Control', 'no-store')
 
@@ -68,7 +69,8 @@ export async function saveFoodPlan(req, res, next) {
   }
 
   const body = req.body ?? {}
-  const title = typeof body.title === 'string' ? body.title.trim() : ''
+  const title =
+    typeof body.title === 'string' ? body.title.trim() : ''
   const { planDate, items } = body
 
   if (title.length < 1 || title.length > 120) {
@@ -176,7 +178,8 @@ export async function saveFoodPlan(req, res, next) {
     const targets = {
       calories: nutritionTargets.targetCalories,
       proteinGrams: nutritionTargets.macros.proteinGrams,
-      carbohydrateGrams: nutritionTargets.macros.carbohydrateGrams,
+      carbohydrateGrams:
+        nutritionTargets.macros.carbohydrateGrams,
       fatGrams: nutritionTargets.macros.fatGrams,
     }
 
@@ -184,30 +187,21 @@ export async function saveFoodPlan(req, res, next) {
 
     const [rows] = await pool.execute(
       `SELECT
-         f.id,
-         f.name,
-         f.preparation_state,
-         f.review_status,
-         f.is_vegan,
-         f.is_vegetarian,
-         f.is_pescatarian,
-         f.allergens,
-         f.allergen_reviewed_at,
-         f.source_name,
-         f.source_reference,
-         f.calories_per_100g,
-         f.protein_per_100g,
-         f.carbohydrate_per_100g,
-         f.fat_per_100g,
+         f.id, f.name, f.preparation_state, f.review_status,
+         f.is_vegan, f.is_vegetarian, f.is_pescatarian,
+         f.allergens, f.allergen_reviewed_at,
+         f.source_name, f.source_reference,
+         f.calories_per_100g, f.protein_per_100g,
+         f.carbohydrate_per_100g, f.fat_per_100g,
          f.fiber_per_100g,
          p.id AS portion_id,
-         p.label,
-         p.amount,
-         p.unit_singular,
-         p.unit_plural,
-         p.gram_weight
+         p.label, p.amount,
+         p.unit_singular, p.unit_plural, p.gram_weight,
+         limits.max_daily_grams,
+         limits.policy_label
        FROM food_portions p
        INNER JOIN foods f ON f.id = p.food_id
+       LEFT JOIN food_quantity_limits limits ON limits.food_id = f.id
        WHERE p.id IN (${placeholders})
          AND p.review_status = 'approved'
          AND f.review_status = 'approved'`,
@@ -220,6 +214,7 @@ export async function saveFoodPlan(req, res, next) {
 
     const selectedFoods = new Set()
     const calculationItems = []
+    const appliedLimits = []
 
     for (const item of items) {
       const food = portionsById.get(item.portionId)
@@ -236,7 +231,8 @@ export async function saveFoodPlan(req, res, next) {
       if (!eligibility.eligible) {
         return res.status(422).json({
           success: false,
-          message: `${food.name} does not pass your saved preference checks.`,
+          message:
+            `${food.name} does not pass your saved preference checks.`,
           reason: eligibility.reason,
         })
       }
@@ -254,28 +250,22 @@ export async function saveFoodPlan(req, res, next) {
 
       const amount = Number(food.amount)
       const gramWeight = Number(food.gram_weight)
+      const maxDailyGrams = readDailyLimit(food.max_daily_grams)
 
-      if (
-        !Number.isFinite(amount) ||
-        amount <= 0 ||
-        !Number.isFinite(gramWeight) ||
-        gramWeight <= 0
-      ) {
-        return res.status(422).json({
-          success: false,
-          message: 'A selected portion has invalid measurement data.',
-        })
-      }
+      // Use current database settings, never browser-supplied limits.
+      assertDailyQuantity({
+        name: food.name,
+        quantity: item.quantity,
+        amount,
+        gramWeight,
+        maxDailyGrams,
+      })
 
-      const grams = (item.quantity / amount) * gramWeight
-
-      // Technical bound only; not a practical serving recommendation.
-      if (!Number.isFinite(grams) || grams <= 0 || grams > 10000) {
-        return res.status(422).json({
-          success: false,
-          message: 'A selected food quantity is outside the supported range.',
-        })
-      }
+      appliedLimits.push({
+        foodId,
+        maxDailyGrams,
+        policyLabel: food.policy_label,
+      })
 
       calculationItems.push({
         food: {
@@ -308,9 +298,8 @@ export async function saveFoodPlan(req, res, next) {
       targets
     )
 
-    // Store server-calculated data, never browser-supplied nutrition totals.
     const snapshot = {
-      schemaVersion: 1,
+      schemaVersion: 2,
       status: 'draft',
       scope: 'daily_totals',
       goal: profile.goal,
@@ -320,13 +309,19 @@ export async function saveFoodPlan(req, res, next) {
       calculation,
       comparison,
       targetMatch,
+      quantityLimits: {
+        status: 'within_configured_limits',
+        items: appliedLimits,
+      },
       requiresReview: true,
       checkedAt: new Date().toISOString(),
       limitations: [
         'Food eligibility was checked against saved preferences at save time.',
         'Nutrition was recalculated from the food database.',
-        'This is a historical snapshot; later preference changes do not update it.',
-        'Practical serving limits and nutritional completeness have not been validated.',
+        'Configured daily quantity limits were checked at save time.',
+        'Demo quantity limits are not validated dietary guidance.',
+        'This is a historical snapshot; later preference or limit changes do not update it.',
+        'Nutritional completeness and personal suitability have not been validated.',
         'Budget matching is not available.',
       ],
     }
@@ -354,7 +349,6 @@ export async function saveFoodPlan(req, res, next) {
   }
 }
 
-// GET /api/food-plans
 export async function listFoodPlans(req, res, next) {
   res.set('Cache-Control', 'no-store')
 
