@@ -1,0 +1,167 @@
+/* Living colour is concentrated around the illustrative plan. */
+.ew-hero {
+  position: relative;
+  isolation: isolate;
+  padding-block: 96px 80px;
+}
+.ew-colour-field {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  inset: 0 -40px;
+  overflow: hidden;
+  contain: paint;
+  mask-image: linear-gradient(to bottom, transparent, black 12%, black 78%, transparent);
+}
+.ew-colour-field span {
+  position: absolute;
+  width: 65%;
+  height: 85%;
+  right: -8%;
+  top: 0;
+  background: radial-gradient(ellipse, #b9e4d9a6, #b9e4d900 68%);
+  animation: ew-colour-drift 16s ease-in-out infinite alternate;
+}
+.ew-colour-field span:nth-child(2) {
+  right: 14%;
+  top: 18%;
+  background: radial-gradient(ellipse, #becffb80, #becffb00 68%);
+  animation-delay: -7s;
+  animation-duration: 19s;
+}
+.ew-colour-field span:nth-child(3) {
+  right: -12%;
+  top: 28%;
+  background: radial-gradient(ellipse, #dcc3f280, #dcc3f200 68%);
+  animation-delay: -12s;
+  animation-duration: 22s;
+}
+.ew-hero-title {
+  font-size: clamp(48px, 5.6vw, 76px);
+  line-height: 1.06;
+  letter-spacing: -.04em;
+}
+.ew-hero-title > span { color: #316965; }
+.ew-hero-description { color: #536762; }
+.ew-brand-mark {
+  background: linear-gradient(145deg, #275e49, #316965 65%, #526c9b);
+}
+.ew-nav-button {
+  background: #ffffff9c;
+  border-color: #d5dfdb;
+  border-radius: 999px;
+}
+.ew-button {
+  position: relative;
+  overflow: hidden;
+  background: #204c40;
+  border-radius: 999px;
+  padding-inline: 25px;
+  transition: background 180ms ease, box-shadow 180ms ease;
+}
+.ew-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, #39695700 35%, #7baebe4d 70%, #c5acf34d);
+  pointer-events: none;
+}
+.ew-button:hover {
+  background: #173c33;
+  box-shadow: 0 6px 18px #234d4026;
+}
+.ew-button svg, .ew-nav-button svg {
+  transition: transform 180ms cubic-bezier(.16, 1, .3, 1);
+}
+.ew-button:hover svg, .ew-nav-button:hover svg { transform: translateX(3px); }
+.ew-preview-stage { min-width: 0; position: relative; }
+.ew-preview {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 32px;
+  border: 0;
+  background: transparent;
+  border-radius: 16px;
+}
+.ew-preview::before {
+  content: '';
+  position: absolute;
+  z-index: -2;
+  inset: -70%;
+  background: conic-gradient(from 35deg, #5d9b84, #a3daca, #a9c1ed, #ae8cd1, #dfd0e8, #5d9b84);
+  animation: ew-colour-orbit 24s linear infinite;
+}
+.ew-preview::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 2px;
+  border-radius: 14px;
+  background: #fcfdfb;
+}
+.ew-preview-top { justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.ew-plan-symbol { color: #316965; }
+.ew-badge {
+  border: 1px solid #dee6e3;
+  padding: 5px 10px;
+  border-radius: 999px;
+  color: #576c64;
+  font-size: 11px;
+}
+.ew-preview h2 { font-size: 30px; max-width: 300px; }
+.ew-preview-description { color: #60716a; }
+.ew-food-list { border-color: #e1e8e2; }
+.ew-food-row { border-color: #e1e8e2; padding-block: 21px; }
+.ew-food-quantity strong { color: #316965; font-weight: 600; font-size: 32px; }
+.ew-food-row:nth-child(2) .ew-food-quantity strong { color: #4e6492; }
+.ew-food-row:nth-child(3) .ew-food-quantity strong { color: #79608d; }
+.ew-preview-note p { color: #476158; }
+.ew-preview-disclaimer { color: #60716a; font-size: 11px; }
+.ew-how { padding-block: 64px 80px; }
+.ew-section-heading h2 { max-width: 560px; }
+.ew-step { border-top-color: #c2d9ce; }
+.ew-step:nth-child(2) { border-top-color: #c7d2e7; }
+.ew-step:nth-child(3) { border-top-color: #d8c8e4; }
+.ew-step-number { font-size: 32px; font-weight: 500; color: #316965; }
+.ew-step:nth-child(2) .ew-step-number { color: #4e6492; }
+.ew-step:nth-child(3) .ew-step-number { color: #79608d; }
+.ew-step h3 { margin-top: 14px; }
+.ew-workspace-heading { padding-block: 8px 12px; }
+.ew-footer-brand .ew-brand-mark { background: #245840; }
+.ew-hero[data-motion='paused'] .ew-colour-field span,
+.ew-hero[data-motion='paused'] .ew-preview::before { animation-play-state: paused; }
+@keyframes ew-colour-drift {
+  0% { transform: translate(-6%, -4%) scale(.95); opacity: .65; }
+  100% { transform: translate(8%, 9%) scale(1.12); opacity: 1; }
+}
+@keyframes ew-colour-orbit { to { transform: rotate(360deg); } }
+@media (max-width: 1000px) {
+  .ew-hero { gap: 32px; padding-block: 64px; }
+  .ew-hero-title { font-size: clamp(42px, 5.5vw, 56px); }
+  .ew-preview { padding: 28px; }
+}
+@media (max-width: 800px) {
+  .ew-hero { padding-block: 48px; }
+  .ew-hero-title { font-size: clamp(44px, 8vw, 64px); }
+  .ew-colour-field { inset: 20% -20px 0; }
+  .ew-colour-field span { width: 110%; height: 70%; top: 25%; }
+  .ew-colour-field span:nth-child(2) { top: 35%; }
+  .ew-colour-field span:nth-child(3) { top: 45%; }
+  .ew-preview h2 { max-width: none; }
+  .ew-how { padding-block: 40px 48px; }
+  .ew-step h3 { margin-top: 0; }
+  .ew-step-number { font-size: 26px; }
+}
+@media (max-width: 480px) {
+  .ew-hero-title { font-size: clamp(38px, 10.5vw, 50px); }
+  .ew-preview { padding: 25px 22px; }
+  .ew-preview h2 { font-size: 28px; }
+  .ew-food-quantity strong { font-size: 29px; }
+  .ew-hero-highlights { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ew-colour-field span, .ew-preview::before { animation: none; }
+  .ew-button svg, .ew-nav-button svg { transition: none; }
+  .ew-button:hover svg, .ew-nav-button:hover svg { transform: none; }
+}

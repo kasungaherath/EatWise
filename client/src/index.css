@@ -4,19 +4,41 @@
   font-family: 'DM Sans', sans-serif;
   color: #183c30;
   background: #fafbf7;
+
+  --ew-ink: #183c30;
+  --ew-muted: #627268;
+  --ew-green: #245840;
+  --ew-green-hover: #183f2d;
+  --ew-accent: #387b54;
+  --ew-line: #dfe7dd;
+  --ew-surface: #ffffff;
+  --ew-soft: #f0f4ec;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-color: #95ac8d #fafbf7;
 }
 
 body {
   margin: 0;
   min-width: 320px;
+  line-height: 1.6;
+}
+
+#root {
+  min-height: 100vh;
 }
 
 a {
@@ -26,8 +48,18 @@ a {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
+  caret-color: var(--ew-green);
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
 
 h1,
@@ -43,13 +75,35 @@ h3 {
   font-family: 'Manrope', sans-serif;
 }
 
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
 a:focus-visible,
-button:focus-visible {
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
   outline: 3px solid #329b65;
-  outline-offset: 5px;
+  outline-offset: 4px;
 }
 
 ::selection {
   color: #183c30;
   background: #d5ebae;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

@@ -1,0 +1,564 @@
+/* EatWise workspace theme */
+
+.ew-workspace {
+  --ws-green: #245840;
+  --ws-green-dark: #183f2d;
+  --ws-text: #183c30;
+  --ws-muted: #627268;
+  --ws-border: #dfe7dd;
+  --ws-soft: #f4f7ef;
+  --ws-radius: 20px;
+
+  color: var(--ws-text);
+  padding-bottom: 12px;
+}
+
+.ew-workspace *,
+.ew-workspace *::before,
+.ew-workspace *::after {
+  box-sizing: border-box;
+}
+
+.ew-workspace > *,
+.ew-workspace section,
+.ew-workspace form,
+.ew-workspace fieldset,
+.ew-workspace article {
+  min-width: 0;
+}
+
+/* Headings and text */
+
+.ew-workspace h2 {
+  font-size: clamp(25px, 3vw, 34px);
+  line-height: 1.3;
+  letter-spacing: -1px;
+}
+
+.ew-workspace h3 {
+  font-size: clamp(20px, 2.3vw, 25px);
+  line-height: 1.4;
+  letter-spacing: -0.6px;
+}
+
+.ew-workspace h4 {
+  margin: 0 0 12px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.ew-workspace p {
+  line-height: 1.8;
+}
+
+.ew-workspace small {
+  display: block;
+  margin-top: 8px;
+  color: var(--ws-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* Account area */
+
+.ew-workspace .account-section {
+  display: block;
+  padding: 28px 0;
+  border: 0;
+}
+
+.ew-workspace .account-intro {
+  max-width: 650px;
+  margin-bottom: 26px;
+}
+
+.ew-workspace .account-intro p {
+  margin-top: 12px;
+  color: var(--ws-muted);
+}
+
+.ew-workspace .account-card {
+  width: 100%;
+  min-width: 0;
+  padding: clamp(22px, 4vw, 38px);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius);
+  background: #ffffff;
+  box-shadow: 0 12px 36px -24px rgb(24 60 48 / 24%);
+}
+
+.ew-workspace .account-card > p {
+  margin-top: 10px;
+  color: var(--ws-muted);
+}
+
+.ew-workspace .account-card form {
+  margin-top: 25px;
+}
+
+.ew-workspace .account-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 6px 12px;
+  border: 1px solid #dce8d4;
+  border-radius: 999px;
+  background: #eff5e8;
+  color: #456934;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Profile and preferences */
+
+.ew-workspace .profile-section {
+  margin-top: 28px;
+  padding: clamp(22px, 4vw, 34px);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius);
+  background: #ffffff;
+  box-shadow: 0 12px 36px -26px rgb(24 60 48 / 20%);
+  scroll-margin-top: 24px;
+}
+
+.ew-workspace .profile-description {
+  max-width: 720px;
+  margin-top: 10px;
+  margin-bottom: 24px;
+  color: var(--ws-muted);
+  font-size: 14px;
+}
+
+.ew-workspace .profile-fields {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ew-workspace .profile-legend {
+  margin-bottom: 20px;
+  padding: 0;
+  color: #50684c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ew-workspace .profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  align-items: start;
+  gap: 20px;
+}
+
+.ew-workspace .profile-note {
+  margin: 18px 0;
+  padding: 12px 15px;
+  border-left: 3px solid #a4bd88;
+  border-radius: 0 8px 8px 0;
+  background: var(--ws-soft);
+  color: #5f7057;
+  font-size: 12px;
+}
+
+/* Form controls */
+
+.ew-workspace .account-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  margin-bottom: 20px;
+}
+
+.ew-workspace label {
+  color: #294b39;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.ew-workspace input:not([type='checkbox']):not([type='radio']),
+.ew-workspace select,
+.ew-workspace textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 49px;
+  padding: 12px 14px;
+  border: 1px solid #d3dfd0;
+  border-radius: 10px;
+  background: #fbfcf9;
+  color: var(--ws-text);
+  font-size: 14px;
+  line-height: 1.5;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.ew-workspace select {
+  padding-right: 30px;
+}
+
+.ew-workspace textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.ew-workspace input::placeholder,
+.ew-workspace textarea::placeholder {
+  color: #788674;
+  opacity: 1;
+}
+
+.ew-workspace input:not([type='checkbox']):not([type='radio']):hover,
+.ew-workspace select:hover,
+.ew-workspace textarea:hover {
+  border-color: #a9bda4;
+}
+
+.ew-workspace input:focus-visible,
+.ew-workspace select:focus-visible,
+.ew-workspace textarea:focus-visible {
+  border-color: #3b8058;
+  outline: 2px solid #3b8058;
+  outline-offset: 2px;
+  background: #ffffff;
+  box-shadow: 0 0 0 5px rgb(59 128 88 / 8%);
+}
+
+.ew-workspace input[type='checkbox'],
+.ew-workspace input[type='radio'] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--ws-green);
+  vertical-align: middle;
+}
+
+.ew-workspace input:disabled,
+.ew-workspace select:disabled,
+.ew-workspace textarea:disabled {
+  cursor: not-allowed;
+  background: #f0f3ec;
+  color: #6b7765;
+}
+
+/* Buttons */
+
+.ew-workspace button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 12px 20px;
+  border: 1px solid var(--ws-green);
+  border-radius: 10px;
+  background: var(--ws-green);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: center;
+  white-space: normal;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.ew-workspace button:hover:not(:disabled) {
+  border-color: var(--ws-green-dark);
+  background: var(--ws-green-dark);
+  box-shadow: 0 5px 14px rgb(24 63 45 / 12%);
+}
+
+.ew-workspace button:focus-visible {
+  outline: 3px solid #329b65;
+  outline-offset: 4px;
+}
+
+.ew-workspace button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+}
+
+.ew-workspace .profile-save {
+  width: auto;
+  min-width: 155px;
+  margin-top: 6px;
+}
+
+/* Secondary actions */
+
+.ew-workspace button.account-switch,
+.ew-workspace button.account-logout {
+  border-color: #cfdbcb;
+  background: #ffffff;
+  color: var(--ws-green);
+  box-shadow: none;
+}
+
+.ew-workspace button.account-switch:hover:not(:disabled),
+.ew-workspace button.account-logout:hover:not(:disabled) {
+  border-color: #9db697;
+  background: #f0f5ea;
+  color: var(--ws-green-dark);
+}
+
+.ew-workspace a.account-switch {
+  color: var(--ws-green);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.ew-workspace .account-toggle {
+  margin-top: 22px;
+  color: var(--ws-muted);
+  font-size: 13px;
+}
+
+/* Feedback messages */
+
+.ew-workspace .account-message {
+  margin: 18px 0;
+  padding: 14px 16px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  font-size: 13px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.ew-workspace .account-error {
+  border-color: #f1d2cd;
+  background: #fff3f0;
+  color: #9f332c;
+}
+
+.ew-workspace .account-success {
+  border-color: #cfe3c6;
+  background: #f0f7eb;
+  color: #365f2d;
+}
+
+/* Food, recipe, and saved-draft cards */
+
+.ew-workspace .food-grid,
+.ew-workspace .recipe-grid,
+.ew-workspace .suggestion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  align-items: stretch;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.ew-workspace article {
+  padding: 24px;
+  border: 1px solid var(--ws-border);
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px -20px rgb(24 60 48 / 25%);
+  overflow-wrap: anywhere;
+}
+
+.ew-workspace article h3 {
+  font-size: 17px;
+  line-height: 1.6;
+  letter-spacing: -0.3px;
+}
+
+.ew-workspace article p {
+  margin-top: 10px;
+  color: var(--ws-muted);
+  font-size: 13px;
+}
+
+.ew-workspace article strong {
+  color: var(--ws-text);
+}
+
+.ew-workspace ul,
+.ew-workspace ol {
+  padding-left: 22px;
+}
+
+.ew-workspace li {
+  margin: 7px 0;
+  line-height: 1.75;
+}
+
+/* Nutrition tables */
+
+.ew-workspace table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 24px 0 16px;
+  overflow-x: auto;
+  border: 1px solid var(--ws-border);
+  border-radius: 13px;
+  border-spacing: 0;
+  border-collapse: separate;
+  background: #ffffff;
+  font-size: 13px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ew-workspace caption {
+  padding: 15px 18px;
+  color: var(--ws-muted);
+  font-size: 12px;
+  line-height: 1.7;
+  text-align: left;
+  caption-side: top;
+}
+
+.ew-workspace th,
+.ew-workspace td {
+  padding: 16px 20px;
+  text-align: left;
+  vertical-align: middle;
+  line-height: 1.6;
+}
+
+.ew-workspace thead th {
+  border-bottom: 1px solid var(--ws-border);
+  background: #eef3e8;
+  color: #3d5937;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.ew-workspace tbody th {
+  color: var(--ws-text);
+  font-weight: 700;
+}
+
+.ew-workspace tbody td {
+  color: #4b6253;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ew-workspace tbody tr + tr > * {
+  border-top: 1px solid #edf0e8;
+}
+
+.ew-workspace tbody tr:nth-child(even) {
+  background: #fafcf7;
+}
+
+.ew-workspace tbody tr:hover {
+  background: #f2f6ec;
+}
+
+/* Saved draft details */
+
+.ew-workspace details {
+  margin-top: 18px;
+  border: 1px solid var(--ws-border);
+  border-radius: 11px;
+  background: #fbfcf8;
+}
+
+.ew-workspace summary {
+  padding: 14px 17px;
+  color: var(--ws-green);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ew-workspace summary:hover {
+  background: #f0f5e9;
+}
+
+.ew-workspace summary:focus-visible {
+  outline: 3px solid #329b65;
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+.ew-workspace details[open] > summary {
+  border-bottom: 1px solid var(--ws-border);
+}
+
+.ew-workspace details > :not(summary) {
+  margin: 16px;
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+  .ew-workspace .account-section {
+    padding: 18px 0;
+  }
+
+  .ew-workspace .account-card,
+  .ew-workspace .profile-section {
+    padding: 22px;
+    border-radius: 16px;
+  }
+
+  .ew-workspace .profile-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .ew-workspace .food-grid,
+  .ew-workspace .recipe-grid,
+  .ew-workspace .suggestion-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .ew-workspace article {
+    padding: 20px;
+  }
+
+  .ew-workspace th,
+  .ew-workspace td {
+    padding: 13px 15px;
+  }
+
+  .ew-workspace .profile-save {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .ew-workspace .account-card,
+  .ew-workspace .profile-section {
+    padding: 18px 15px;
+  }
+
+  .ew-workspace input:not([type='checkbox']):not([type='radio']),
+  .ew-workspace select,
+  .ew-workspace textarea {
+    font-size: 16px;
+  }
+
+  .ew-workspace .account-field {
+    margin-bottom: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ew-workspace button,
+  .ew-workspace input,
+  .ew-workspace select,
+  .ew-workspace textarea {
+    transition: none;
+  }
+}
