@@ -7,6 +7,15 @@
     <meta name="theme-color" content="#245840" />
     <meta name="description" content="Turn your nutrition targets into simple food quantities with EatWise. Explore food suggestions and save your daily drafts." />
     <title>EatWise — Your food. A clearer plan.</title>
+    <script>
+      try {
+        const savedTheme = localStorage.getItem('eatwise-theme');
+        const theme = savedTheme === 'light' || savedTheme === 'dark'
+          ? savedTheme : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      } catch { document.documentElement.dataset.theme = 'light'; }
+    </script>
   </head>
   <body>
     <div id="root"></div>

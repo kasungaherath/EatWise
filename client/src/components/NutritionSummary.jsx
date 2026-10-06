@@ -117,7 +117,7 @@ export default function NutritionSummary({ refreshKey = 0 }) {
 
       {!loading && !error && result && (
         <>
-          <div className="nutrition-energy-grid">
+          <div className="nutrition-overview"><div className="nutrition-energy-grid">
             <div className="nutrition-stat">
               <span className="nutrition-label">
                 Resting energy
@@ -165,7 +165,7 @@ export default function NutritionSummary({ refreshKey = 0 }) {
             </p>
           </div>
 
-          <h4 className="nutrition-macro-heading">
+          </div><h4 className="nutrition-macro-heading">
             Estimated daily macros
           </h4>
 

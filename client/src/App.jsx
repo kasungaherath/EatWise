@@ -1,34 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import AccountPanel from './components/AccountPanel.jsx'
 import eatwiseLogo from './assets/eatwise-logo.png'
+import servingBoard from './assets/serving-board.png'
 import './App.css'
 import './Workspace.css'
 import './LivingHomepage.css'
 import './LivingWorkspace.css'
-const exampleFoods = [
-  {
-    number: '01',
-    name: 'Cooked rice',
-    detail: 'Weight after cooking',
-    quantity: '150',
-    unit: 'grams',
-  },
-  {
-    number: '02',
-    name: 'Boiled eggs',
-    detail: 'Whole-food portions',
-    quantity: '2',
-    unit: 'eggs',
-  },
-  {
-    number: '03',
-    name: 'Banana',
-    detail: 'Simple everyday choices',
-    quantity: '1',
-    unit: 'medium',
-  },
-]
-
+import './Theme.css'
 const steps = [
   {
     number: '01',
@@ -74,6 +52,13 @@ function ArrowIcon() {
 }
 
 export default function App() {
+  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || 'light')
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    document.documentElement.style.colorScheme = theme
+    try { localStorage.setItem('eatwise-theme', theme) } catch { /* Storage may be unavailable. */ }
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#101d1a' : '#fafbf7')
+  }, [theme])
   const heroRef = useRef(null)
   const workspaceRef = useRef(null)
   const [heroVisible, setHeroVisible] = useState(true)
@@ -107,6 +92,15 @@ export default function App() {
         </a>
 
         <nav className="ew-nav" aria-label="Main navigation">
+          <button className="ew-theme-toggle" type="button"
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            onClick={() => setTheme((current) => current === 'dark' ? 'light' : 'dark')}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              {theme === 'dark' ? <><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" /></>
+                : <path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z" />}
+            </svg>
+            <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
+          </button>
           <a className="ew-nav-link" href="#how-it-works">
             How it works
           </a>
@@ -162,53 +156,11 @@ export default function App() {
             </div>
           </div>
 
-          <div className="ew-preview-stage">
-          <aside className="ew-preview" aria-labelledby="ew-preview-title">
-            <div className="ew-preview-top">
-              <svg className="ew-plan-symbol" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-                <path d="M7 6h12l6 6v14H7V6Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-                <path d="M18 6v7h7M11 18h10M11 22h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-              <span className="ew-badge">Illustrative example</span>
-            </div>
-
-            <h2 id="ew-preview-title">Good food. Clear quantities.</h2>
-
-            <p className="ew-preview-description">
-              Familiar foods, with portions you can understand.
-            </p>
-
-            <div className="ew-food-list">
-              {exampleFoods.map((food) => (
-                <div className="ew-food-row" key={food.number}>
-                  <div className="ew-food-copy">
-                    <h3>{food.name}</h3>
-                    <p>{food.detail}</p>
-                  </div>
-
-                  <div className="ew-food-quantity">
-                    <strong>{food.quantity}</strong>
-                    <span>{food.unit}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="ew-preview-note">
-              <span className="ew-note-icon" aria-hidden="true">
-                <ArrowIcon />
-              </span>
-              <p>
-                Your generated draft includes daily quantities and a
-                comparison with your calorie and macro targets.
-              </p>
-            </div>
-
-            <p className="ew-preview-disclaimer">
-              These examples show the format, not a complete daily plan
-              or a recommendation for you.
-            </p>
-          </aside>
+          <div className="ew-meal-stage">
+            <div className="ew-meal-shadow" aria-hidden="true" />
+            <img className="ew-serving-board" src={servingBoard} width="1254" height="1254"
+              alt="A sage-green serving board holding a chicken and vegetable meal bowl, a fresh fruit bowl, and a glass of milk"
+              fetchPriority="high" />
           </div>
         </section>
 
