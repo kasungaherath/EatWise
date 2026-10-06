@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { foodDisplayName } from '../foodDisplayName.js'
 
 const API_URL = (
   import.meta.env.VITE_API_URL || 'http://localhost:5000'
@@ -100,7 +101,7 @@ export default function FoodList({ refreshKey = 0 }) {
         <div className="profile-grid">
           {foods.map((food) => (
             <article className="account-card" key={food.id}>
-              <h4>{food.name}</h4>
+              <h4>{foodDisplayName(food.name)}</h4>
 
               <p>Preparation: {food.preparationState}</p>
 

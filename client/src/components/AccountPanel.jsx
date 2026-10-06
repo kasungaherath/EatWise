@@ -4,8 +4,6 @@ import PreferencesForm from './PreferencesForm'
 import NutritionSummary from './NutritionSummary'
 import FoodSuggestions from './FoodSuggestions'
 import SavedFoodPlans from './SavedFoodPlans'
-import FoodList from './FoodList'
-import RecipeList from './RecipeList'
 import './AccountPanel.css'
 
 const API_URL = (
@@ -335,15 +333,6 @@ export default function AccountPanel() {
           refreshKey={savedPlansRevision}
         />
 
-        <FoodList
-          key={`foods-${user.id}`}
-          refreshKey={preferencesRevision}
-        />
-
-        <RecipeList
-          key={`recipes-${user.id}`}
-          refreshKey={preferencesRevision}
-        />
       </section>
     )
   }

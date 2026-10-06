@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { foodDisplayName } from '../foodDisplayName.js'
 import './RecipeList.css'
 
 const API_URL = (
@@ -244,7 +245,7 @@ export default function RecipeList({ refreshKey = 0 }) {
                             ingredient.quantityGrams
                           )} g
                         </strong>
-                        {' '}{ingredient.name}
+                        {' '}{foodDisplayName(ingredient.name)}
 
                         {ingredient.preparationNote && (
                           <small>

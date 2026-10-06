@@ -87,6 +87,7 @@ test('calculates nutrition from converted weights', () => {
 
   assert.equal(result.items[0].grams, 150)
   assert.equal(result.items[0].unit, 'pieces')
+  assert.deepEqual(result.items[0].nutrition, result.totals)
 
   assert.deepEqual(result.totals, {
     calories: 300,

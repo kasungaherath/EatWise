@@ -13,7 +13,7 @@ function localDate() {
   return `${year}-${month}-${day}`
 }
 
-export default function SaveFoodPlanForm({ suggestion, onSaved }) {
+export default function SaveFoodPlanForm({ suggestion, onSaved, onSavingChange }) {
   const [title, setTitle] = useState('My food-plan draft')
   const [planDate, setPlanDate] = useState(localDate)
   const [saving, setSaving] = useState(false)
@@ -56,6 +56,7 @@ export default function SaveFoodPlanForm({ suggestion, onSaved }) {
     const controller = new AbortController()
     requestRef.current = controller
     setSaving(true)
+    onSavingChange?.(true)
     setError('')
 
     let savedDraft
@@ -106,6 +107,7 @@ export default function SaveFoodPlanForm({ suggestion, onSaved }) {
 
       if (!controller.signal.aborted) {
         setSaving(false)
+        onSavingChange?.(false)
       }
     }
 

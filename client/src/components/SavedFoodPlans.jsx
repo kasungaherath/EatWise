@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { foodDisplayName } from '../foodDisplayName.js'
 
 const API_URL = (
   import.meta.env.VITE_API_URL || 'http://localhost:5000'
@@ -48,6 +49,40 @@ export default function SavedFoodPlans({ refreshKey = 0 }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retry, setRetry] = useState(0)
+  const [confirmDelete, setConfirmDelete] = useState(null)
+  const [deleting, setDeleting] = useState(null)
+  const [deleteError, setDeleteError] = useState('')
+  const [notice, setNotice] = useState('')
+  const deletePending = useRef(false)
+  const deletedIds = useRef(new Set())
+
+  async function deleteDraft(draft) {
+    if (deletePending.current) return
+    deletePending.current = true
+    setDeleting(draft.id)
+    setDeleteError('')
+    setNotice('')
+    try {
+      const response = await fetch(`${API_URL}/api/food-plans/${encodeURIComponent(draft.id)}`, {
+        method: 'DELETE', credentials: 'include',
+      })
+      if (!response.ok) {
+        const data = await response.json().catch(() => null)
+        throw new Error(data?.message || 'Unable to delete this draft. Please try again.')
+      }
+      deletedIds.current.add(draft.id)
+      setDrafts((current) => current.filter((item) => item.id !== draft.id))
+      setConfirmDelete(null)
+      setNotice(`Deleted “${draft.title}”.`)
+    } catch (error) {
+      setDeleteError(error instanceof TypeError
+        ? 'Deletion could not be confirmed. Refresh saved drafts before trying again.'
+        : error.message)
+    } finally {
+      deletePending.current = false
+      setDeleting(null)
+    }
+  }
 
   useEffect(() => {
     const controller = new AbortController()
@@ -76,7 +111,7 @@ export default function SavedFoodPlans({ refreshKey = 0 }) {
         }
 
         if (!controller.signal.aborted) {
-          setDrafts(data.drafts)
+          setDrafts(data.drafts.filter((draft) => !deletedIds.current.has(draft.id)))
         }
       } catch (error) {
         if (!controller.signal.aborted) {
@@ -113,11 +148,13 @@ export default function SavedFoodPlans({ refreshKey = 0 }) {
       <button
         className="profile-save"
         type="button"
-        disabled={loading}
+        disabled={loading || deleting !== null}
         onClick={() => setRetry((current) => current + 1)}
       >
         {loading ? 'Loading…' : 'Refresh saved drafts'}
       </button>
+      {notice && <p className="account-message account-success" role="status">{notice}</p>}
+      {deleteError && <p className="account-message account-error" role="alert">{deleteError}</p>}
 
       {loading ? (
         <p role="status">Loading your saved drafts…</p>
@@ -128,7 +165,7 @@ export default function SavedFoodPlans({ refreshKey = 0 }) {
       ) : drafts.length === 0 ? (
         <p>No saved drafts yet.</p>
       ) : (
-        <div>
+        <div className="saved-drafts-grid">
           {drafts.map((draft) => {
             const snapshot = draft.suggestion
             const calculation = snapshot?.calculation
@@ -138,6 +175,25 @@ export default function SavedFoodPlans({ refreshKey = 0 }) {
             return (
               <article className="account-card" key={draft.id}>
                 <h4>{draft.title}</h4>
+                <div className="saved-draft-actions">
+                  {confirmDelete === draft.id ? (
+                    <>
+                      <p>Delete this draft permanently?</p>
+                      <button className="draft-delete" type="button" disabled={deleting !== null}
+                        onClick={() => deleteDraft(draft)}>
+                        {deleting === draft.id ? 'Deleting…' : 'Confirm delete'}
+                      </button>
+                      <button className="account-switch" type="button" disabled={deleting !== null}
+                        onClick={() => setConfirmDelete(null)}>Cancel</button>
+                    </>
+                  ) : (
+                    <button className="draft-delete" type="button" disabled={deleting !== null}
+                      aria-label={`Delete draft: ${draft.title}`}
+                      onClick={() => { setConfirmDelete(draft.id); setDeleteError('') }}>
+                      Delete draft
+                    </button>
+                  )}
+                </div>
 
                 <p>
                   <time dateTime={draft.planDate}>
@@ -169,7 +225,7 @@ export default function SavedFoodPlans({ refreshKey = 0 }) {
                     <ul>
                       {items.map((item) => (
                         <li key={`${item.foodId}-${item.portionId}`}>
-                          <strong>{item.name}</strong>
+                          <strong>{foodDisplayName(item.name)}</strong>
                           {' — '}
                           {displayNumber(item.quantity)} {item.unit}
                           {' ('}
@@ -178,6 +234,11 @@ export default function SavedFoodPlans({ refreshKey = 0 }) {
                           {item.preparationState
                             ? ` · ${item.preparationState}`
                             : ''}
+                          <p>
+                            {displayNumber(item.nutrition?.calories)} kcal · Protein {displayNumber(item.nutrition?.proteinGrams)} g
+                            {' · '}Carbohydrates {displayNumber(item.nutrition?.carbohydrateGrams)} g
+                            {' · '}Fat {displayNumber(item.nutrition?.fatGrams)} g
+                          </p>
                         </li>
                       ))}
                     </ul>

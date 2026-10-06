@@ -6,6 +6,13 @@ const dietColumns = {
 }
 
 const aliases = new Map([
+  ['peanut', 'peanut'], ['peanuts', 'peanut'],
+  ['groundnut', 'peanut'], ['groundnuts', 'peanut'],
+  ['quinoa', 'quinoa'], ['bulgur', 'bulgur'], ['wheat', 'wheat'],
+  ['gluten', 'gluten'], ['apple', 'apple'], ['apples', 'apple'],
+  ['avocado', 'avocado'], ['avocados', 'avocado'], ['spinach', 'spinach'],
+  ['salmon', 'salmon'], ['fish', 'fish'], ['fresh milk', 'milk'],
+  ['whole milk', 'milk'],
   ['egg', 'egg'],
   ['eggs', 'egg'],
   ['rice', 'rice'],
@@ -31,11 +38,28 @@ const aliases = new Map([
   ['garbanzo bean', 'chickpea'],
   ['garbanzo beans', 'chickpea'],
   ['bengal gram', 'chickpea'],
+  ['broccoli', 'broccoli'],
+  ['sweet potato', 'sweet_potato'],
+  ['sweet potatoes', 'sweet_potato'],
+  ['yogurt', 'yogurt'],
+  ['yoghurt', 'yogurt'],
+  ['greek yogurt', 'yogurt'],
+  ['greek yoghurt', 'yogurt'],
+  ['milk', 'milk'],
+  ['dairy', 'milk'],
 ])
 
 // Explicit classifications for the imported USDA records.
 // Unknown records remain excluded when exclusions are present.
 const foodTags = new Map([
+  ['171265', ['milk']],
+  ['173806', ['peanut']],
+  ['168917', ['quinoa']],
+  ['170287', ['bulgur', 'wheat', 'gluten']],
+  ['171688', ['apple']],
+  ['171705', ['avocado']],
+  ['168463', ['spinach']],
+  ['175168', ['salmon', 'fish']],
   ['168878', ['rice']],
   ['173944', ['banana']],
   ['172421', ['lentil']],
@@ -45,6 +69,9 @@ const foodTags = new Map([
   ['170567', ['almond', 'tree_nut']],
   ['171413', ['olive_oil']],
   ['173757', ['chickpea']],
+  ['169967', ['broccoli']],
+  ['168483', ['sweet_potato']],
+  ['170894', ['yogurt', 'milk']],
 ])
 
 function normalize(value) {

@@ -197,3 +197,47 @@
 @media (prefers-reduced-motion: reduce) {
   .ew-workspace-heading::before { animation: none; }
 }
+
+/* Nutrition is for the exact suggested quantity, not per 100 g. */
+.ew-workspace .fs-item-macros {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 20px 0 0;
+}
+.ew-workspace .fs-item-macros > div {
+  padding: 12px;
+  border-radius: 10px;
+  background: #edf4f0;
+}
+.ew-workspace .fs-item-macros > div:nth-child(2) { background: #edf1fa; }
+.ew-workspace .fs-item-macros > div:nth-child(4) { background: #f3eef8; }
+.ew-workspace .fs-item-macros dt { color: #536762; font-size: 12px; }
+.ew-workspace .fs-item-macros dd {
+  margin: 5px 0 0;
+  color: #204c40;
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.ew-workspace .fs-item-macros dd span { font-size: 12px; font-weight: 400; }
+
+/* Distinct food cards keep quantities and macros visually grouped. */
+.ew-workspace article.fs-food-card {
+  padding: 22px;
+  border: 1px solid #ccdcd5;
+  border-radius: 16px;
+  background: #fcfdfb;
+}
+.ew-workspace article.fs-food-card:nth-child(3n + 2) { border-color: #cbd6eb; }
+.ew-workspace article.fs-food-card:nth-child(3n) { border-color: #dacde4; }
+.ew-workspace .saved-drafts-grid { display: grid; gap: 20px; margin-top: 24px; }
+.ew-workspace .saved-draft-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-block: 16px; }
+.ew-workspace .saved-draft-actions p { flex-basis: 100%; margin: 0; }
+.ew-workspace button.draft-delete { background: #fff6f4; border-color: #e7c6c0; color: #943c32; }
+.ew-workspace button.draft-delete:hover:not(:disabled) { background: #f8e4df; border-color: #bd766a; color: #7b2e26; box-shadow: none; }
+.ew-workspace .saved-drafts-grid details ul { list-style: none; padding: 0; }
+.ew-workspace .saved-drafts-grid details li { padding: 16px; margin-block: 12px; border: 1px solid var(--ws-border); border-radius: 12px; background: #fff; }
+@media (max-width: 480px) {
+  .ew-workspace article.fs-food-card { padding: 18px; }
+}

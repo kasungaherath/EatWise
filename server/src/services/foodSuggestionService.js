@@ -210,6 +210,12 @@ Rules:
 - Propose totals for ONE DAY, not quantities per meal.
 - Aim close to ALL supplied targets: calories, protein, carbohydrates, and fat.
 - Do not focus only on matching calories.
+- Prefer a varied selection of minimally processed foods: vegetables, fruit,
+  whole grains or starchy vegetables, legumes, and suitable protein sources.
+- Include vegetables and fruit when the eligible catalogue supports them.
+- Choose unsweetened dairy, nuts, seeds, or unsaturated oils where eligible
+  to complement the protein, carbohydrate, and fat targets.
+- Respect each food's maxDailyGrams and each portion's maxQuantity.
 - Do not invent foods, portion IDs, nutrition values, or target values.
 - Choose at most one portion per food.
 - Choose no more than 50 foods.
@@ -226,6 +232,8 @@ Rules:
 
 Data:
 ${JSON.stringify({
+  goal: context.goal,
+  dietType: context.dietType,
   targets,
   foods: context.foods,
 })}
