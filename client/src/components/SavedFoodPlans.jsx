@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { foodDisplayName } from '../foodDisplayName.js'
+import {
+  DEFAULT_DEMO_DRAFTS,
+  getDemoStorage,
+  setDemoStorage,
+} from '../demoWorkspace.js'
 
 const API_URL = (
   import.meta.env.VITE_API_URL || 'http://localhost:5000'
@@ -44,7 +49,7 @@ function matchLabel(status) {
   return 'Target matching not assessed'
 }
 
-export default function SavedFoodPlans({ refreshKey = 0 }) {
+export default function SavedFoodPlans({ refreshKey = 0, isDemo = false }) {
   const [drafts, setDrafts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -58,6 +63,15 @@ export default function SavedFoodPlans({ refreshKey = 0 }) {
 
   async function deleteDraft(draft) {
     if (deletePending.current) return
+
+    if (isDemo) {
+      const updated = drafts.filter((item) => item.id !== draft.id)
+      setDemoStorage('drafts', updated)
+      setDrafts(updated)
+      setConfirmDelete(null)
+      setNotice(`Deleted “${draft.title}”.`)
+      return
+    }
     deletePending.current = true
     setDeleting(draft.id)
     setDeleteError('')
@@ -90,6 +104,13 @@ export default function SavedFoodPlans({ refreshKey = 0 }) {
     async function loadDrafts() {
       setLoading(true)
       setError('')
+
+      if (isDemo) {
+        const demoDrafts = getDemoStorage('drafts', DEFAULT_DEMO_DRAFTS)
+        setDrafts(demoDrafts)
+        setLoading(false)
+        return
+      }
 
       try {
         const response = await fetch(`${API_URL}/api/food-plans`, {
@@ -131,7 +152,7 @@ export default function SavedFoodPlans({ refreshKey = 0 }) {
     loadDrafts()
 
     return () => controller.abort()
-  }, [refreshKey, retry])
+  }, [refreshKey, retry, isDemo])
 
   return (
     <section

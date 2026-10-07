@@ -8,3 +8,7 @@ dist/
 .vscode/
 .DS_Store
 Thumbs.db
+.agent/
+.agents/
+.codex/
+.gemini/

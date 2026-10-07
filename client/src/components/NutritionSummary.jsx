@@ -1,4 +1,8 @@
 import { useEffect, useState } from 'react'
+import {
+  DEFAULT_DEMO_NUTRITION,
+  getDemoStorage,
+} from '../demoWorkspace.js'
 import './NutritionSummary.css'
 
 const API_URL = (
@@ -15,10 +19,11 @@ const numberFormat = new Intl.NumberFormat('en', {
   maximumFractionDigits: 1,
 })
 
-export default function NutritionSummary({ refreshKey = 0 }) {
+export default function NutritionSummary({ refreshKey = 0, isDemo = false }) {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [needsProfile, setNeedsProfile] = useState(false)
   const [retry, setRetry] = useState(0)
 
   useEffect(() => {
@@ -27,7 +32,15 @@ export default function NutritionSummary({ refreshKey = 0 }) {
     async function loadNutrition() {
       setLoading(true)
       setError('')
+      setNeedsProfile(false)
       setResult(null)
+
+      if (isDemo) {
+        const demoNut = getDemoStorage('nutrition', DEFAULT_DEMO_NUTRITION)
+        setResult(demoNut)
+        setLoading(false)
+        return
+      }
 
       try {
         const response = await fetch(
@@ -42,6 +55,10 @@ export default function NutritionSummary({ refreshKey = 0 }) {
         const data = await response.json()
 
         if (!response.ok) {
+          if (response.status === 422 || data.message?.includes('profile first')) {
+            setNeedsProfile(true)
+            return
+          }
           throw new Error(
             data.message || 'Unable to load your nutrition estimates.'
           )
@@ -87,7 +104,7 @@ export default function NutritionSummary({ refreshKey = 0 }) {
     loadNutrition()
 
     return () => controller.abort()
-  }, [refreshKey, retry])
+  }, [refreshKey, retry, isDemo])
 
   const estimate = result?.estimate
   const targets = result?.targets
@@ -108,6 +125,36 @@ export default function NutritionSummary({ refreshKey = 0 }) {
       </p>
 
       {loading && <p role="status">Calculating your estimates…</p>}
+
+      {needsProfile && (
+        <div style={{
+          marginTop: '16px',
+          padding: '24px',
+          background: 'rgba(240, 246, 238, 0.9)',
+          borderRadius: '16px',
+          border: '1px dashed rgba(56, 123, 84, 0.3)',
+          textAlign: 'center'
+        }}>
+          <h4 style={{ fontSize: '16px', fontWeight: '700', margin: '0 0 8px', color: 'var(--ew-ink)' }}>Profile Measurements Needed</h4>
+          <p style={{ fontSize: '14px', color: 'var(--ew-muted)', margin: '0 0 16px', maxWidth: '480px', marginLeft: 'auto', marginRight: 'auto' }}>
+            Complete your measurements in the Personal Profile section above and click "Save profile" to calculate your personalized energy needs, resting calories, and target macros.
+          </p>
+          <a href="#profile-heading" style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '9px 18px',
+            borderRadius: '999px',
+            background: 'var(--ew-green)',
+            color: '#fff',
+            fontSize: '13px',
+            fontWeight: '700',
+            textDecoration: 'none'
+          }}>
+            Complete Personal Profile ↑
+          </a>
+        </div>
+      )}
 
       {error && (
         <p className="account-message account-error" role="alert">

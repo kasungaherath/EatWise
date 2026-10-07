@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import SaveFoodPlanForm from './SaveFoodPlanForm.jsx'
 import { foodDisplayName } from '../foodDisplayName.js'
+import {
+  DEFAULT_DEMO_SUGGESTION,
+  getDemoStorage,
+  setDemoStorage,
+} from '../demoWorkspace.js'
 import './FoodSuggestions.css'
 
 const API_URL = (
@@ -56,8 +61,10 @@ function validSuggestion(result) {
   )
 }
 
-export default function FoodSuggestions({ onSaved }) {
-  const [suggestion, setSuggestion] = useState(null)
+export default function FoodSuggestions({ onSaved, isDemo = false }) {
+  const [suggestion, setSuggestion] = useState(() =>
+    isDemo ? getDemoStorage('suggestion', DEFAULT_DEMO_SUGGESTION) : null
+  )
   const [generating, setGenerating] = useState(false)
   const [savingDraft, setSavingDraft] = useState(false)
   const [error, setError] = useState('')
@@ -76,6 +83,17 @@ export default function FoodSuggestions({ onSaved }) {
 
   async function generateSuggestion() {
     if (requestRef.current || savingRef.current) return
+
+    if (isDemo) {
+      setGenerating(true)
+      setError('')
+      setTimeout(() => {
+        setSuggestion(DEFAULT_DEMO_SUGGESTION)
+        setDemoStorage('suggestion', DEFAULT_DEMO_SUGGESTION)
+        setGenerating(false)
+      }, 500)
+      return
+    }
 
     const controller = new AbortController()
     requestRef.current = controller
@@ -343,6 +361,7 @@ export default function FoodSuggestions({ onSaved }) {
               suggestion={suggestion}
               onSavingChange={handleSavingChange}
               onSaved={onSaved}
+              isDemo={isDemo}
             />
           </div>
         </div>

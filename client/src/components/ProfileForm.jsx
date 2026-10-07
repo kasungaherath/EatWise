@@ -1,4 +1,9 @@
 import { useEffect, useState } from 'react'
+import {
+  DEFAULT_DEMO_PROFILE,
+  getDemoStorage,
+  setDemoStorage,
+} from '../demoWorkspace.js'
 import './ProfileForm.css'
 
 const API_URL = (
@@ -68,7 +73,7 @@ async function profileRequest(options = {}) {
   return data
 }
 
-export default function ProfileForm({ onSaved }) {
+export default function ProfileForm({ onSaved, isDemo = false }) {
   const [form, setForm] = useState({ ...emptyProfile })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -85,6 +90,13 @@ export default function ProfileForm({ onSaved }) {
       setLoadFailed(false)
       setError('')
       setNotice('')
+
+      if (isDemo) {
+        const demoData = getDemoStorage('profile', DEFAULT_DEMO_PROFILE)
+        setForm(toForm(demoData))
+        setLoading(false)
+        return
+      }
 
       try {
         const data = await profileRequest({
@@ -113,7 +125,7 @@ export default function ProfileForm({ onSaved }) {
     loadProfile()
 
     return () => controller.abort()
-  }, [retry])
+  }, [retry, isDemo])
 
   function updateField(event) {
     const { name, value } = event.target
@@ -127,6 +139,12 @@ export default function ProfileForm({ onSaved }) {
     setNotice('')
   }
 
+  function handleQuickFill() {
+    setForm(toForm(DEFAULT_DEMO_PROFILE))
+    setError('')
+    setNotice('Sample measurements filled. Click "Save profile" to calculate nutrition.')
+  }
+
   async function handleSave(event) {
     event.preventDefault()
     if (saving) return
@@ -134,6 +152,23 @@ export default function ProfileForm({ onSaved }) {
     setSaving(true)
     setError('')
     setNotice('')
+
+    if (isDemo) {
+      const demoSaved = {
+        age: Number(form.age),
+        sexForCalculation: form.sexForCalculation || 'female',
+        heightCm: Number(form.heightCm),
+        weightKg: Number(form.weightKg),
+        activityLevel: form.activityLevel || 'active',
+        goal: form.goal || 'maintain_weight',
+      }
+      setDemoStorage('profile', demoSaved)
+      setForm(toForm(demoSaved))
+      setNotice('Demo profile saved successfully.')
+      setSaving(false)
+      onSaved?.()
+      return
+    }
 
     const payload = {
       age: Number(form.age),
@@ -359,9 +394,27 @@ export default function ProfileForm({ onSaved }) {
             EatWise currently supports adults aged 18 and over.
           </p>
 
-          <button className="profile-save" type="submit">
-            {saving ? 'Saving…' : 'Save profile'}
-          </button>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', marginTop: '16px' }}>
+            <button className="profile-save" type="submit">
+              {saving ? 'Saving…' : 'Save profile'}
+            </button>
+            <button
+              type="button"
+              onClick={handleQuickFill}
+              style={{
+                background: 'rgba(235, 243, 233, 0.9)',
+                border: '1px solid rgba(56, 123, 84, 0.25)',
+                color: 'var(--ew-ink, #183c30)',
+                padding: '11px 18px',
+                borderRadius: '10px',
+                fontSize: '13.5px',
+                fontWeight: '600',
+                cursor: 'pointer',
+              }}
+            >
+              Fill Sample Measurements
+            </button>
+          </div>
         </fieldset>
 
         {error && (

@@ -1,4 +1,9 @@
 import { useEffect, useState } from 'react'
+import {
+  DEFAULT_DEMO_PREFERENCES,
+  getDemoStorage,
+  setDemoStorage,
+} from '../demoWorkspace.js'
 import './ProfileForm.css'
 
 const API_URL = (
@@ -101,7 +106,7 @@ async function preferencesRequest(options = {}) {
   return data
 }
 
-export default function PreferencesForm({ onSaved }) {
+export default function PreferencesForm({ onSaved, isDemo = false }) {
   const [form, setForm] = useState({ ...emptyPreferences })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -117,6 +122,13 @@ export default function PreferencesForm({ onSaved }) {
       setLoading(true)
       setLoadFailed(false)
       setError('')
+
+      if (isDemo) {
+        const demoData = getDemoStorage('preferences', DEFAULT_DEMO_PREFERENCES)
+        setForm(toForm(demoData))
+        setLoading(false)
+        return
+      }
 
       try {
         const data = await preferencesRequest({
@@ -145,7 +157,7 @@ export default function PreferencesForm({ onSaved }) {
     loadPreferences()
 
     return () => controller.abort()
-  }, [retry])
+  }, [retry, isDemo])
 
   function updateField(event) {
     const { name, value } = event.target
@@ -167,6 +179,22 @@ export default function PreferencesForm({ onSaved }) {
     setSaving(true)
     setError('')
     setNotice('')
+
+    if (isDemo) {
+      const demoSaved = {
+        dietType: form.dietType || 'omnivore',
+        allergies: parseList(form.allergies, 'Allergies'),
+        avoidedFoods: parseList(form.avoidedFoods, 'Foods to avoid'),
+        dailyBudgetLkr: form.dailyBudgetLkr ? Number(form.dailyBudgetLkr) : null,
+        mealsPerDay: Number(form.mealsPerDay || 3),
+      }
+      setDemoStorage('preferences', demoSaved)
+      setForm(toForm(demoSaved))
+      setNotice('Demo preferences saved successfully.')
+      setSaving(false)
+      onSaved?.()
+      return
+    }
 
     try {
       const validDiets = [

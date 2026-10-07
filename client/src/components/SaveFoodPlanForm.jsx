@@ -1,4 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
+import {
+  DEFAULT_DEMO_DRAFTS,
+  getDemoStorage,
+  setDemoStorage,
+} from '../demoWorkspace.js'
 
 const API_URL = (
   import.meta.env.VITE_API_URL || 'http://localhost:5000'
@@ -13,7 +18,7 @@ function localDate() {
   return `${year}-${month}-${day}`
 }
 
-export default function SaveFoodPlanForm({ suggestion, onSaved, onSavingChange }) {
+export default function SaveFoodPlanForm({ suggestion, onSaved, onSavingChange, isDemo = false }) {
   const [title, setTitle] = useState('My food-plan draft')
   const [planDate, setPlanDate] = useState(localDate)
   const [saving, setSaving] = useState(false)
@@ -52,6 +57,26 @@ export default function SaveFoodPlanForm({ suggestion, onSaved, onSavingChange }
       portionId: item.portionId,
       quantity: item.quantity,
     }))
+
+    if (isDemo) {
+      setSaving(true)
+      onSavingChange?.(true)
+      const drafts = getDemoStorage('drafts', DEFAULT_DEMO_DRAFTS)
+      const newDraft = {
+        id: Date.now(),
+        title: cleanedTitle,
+        planDate,
+        status: 'draft',
+        suggestion,
+        createdAt: new Date().toISOString(),
+      }
+      setDemoStorage('drafts', [newDraft, ...drafts])
+      setSaved(true)
+      setSaving(false)
+      onSavingChange?.(false)
+      onSaved?.()
+      return
+    }
 
     const controller = new AbortController()
     requestRef.current = controller
