@@ -27,10 +27,22 @@ const photos = [
   ['general-food', null],
 ]
 
+// Square crops fill the thumbnail without letterboxing or stretching.
+// Keep each crop inside its photographed row; trim the last row's empty
+// table space below the food rather than shrinking it into a tall frame.
+const rowFrames = [
+  { top: 0, size: 250 },
+  { top: 250, size: 246 },
+  { top: 496, size: 244 },
+  { top: 740, size: 256 },
+]
+
 function photoAt(index) {
+  const { top, size } = rowFrames[Math.floor(index / 6)]
+  const left = (index % 6) * 256 + (256 - size) / 2
   return {
     key: photos[index][0],
-    position: `${(index % 6) * 20}% ${Math.floor(index / 6) * (100 / 3)}%`,
+    viewBox: left + ' ' + top + ' ' + size + ' ' + size,
   }
 }
 

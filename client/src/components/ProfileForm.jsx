@@ -1,3 +1,4 @@
+import WorkspaceSectionTitle from './WorkspaceSectionTitle.jsx'
 import { useEffect, useState } from 'react'
 import {
   DEFAULT_DEMO_PROFILE,
@@ -230,7 +231,7 @@ export default function ProfileForm({ onSaved, isDemo = false }) {
   if (loading) {
     return (
       <section className="profile-section ew-section-state" data-workspace-section="profile" aria-labelledby="profile-heading" aria-busy={loading}>
-        <h3 id="profile-heading">Your personal profile</h3>
+        <WorkspaceSectionTitle id="profile-heading" icon="profile">Your personal profile</WorkspaceSectionTitle>
         <p role="status">Loading your profile…</p>
       </section>
     )
@@ -239,7 +240,7 @@ export default function ProfileForm({ onSaved, isDemo = false }) {
   if (loadFailed) {
     return (
       <section className="profile-section ew-section-state" data-workspace-section="profile" aria-labelledby="profile-heading" aria-busy={loading}>
-        <h3 id="profile-heading">Your personal profile</h3>
+        <WorkspaceSectionTitle id="profile-heading" icon="profile">Your personal profile</WorkspaceSectionTitle>
         <p className="account-message account-error" role="alert">
           {error}
         </p>
@@ -260,7 +261,7 @@ export default function ProfileForm({ onSaved, isDemo = false }) {
       className="profile-section" data-workspace-section="profile"
       aria-labelledby="profile-heading"
     >
-      <h3 id="profile-heading">Your personal profile</h3>
+      <WorkspaceSectionTitle id="profile-heading" icon="profile">Your personal profile</WorkspaceSectionTitle>
 
       <p className="profile-description">
         Tell us about yourself and what you want to achieve.

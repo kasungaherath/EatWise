@@ -1,28 +1,51 @@
 /* Shared Profile sage palette for every workspace section.
    Primary actions and success/error meanings remain shared across the app. */
+/* The workspace canvas has its own quiet, continuous colour field. */
+.ew-workspace-shell { --workspace-canvas: #d4e2d8; }
+html:has(.ew-workspace-shell), body:has(.ew-workspace-shell) { background: #d4e2d8; }
 .ew-workspace-shell .ew-alive-fullscreen {
-  background: linear-gradient(135deg, #e3eadf 0%, #f2f0e7 52%, #e6eee6 100%);
+  background:
+    radial-gradient(ellipse at 48% 8%, #f1f3e7 0%, #f1f3e700 58%),
+    radial-gradient(ellipse at 0% 55%, #bbd2bf80 0%, #bbd2bf00 62%),
+    linear-gradient(145deg, #d1e0d1 0%, #e3eadd 44%, #c6dcd2 100%);
 }
-.ew-workspace-shell .ew-alive-aura { display: none; mix-blend-mode: normal; filter: none; }
-.ew-workspace-shell .ew-aura-mint {
+.ew-workspace-shell .ew-alive-aura { display: none; mix-blend-mode: normal; filter: none; -webkit-filter: none; }
+.ew-workspace-shell :is(.ew-aura-mint, .ew-aura-emerald) {
   display: block;
-  width: 80vw;
-  height: 80vh;
-  left: -35vw;
-  top: -35vh;
-  background: radial-gradient(ellipse, #afc5ad80 0%, #afc5ad00 68%);
-  animation-duration: 36s;
+  width: clamp(420px, 72vw, 1120px);
+  height: clamp(420px, 90vh, 900px);
+  opacity: .55;
+  animation: ew-workspace-breathe 32s ease-in-out infinite alternate;
+}
+.ew-workspace-shell .ew-aura-mint {
+  left: -24%;
+  top: -32%;
+  background: radial-gradient(ellipse, #aec99099 0%, #aec99000 68%);
 }
 .ew-workspace-shell .ew-aura-emerald {
-  display: block;
-  width: 70vw;
-  height: 80vh;
-  right: -30vw;
-  bottom: -40vh;
-  background: radial-gradient(ellipse, #a7c6b580 0%, #a7c6b500 70%);
-  animation-duration: 36s;
+  right: -22%;
+  bottom: -32%;
+  background: radial-gradient(ellipse, #78ae9a80 0%, #78ae9a00 70%);
+  animation-direction: alternate-reverse;
 }
 .ew-workspace-shell .ew-alive-frost { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+@keyframes ew-workspace-breathe {
+  from { transform: translate3d(0, 0, 0) scale(1); opacity: .45; }
+  to { transform: translate3d(5%, 3%, 0) scale(1.08); opacity: .65; }
+}
+@media (max-width: 600px) {
+  .ew-workspace-shell .ew-alive-fullscreen {
+    background:
+      radial-gradient(ellipse at 50% 0%, #eef2e4 0%, #eef2e400 65%),
+      linear-gradient(155deg, #d1e0d1 0%, #dce7d9 48%, #c6dcd2 100%);
+  }
+  .ew-workspace-shell .ew-aura-mint { left: -70%; top: -30%; }
+  .ew-workspace-shell .ew-aura-emerald { right: -65%; bottom: -25%; }
+}
+@media (forced-colors: active) {
+  .ew-workspace-shell .ew-alive-fullscreen { background: Canvas; }
+  .ew-workspace-shell .ew-alive-aura { display: none; }
+}
 .ew-workspace-shell .ew-header { border-color: #bccdbf; }
 .ew-workspace .ew-workspace-topbar, .ew-workspace .ew-section-nav {
   background: #eaf1e7;
@@ -166,7 +189,7 @@
 .ew-workspace [data-workspace-section] .profile-note { margin: 0; font-size: 13px; line-height: 1.65; padding: 12px 14px; }
 .ew-workspace [data-workspace-section='preferences'] .profile-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 20px; }
 .ew-workspace [data-workspace-section='preferences'] .profile-save { grid-column: 1 / -1; justify-self: start; width: auto; margin: 0; }
-.ew-workspace [data-workspace-section='preferences'] .account-field:has(#preferences-budget) { grid-column: 1 / -1; max-width: 440px; }
+.ew-workspace [data-workspace-section='preferences'] .account-field:has(#preferences-diet) { grid-column: 1 / -1; max-width: 440px; }
 .ew-workspace .nutrition-overview { gap: 16px; }
 .ew-workspace .nutrition-stat { padding: 18px; }
 .ew-workspace .nutrition-stat strong { font-size: 28px; }
@@ -209,7 +232,7 @@
   .ew-workspace .fs-heading { align-items: stretch; }
   .ew-workspace .nutrition-macro-grid .nutrition-stat { min-height: 0; }
   .ew-workspace [data-workspace-section='preferences'] .profile-fields { grid-template-columns: 1fr; gap: 20px; }
-  .ew-workspace [data-workspace-section='preferences'] .account-field:has(#preferences-budget) { max-width: none; }
+  .ew-workspace [data-workspace-section='preferences'] .account-field:has(#preferences-diet) { max-width: none; }
   .ew-workspace .fs-save-panel .profile-fields { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {

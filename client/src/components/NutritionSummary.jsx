@@ -4,6 +4,8 @@ import {
   getDemoStorage,
 } from '../demoWorkspace.js'
 import './NutritionSummary.css'
+import WorkspaceIcon from './WorkspaceIcon.jsx'
+import WorkspaceSectionTitle from './WorkspaceSectionTitle.jsx'
 
 const API_URL = (
   import.meta.env.VITE_API_URL || 'http://localhost:5000'
@@ -116,7 +118,7 @@ export default function NutritionSummary({ refreshKey = 0, isDemo = false }) {
       aria-busy={loading}
     >
       <div className="nutrition-heading-row">
-        <h3 id="nutrition-heading">Your nutrition estimates</h3>
+        <WorkspaceSectionTitle id="nutrition-heading" icon="nutrition">Your nutrition estimates</WorkspaceSectionTitle>
         <span className="nutrition-badge">Estimated</span>
       </div>
 
@@ -250,6 +252,7 @@ export default function NutritionSummary({ refreshKey = 0, isDemo = false }) {
           type="button"
           onClick={() => setRetry((current) => current + 1)}
         >
+          <WorkspaceIcon name="nutrition" size={20} />
           {error ? 'Try again' : 'Refresh estimates'}
         </button>
       )}

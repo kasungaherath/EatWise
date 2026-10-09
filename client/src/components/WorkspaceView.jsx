@@ -4,13 +4,14 @@ import PreferencesForm from './PreferencesForm.jsx'
 import NutritionSummary from './NutritionSummary.jsx'
 import FoodSuggestions from './FoodSuggestions.jsx'
 import SavedFoodPlans from './SavedFoodPlans.jsx'
+import WorkspaceIcon from './WorkspaceIcon.jsx'
 
 const WORKSPACE_SECTIONS = [
-  { id: 'profile-heading', label: 'Profile', icon: 'M20 21v-2a7 7 0 0 0-14 0v2M17 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0' },
-  { id: 'nutrition-heading', label: 'Nutrition targets', icon: 'M21 12a9 9 0 1 1-9-9m5 9a5 5 0 1 1-5-5m0 5 9-9m-5 0h5v5' },
-  { id: 'preferences-heading', label: 'Preferences', icon: 'M4 7h9m4 0h3M4 17h3m4 0h9M13 4v6m-6 4v6' },
-  { id: 'food-suggestions-heading', label: 'Food draft', icon: 'M3 11h18a9 9 0 0 1-18 0Zm4 10h10M8 3v4m4-4v4m4-4v4' },
-  { id: 'saved-food-plans-heading', label: 'Saved drafts', icon: 'M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16l-6-4-6 4Z' },
+  { id: 'profile-heading', label: 'Profile', icon: 'profile' },
+  { id: 'nutrition-heading', label: 'Nutrition targets', icon: 'nutrition' },
+  { id: 'preferences-heading', label: 'Preferences', icon: 'preferences' },
+  { id: 'food-suggestions-heading', label: 'Food draft', icon: 'foodDraft' },
+  { id: 'saved-food-plans-heading', label: 'Saved drafts', icon: 'saved' },
 ]
 
 export default function WorkspaceView({ user, onLogout, onGoHome }) {
@@ -151,7 +152,7 @@ export default function WorkspaceView({ user, onLogout, onGoHome }) {
             aria-controls={section.id}
             aria-current={activeSection === section.id ? 'location' : undefined}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={section.icon} /></svg>
+            <WorkspaceIcon name={section.icon} />
           </button>
         ))}
       </nav>

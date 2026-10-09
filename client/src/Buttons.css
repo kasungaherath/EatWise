@@ -197,3 +197,8 @@
   :is(.ew-workspace, .ew-app-entry) .ew-action, .ew-section-button { transition: none; }
   .ew-action[aria-busy='true']::before { animation: none; }
 }
+
+/* Headings and actions share the navigation's visual vocabulary. */
+.ew-workspace .ew-workspace-section-title { display: flex; align-items: flex-start; gap: 10px; }
+.ew-workspace-section-title > .ew-workspace-icon { flex-shrink: 0; margin-top: 4px; }
+.ew-workspace-section-title > span { min-width: 0; }

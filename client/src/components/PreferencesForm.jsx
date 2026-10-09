@@ -1,3 +1,4 @@
+import WorkspaceSectionTitle from './WorkspaceSectionTitle.jsx'
 import { useEffect, useState } from 'react'
 import {
   DEFAULT_DEMO_PREFERENCES,
@@ -14,8 +15,9 @@ const emptyPreferences = {
   dietType: '',
   allergies: '',
   avoidedFoods: '',
-  dailyBudgetLkr: '',
-  mealsPerDay: '3',
+  // Retain compatibility with saved preferences and the existing API.
+  dailyBudgetLkr: null,
+  mealsPerDay: 3,
 }
 
 function toForm(preferences) {
@@ -29,9 +31,9 @@ function toForm(preferences) {
       : '',
     dailyBudgetLkr:
       preferences.dailyBudgetLkr == null
-        ? ''
-        : String(preferences.dailyBudgetLkr),
-    mealsPerDay: String(preferences.mealsPerDay ?? 3),
+        ? null
+        : Number(preferences.dailyBudgetLkr),
+    mealsPerDay: Number(preferences.mealsPerDay ?? 3),
   }
 }
 
@@ -174,90 +176,43 @@ export default function PreferencesForm({ onSaved, isDemo = false }) {
 
   async function handleSave(event) {
     event.preventDefault()
-
     if (saving) return
 
     setSaving(true)
     setError('')
     setNotice('')
 
-    if (isDemo) {
-      const demoSaved = {
-        dietType: form.dietType || 'omnivore',
-        allergies: parseList(form.allergies, 'Allergies'),
-        avoidedFoods: parseList(form.avoidedFoods, 'Foods to avoid'),
-        dailyBudgetLkr: form.dailyBudgetLkr ? Number(form.dailyBudgetLkr) : null,
-        mealsPerDay: Number(form.mealsPerDay || 3),
-      }
-      setDemoStorage('preferences', demoSaved)
-      setForm(toForm(demoSaved))
-      setNotice('Demo preferences saved successfully.')
-      setSaving(false)
-      onSaved?.()
-      return
-    }
-
     try {
-      const validDiets = [
-        'omnivore',
-        'vegetarian',
-        'vegan',
-        'pescatarian',
-      ]
-
+      const validDiets = ['omnivore', 'vegetarian', 'vegan', 'pescatarian']
       if (!validDiets.includes(form.dietType)) {
         throw new Error('Select a valid diet type.')
-      }
-
-      const mealsPerDay = Number(form.mealsPerDay)
-
-      if (
-        !Number.isInteger(mealsPerDay) ||
-        mealsPerDay < 2 ||
-        mealsPerDay > 6
-      ) {
-        throw new Error('Select between 2 and 6 meals per day.')
-      }
-
-      const dailyBudgetLkr =
-        form.dailyBudgetLkr.trim() === ''
-          ? null
-          : Number(form.dailyBudgetLkr)
-
-      if (
-        dailyBudgetLkr !== null &&
-        (
-          !Number.isFinite(dailyBudgetLkr) ||
-          dailyBudgetLkr < 1 ||
-          dailyBudgetLkr > 100000
-        )
-      ) {
-        throw new Error(
-          'Enter a daily budget between LKR 1 and 100,000, or leave it empty.'
-        )
       }
 
       const payload = {
         dietType: form.dietType,
         allergies: parseList(form.allergies, 'Allergies'),
-        avoidedFoods: parseList(form.avoidedFoods, 'Avoided foods'),
-        dailyBudgetLkr,
-        mealsPerDay,
+        avoidedFoods: parseList(form.avoidedFoods, 'Foods to avoid'),
+        // These retained values are required by the existing API, but no
+        // longer offered as editable options in the preferences dashboard.
+        dailyBudgetLkr: form.dailyBudgetLkr,
+        mealsPerDay: form.mealsPerDay,
       }
 
-      const data = await preferencesRequest({
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      })
-
-      if (!data.preferences) {
-        throw new Error(
-          'The server did not return your saved preferences.'
-        )
+      if (isDemo) {
+        setDemoStorage('preferences', payload)
+        setForm(toForm(payload))
+        setNotice('Demo preferences saved successfully.')
+      } else {
+        const data = await preferencesRequest({
+          method: 'PUT',
+          body: JSON.stringify(payload),
+        })
+        if (!data.preferences) {
+          throw new Error('The server did not return your saved preferences.')
+        }
+        setForm(toForm(data.preferences))
+        setNotice('Your food preferences have been saved.')
       }
-
-      setForm(toForm(data.preferences))
-      setNotice('Your food preferences have been saved.')
     } catch (error) {
       setError(error.message)
       return
@@ -271,7 +226,7 @@ export default function PreferencesForm({ onSaved, isDemo = false }) {
   if (loading) {
     return (
       <section className="profile-section ew-section-state" data-workspace-section="preferences" aria-labelledby="preferences-heading" aria-busy={loading}>
-        <h3 id="preferences-heading">Food preferences</h3>
+        <WorkspaceSectionTitle id="preferences-heading" icon="preferences">Food preferences</WorkspaceSectionTitle>
         <p role="status">Loading your food preferences…</p>
       </section>
     )
@@ -280,7 +235,7 @@ export default function PreferencesForm({ onSaved, isDemo = false }) {
   if (loadFailed) {
     return (
       <section className="profile-section ew-section-state" data-workspace-section="preferences" aria-labelledby="preferences-heading" aria-busy={loading}>
-        <h3 id="preferences-heading">Food preferences</h3>
+        <WorkspaceSectionTitle id="preferences-heading" icon="preferences">Food preferences</WorkspaceSectionTitle>
         <p className="account-message account-error" role="alert">
           {error}
         </p>
@@ -301,7 +256,7 @@ export default function PreferencesForm({ onSaved, isDemo = false }) {
       className="profile-section" data-workspace-section="preferences"
       aria-labelledby="preferences-heading"
     >
-      <h3 id="preferences-heading">Food preferences</h3>
+      <WorkspaceSectionTitle id="preferences-heading" icon="preferences">Food preferences</WorkspaceSectionTitle>
 
       <p className="profile-description">
         Choose your diet and save your food preferences.
@@ -311,7 +266,7 @@ export default function PreferencesForm({ onSaved, isDemo = false }) {
       <form onSubmit={handleSave} aria-busy={saving}>
         <fieldset className="profile-fields" disabled={saving}>
           <legend className="profile-legend">
-            Diet and meal preferences
+            Diet and food preferences
           </legend>
 
           <div className="account-field">
@@ -329,26 +284,6 @@ export default function PreferencesForm({ onSaved, isDemo = false }) {
               <option value="vegetarian">Vegetarian</option>
               <option value="vegan">Vegan</option>
               <option value="pescatarian">Pescatarian</option>
-            </select>
-          </div>
-
-          <div className="account-field">
-            <label htmlFor="preferences-meals">
-              Meals per day
-            </label>
-
-            <select
-              id="preferences-meals"
-              name="mealsPerDay"
-              value={form.mealsPerDay}
-              onChange={updateField}
-              required
-            >
-              <option value="2">2 meals</option>
-              <option value="3">3 meals</option>
-              <option value="4">4 meals</option>
-              <option value="5">5 meals</option>
-              <option value="6">6 meals</option>
             </select>
           </div>
 
@@ -391,30 +326,6 @@ export default function PreferencesForm({ onSaved, isDemo = false }) {
             <small id="preferences-avoided-hint">
               Separate items with commas. These preferences are
               saved, but avoided-food filtering is not available yet.
-            </small>
-          </div>
-
-          <div className="account-field">
-            <label htmlFor="preferences-budget">
-              Daily food budget (LKR)
-            </label>
-
-            <input
-              id="preferences-budget"
-              name="dailyBudgetLkr"
-              type="number"
-              min="1"
-              max="100000"
-              step="0.01"
-              value={form.dailyBudgetLkr}
-              onChange={updateField}
-              placeholder="Optional"
-              aria-describedby="preferences-budget-hint"
-            />
-
-            <small id="preferences-budget-hint">
-              Leave empty if you do not want to set a budget.
-              Budget matching is not available yet.
             </small>
           </div>
 

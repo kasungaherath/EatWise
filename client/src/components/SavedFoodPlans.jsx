@@ -1,7 +1,9 @@
+import WorkspaceSectionTitle from './WorkspaceSectionTitle.jsx'
 import { useEffect, useRef, useState } from 'react'
 import { foodDisplayName } from '../foodDisplayName.js'
 import { foodImageFor } from '../foodImages.js'
 import './SavedFoodPlans.css'
+import FoodPhoto from './FoodPhoto.jsx'
 import {
   DEFAULT_DEMO_DRAFTS,
   getDemoStorage,
@@ -161,7 +163,7 @@ export default function SavedFoodPlans({ refreshKey = 0, isDemo = false }) {
       className="profile-section" data-workspace-section="saved"
       aria-labelledby="saved-food-plans-heading"
     >
-      <h3 id="saved-food-plans-heading">Saved food-plan drafts</h3>
+      <WorkspaceSectionTitle id="saved-food-plans-heading" icon="saved">Saved food-plan drafts</WorkspaceSectionTitle>
 
       <p className="profile-description">
         Your latest 50 saved drafts. Each keeps the food quantities,
@@ -256,8 +258,8 @@ export default function SavedFoodPlans({ refreshKey = 0, isDemo = false }) {
                           !['g', 'gram', 'grams'].includes(item.unit.toLowerCase())
 
                         return (
-                          <li className="saved-food-row" key={`${item.foodId}-${item.portionId}`} data-food-image={photo.key} style={{ '--food-photo-position': photo.position }}>
-                            <span className="food-photo saved-food-photo" aria-hidden="true" />
+                          <li className="saved-food-row" key={`${item.foodId}-${item.portionId}`} data-food-image={photo.key}>
+                            <FoodPhoto photo={photo} className="saved-food-photo" />
                             <div className="saved-food-content">
                               <div className="saved-food-heading">
                                 <strong>{foodName}</strong>

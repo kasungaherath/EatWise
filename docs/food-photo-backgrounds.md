@@ -3,9 +3,11 @@
 Generated with the built-in image-generation tool. Saved asset: `client/src/assets/food-photography-atlas.webp`.
 The original PNG is retained in the tool output folder. WebP encoding is lossless; the decoded pixels were verified equal to the generated original.
 
-Each generated or saved food row uses its corresponding tile as a decorative background. Shared photography styles are in `client/src/FoodPhotos.css`. The image is hidden from assistive technology because the food name provides its identity. Images are illustrations of the food, not a visual measurement of the suggested portion.
+Each generated or saved food row uses its corresponding tile in a contained decorative image frame. Shared photography styles are in `client/src/FoodPhotos.css`, with the reusable renderer in `client/src/components/FoodPhoto.jsx`. The image is hidden from assistive technology because the food name provides its identity. Images are illustrations of the food, not a visual measurement of the suggested portion.
 
 The existing grams, nutrition values, disclosure buttons, and save actions remain sourced from the original suggestion. A local name resolver covers all 20 catalogue foods and the guest aliases, including brown rice, oats, and broccoli with zucchini. Unrecognized future foods receive a neutral food photograph.
+
+The renderer uses square crops contained within the original atlas rows: 250px at y=0, 246px at y=250, 244px at y=496, and 256px at y=740. The first three rows are centred horizontally within their 256px cells. The last row trims excess table space below the food, including bulgur and apple. Matching the crop and frame proportions removes the side strips caused by fitting tall rectangles into square thumbnails. Explicit clipping still prevents neighbouring tiles from leaking into the frame. Every image fills its 80px desktop or 64px mobile frame without stretching. Mobile snapshot macros occupy the full row width below the photo and heading.
 
 Row-major sheet positions: white rice, lentils, egg, chicken breast, olive oil, tofu; almonds, chickpeas, broccoli, sweet potato, Greek yogurt, banana; milk, peanuts, quinoa, avocado, spinach, salmon; bulgur, apple, oats, brown rice, broccoli with zucchini, general food.
 

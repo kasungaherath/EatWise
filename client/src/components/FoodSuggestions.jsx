@@ -2,6 +2,9 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import SaveFoodPlanForm from './SaveFoodPlanForm.jsx'
 import { foodDisplayName } from '../foodDisplayName.js'
 import { foodImageFor } from '../foodImages.js'
+import FoodPhoto from './FoodPhoto.jsx'
+import WorkspaceIcon from './WorkspaceIcon.jsx'
+import WorkspaceSectionTitle from './WorkspaceSectionTitle.jsx'
 import {
   DEFAULT_DEMO_SUGGESTION,
   getDemoStorage,
@@ -19,14 +22,6 @@ const nutrients = [
   { key: 'carbohydrateGrams', label: 'Carbohydrates', unit: 'g' },
   { key: 'fatGrams', label: 'Fat', unit: 'g' },
 ]
-
-function FoodDraftIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M3 11h18a9 9 0 0 1-18 0Zm4 10h10M8 3v4m4-4v4m4-4v4" />
-    </svg>
-  )
-}
 
 function displayNumber(value) {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
@@ -178,7 +173,7 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
     >
       <div className="fs-heading">
         <div>
-          <h3 id="food-suggestions-heading">Food quantities for your goals.</h3>
+          <WorkspaceSectionTitle id="food-suggestions-heading" icon="foodDraft">Food quantities for your goals.</WorkspaceSectionTitle>
           <p className="fs-description">
             Get AI-selected foods and daily quantities based on your goal,
             calorie and macro targets, and food preferences. Each food’s
@@ -196,7 +191,7 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
           {generating ? (
             <span className="fs-spinner" aria-hidden="true" />
           ) : (
-            <FoodDraftIcon />
+            <WorkspaceIcon name="generation" size={20} />
           )}
 
           {generating
@@ -222,7 +217,7 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
 
       {!suggestion && !generating && !error && (
         <div className="fs-empty">
-          <span className="fs-empty-icon"><FoodDraftIcon /></span>
+          <span className="fs-empty-icon"><WorkspaceIcon name="generation" size={20} /></span>
           <h4>Your next draft starts here.</h4>
           <p>
             Save your profile and preferences, then generate a draft to
@@ -263,7 +258,7 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
                 !['g', 'gram', 'grams'].includes(item.unit.toLowerCase())
 
               return (
-                <li className="fs-food-row" key={item.foodId} data-food-image={photo.key} style={{ '--food-photo-position': photo.position }}>
+                <li className="fs-food-row" key={item.foodId} data-food-image={photo.key}>
                   <button
                     className="fs-food-toggle"
                     type="button"
@@ -272,7 +267,7 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
                     disabled={generating}
                     onClick={() => setExpandedFoodId(expanded ? null : item.foodId)}
                   >
-                    <span className="food-photo fs-food-photo" aria-hidden="true" />
+                    <FoodPhoto photo={photo} className="fs-food-photo" />
                     <span className="fs-food-name" id={nameId}>{foodName}</span>
                     <span className="fs-food-weight">
                       <strong>{displayNumber(item.grams)}</strong>
