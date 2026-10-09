@@ -111,7 +111,7 @@ export default function NutritionSummary({ refreshKey = 0, isDemo = false }) {
 
   return (
     <section
-      className="nutrition-section"
+      className="nutrition-section" data-workspace-section="nutrition"
       aria-labelledby="nutrition-heading"
       aria-busy={loading}
     >
@@ -127,31 +127,16 @@ export default function NutritionSummary({ refreshKey = 0, isDemo = false }) {
       {loading && <p role="status">Calculating your estimates…</p>}
 
       {needsProfile && (
-        <div style={{
-          marginTop: '16px',
-          padding: '24px',
-          background: 'rgba(240, 246, 238, 0.9)',
-          borderRadius: '16px',
-          border: '1px dashed rgba(56, 123, 84, 0.3)',
-          textAlign: 'center'
-        }}>
-          <h4 style={{ fontSize: '16px', fontWeight: '700', margin: '0 0 8px', color: 'var(--ew-ink)' }}>Profile Measurements Needed</h4>
-          <p style={{ fontSize: '14px', color: 'var(--ew-muted)', margin: '0 0 16px', maxWidth: '480px', marginLeft: 'auto', marginRight: 'auto' }}>
+        <div className="nutrition-empty">
+          <h4>Profile Measurements Needed</h4>
+          <p>
             Complete your measurements in the Personal Profile section above and click "Save profile" to calculate your personalized energy needs, resting calories, and target macros.
           </p>
-          <a href="#profile-heading" style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '9px 18px',
-            borderRadius: '999px',
-            background: 'var(--ew-green)',
-            color: '#fff',
-            fontSize: '13px',
-            fontWeight: '700',
-            textDecoration: 'none'
-          }}>
-            Complete Personal Profile ↑
+          <a href="#profile-heading" className="ew-action ew-action--primary">
+            Complete Personal Profile
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m6 12 6-6 6 6M12 6v12" />
+            </svg>
           </a>
         </div>
       )}
@@ -201,7 +186,8 @@ export default function NutritionSummary({ refreshKey = 0, isDemo = false }) {
               <span> kcal/day</span>
             </p>
 
-            <p className="nutrition-adjustment">
+            {Number.isFinite(targets.calorieAdjustmentPercent) && (
+              <p className="nutrition-adjustment">
               {targets.calorieAdjustmentPercent === 0
                 ? 'Matches your estimated maintenance energy.'
                 : `${Math.abs(targets.calorieAdjustmentPercent)}% ${
@@ -209,7 +195,8 @@ export default function NutritionSummary({ refreshKey = 0, isDemo = false }) {
                       ? 'below'
                       : 'above'
                   } your estimated maintenance energy.`}
-            </p>
+              </p>
+            )}
           </div>
 
           </div><h4 className="nutrition-macro-heading">
@@ -259,7 +246,7 @@ export default function NutritionSummary({ refreshKey = 0, isDemo = false }) {
 
       {!loading && (
         <button
-          className="nutrition-refresh"
+          className="nutrition-refresh ew-action"
           type="button"
           onClick={() => setRetry((current) => current + 1)}
         >

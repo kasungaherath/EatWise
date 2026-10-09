@@ -8,6 +8,8 @@
   --ui-muted: #536762;
   --ui-border: #ccdcd5;
   --ui-accent: #316965;
+  --ui-forest: #245840;
+  --ui-forest-hover: #183f2d;
 }
 
 html, body {
@@ -83,22 +85,13 @@ html {
   --ws-muted: var(--ui-muted);
 }
 
-.ew-workspace :is(.profile-section, .account-section, .account-card, .fs-food-card) {
+.ew-workspace :is(.profile-section, .account-section, .account-card) {
   border-color: var(--ui-border);
 }
 
 .ew-workspace input:focus {
   outline-color: var(--ui-accent);
   border-color: var(--ui-accent);
-}
-
-.ew-workspace article.fs-food-card {
-  transition: border-color 200ms ease, box-shadow 200ms ease;
-}
-
-.ew-workspace article.fs-food-card:hover {
-  border-color: var(--ui-accent);
-  box-shadow: 0 8px 20px #10281c0d;
 }
 
 .ew-preview-stage {
@@ -128,14 +121,12 @@ html {
   .ew-nav { gap: 8px; }
   .ew-nav-link { font-size: 12px; }
   .ew-nav-button { font-size: 12px; gap: 6px; }
-  .ew-workspace .fs-food-card h4 { min-height: 0; }
   .ew-food-story figcaption { padding: 24px; }
-  .ew-workspace .fs-food-details { min-height: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .ew-preview-stage { animation: none; }
-  .ew-button, .ew-nav-button, .ew-workspace button, .ew-workspace article.fs-food-card { transition: none; }
+  .ew-button, .ew-nav-button, .ew-workspace button { transition: none; }
   .ew-button:active, .ew-nav-button:active, .ew-workspace button:active:not(:disabled) { transform: none; }
 }
 
@@ -338,35 +329,16 @@ html {
 }
 
 .ew-workspace .fs-result-heading {
-  padding: 24px;
+  padding: 0 0 20px;
   border: 0;
-  border-radius: 16px;
-  background: var(--ui-soft);
+  border-bottom: 1px solid var(--ui-border);
+  border-radius: 0;
+  background: transparent;
 }
 
 .ew-workspace .fs-result-heading .fs-badge {
   align-self: center;
   padding: 8px 14px;
-}
-
-.ew-workspace .fs-food-grid {
-  gap: 24px;
-}
-
-.ew-workspace .fs-food-card {
-  padding: 24px;
-}
-
-.ew-workspace .fs-food-top {
-  margin-bottom: 20px;
-}
-
-.ew-workspace .fs-food-card .fs-item-macros {
-  gap: 10px;
-}
-
-.ew-workspace .fs-food-card .fs-item-macros > div {
-  padding: 14px;
 }
 
 @media (max-width: 700px) {
@@ -386,7 +358,7 @@ html {
     margin: 0;
   }
   .ew-workspace .fs-result-heading {
-    padding: 20px;
+    padding: 0 0 20px;
     align-items: flex-start;
   }
 }

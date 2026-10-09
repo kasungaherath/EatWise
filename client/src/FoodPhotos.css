@@ -1,0 +1,17 @@
+/* Shared decorative photography for generated and saved food quantities. */
+.food-photo {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: var(--food-photo-size, 110px);
+  aspect-ratio: 1;
+  transform: translateY(-50%);
+  background: url('./assets/food-photography-atlas.webp') var(--food-photo-position, 100% 100%) / 600% 400% no-repeat;
+  -webkit-mask-image: linear-gradient(to right, #000 78%, transparent);
+  mask-image: linear-gradient(to right, #000 78%, transparent);
+  pointer-events: none;
+}
+@media (forced-colors: active) {
+  .food-photo { display: none; }
+  .ew-workspace :is(.fs-food-list .fs-food-toggle, .saved-food-row) { padding-inline-start: 16px; }
+}

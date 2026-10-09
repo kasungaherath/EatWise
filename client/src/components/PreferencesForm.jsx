@@ -77,7 +77,8 @@ async function preferencesRequest(options = {}) {
     }
 
     throw new Error(
-      'Cannot connect to EatWise. Check that the backend is running.'
+      'Cannot connect to EatWise. Check that the backend is running.',
+      { cause: error }
     )
   }
 
@@ -90,7 +91,7 @@ async function preferencesRequest(options = {}) {
       throw error
     }
 
-    throw new Error('The server returned an unexpected response.')
+    throw new Error('The server returned an unexpected response.', { cause: error })
   }
 
   if (!response.ok || data.success === false) {
@@ -269,33 +270,35 @@ export default function PreferencesForm({ onSaved, isDemo = false }) {
 
   if (loading) {
     return (
-      <div className="profile-section">
+      <section className="profile-section ew-section-state" data-workspace-section="preferences" aria-labelledby="preferences-heading" aria-busy={loading}>
+        <h3 id="preferences-heading">Food preferences</h3>
         <p role="status">Loading your food preferences…</p>
-      </div>
+      </section>
     )
   }
 
   if (loadFailed) {
     return (
-      <div className="profile-section">
+      <section className="profile-section ew-section-state" data-workspace-section="preferences" aria-labelledby="preferences-heading" aria-busy={loading}>
+        <h3 id="preferences-heading">Food preferences</h3>
         <p className="account-message account-error" role="alert">
           {error}
         </p>
 
         <button
-          className="profile-save"
+          className="profile-save ew-action"
           type="button"
           onClick={() => setRetry((current) => current + 1)}
         >
           Try again
         </button>
-      </div>
+      </section>
     )
   }
 
   return (
     <section
-      className="profile-section"
+      className="profile-section" data-workspace-section="preferences"
       aria-labelledby="preferences-heading"
     >
       <h3 id="preferences-heading">Food preferences</h3>
@@ -326,6 +329,26 @@ export default function PreferencesForm({ onSaved, isDemo = false }) {
               <option value="vegetarian">Vegetarian</option>
               <option value="vegan">Vegan</option>
               <option value="pescatarian">Pescatarian</option>
+            </select>
+          </div>
+
+          <div className="account-field">
+            <label htmlFor="preferences-meals">
+              Meals per day
+            </label>
+
+            <select
+              id="preferences-meals"
+              name="mealsPerDay"
+              value={form.mealsPerDay}
+              onChange={updateField}
+              required
+            >
+              <option value="2">2 meals</option>
+              <option value="3">3 meals</option>
+              <option value="4">4 meals</option>
+              <option value="5">5 meals</option>
+              <option value="6">6 meals</option>
             </select>
           </div>
 
@@ -395,27 +418,7 @@ export default function PreferencesForm({ onSaved, isDemo = false }) {
             </small>
           </div>
 
-          <div className="account-field">
-            <label htmlFor="preferences-meals">
-              Meals per day
-            </label>
-
-            <select
-              id="preferences-meals"
-              name="mealsPerDay"
-              value={form.mealsPerDay}
-              onChange={updateField}
-              required
-            >
-              <option value="2">2 meals</option>
-              <option value="3">3 meals</option>
-              <option value="4">4 meals</option>
-              <option value="5">5 meals</option>
-              <option value="6">6 meals</option>
-            </select>
-          </div>
-
-          <button className="profile-save" type="submit">
+          <button className="profile-save ew-action ew-action--primary" type="submit" aria-busy={saving}>
             {saving ? 'Saving…' : 'Save preferences'}
           </button>
         </fieldset>

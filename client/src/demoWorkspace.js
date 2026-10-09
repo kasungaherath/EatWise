@@ -17,6 +17,8 @@ export const DEFAULT_DEMO_NUTRITION = {
     maintenanceCalories: 2185,
   },
   targets: {
+    goal: 'maintain_weight',
+    calorieAdjustmentPercent: 0,
     targetCalories: 2185,
     macros: {
       proteinGrams: 125,
@@ -27,7 +29,7 @@ export const DEFAULT_DEMO_NUTRITION = {
 }
 
 export const DEFAULT_DEMO_PREFERENCES = {
-  dietType: 'balanced',
+  dietType: 'omnivore',
   allergies: ['peanuts'],
   avoidedFoods: ['grapefruit'],
   dailyBudgetLkr: '2500',

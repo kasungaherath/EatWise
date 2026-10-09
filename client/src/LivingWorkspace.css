@@ -93,27 +93,8 @@
   outline-color: #526c9b;
   box-shadow: none;
 }
-.ew-workspace button {
-  border-radius: 999px;
-  background: linear-gradient(110deg, #204c40 35%, #3d6370);
-  border-color: transparent;
-}
-.ew-workspace button:hover:not(:disabled) {
-  background: #173c33;
-  border-color: transparent;
-  box-shadow: 0 5px 14px #234d401f;
-}
-.ew-workspace button:focus-visible,
 .ew-workspace summary:focus-visible,
-.ew-workspace .fs-table-scroll:focus-visible { outline-color: #526c9b; }
-.ew-workspace button.account-switch,
-.ew-workspace button.account-logout,
-.ew-workspace button.nutrition-refresh,
-.ew-workspace button.recipe-retry {
-  background: #fcfdfb;
-  border-color: #cbd9d3;
-  color: #316965;
-}
+.ew-workspace .fs-table-scroll:focus-visible { outline-color: #316965; }
 .ew-workspace .profile-note {
   border: 1px solid var(--ws-border);
   border-radius: 12px;
@@ -122,10 +103,8 @@
 }
 .ew-workspace .account-success { background: #edf7f1; color: #286044; border-color: #cce3d6; }
 .ew-workspace .account-card > .account-error { color: #9f332c; }
-.ew-workspace article,
-.ew-workspace article.fs-food-card { box-shadow: none; border-color: var(--ws-border); background: #fcfdfb; }
-.ew-workspace .profile-grid > article,
-.ew-workspace article.fs-food-card {
+.ew-workspace article { box-shadow: none; border-color: var(--ws-border); background: #fcfdfb; }
+.ew-workspace .profile-grid > article {
   border: 0;
   border-top: 1px solid var(--ws-border);
   border-radius: 0;
@@ -166,12 +145,10 @@
 .ew-workspace details { background: #f7f9f8; border-color: var(--ws-border); overflow: hidden; }
 .ew-workspace summary:hover { background: #eaf1ef; }
 .ew-workspace .fs-empty { background: linear-gradient(120deg, #f0f6f3, #f1f3fa, #f5f0f8); border: 1px solid var(--ws-border); }
-.ew-workspace .fs-empty-icon, .ew-workspace .fs-food-index { background: #e4eeeb; color: #316965; }
+.ew-workspace .fs-empty-icon { background: #e4eeeb; color: #316965; }
 .ew-workspace .fs-empty-tags span { color: #536762; border-color: var(--ws-border); }
 .ew-workspace .fs-loading { background: #edf1fa; border-color: #d6e0f1; }
 .ew-workspace .fs-save-panel { background: #f4f0f8; border: 0; border-radius: 12px; }
-.ew-workspace .fs-food-card:nth-child(3n + 2) .fs-quantity strong { color: var(--ws-blue); }
-.ew-workspace .fs-food-card:nth-child(3n) .fs-quantity strong { color: var(--ws-lilac); }
 .ew-workspace table { border-color: var(--ws-border); }
 .ew-workspace thead th,
 .ew-workspace .fs-table thead th { background: #edf1f8; color: #465b80; }
@@ -198,46 +175,8 @@
   .ew-workspace-heading::before { animation: none; }
 }
 
-/* Nutrition is for the exact suggested quantity, not per 100 g. */
-.ew-workspace .fs-item-macros {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin: 20px 0 0;
-}
-.ew-workspace .fs-item-macros > div {
-  padding: 12px;
-  border-radius: 10px;
-  background: #edf4f0;
-}
-.ew-workspace .fs-item-macros > div:nth-child(2) { background: #edf1fa; }
-.ew-workspace .fs-item-macros > div:nth-child(4) { background: #f3eef8; }
-.ew-workspace .fs-item-macros dt { color: #536762; font-size: 12px; }
-.ew-workspace .fs-item-macros dd {
-  margin: 5px 0 0;
-  color: #204c40;
-  font-size: 20px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-.ew-workspace .fs-item-macros dd span { font-size: 12px; font-weight: 400; }
-
-/* Distinct food cards keep quantities and macros visually grouped. */
-.ew-workspace article.fs-food-card {
-  padding: 22px;
-  border: 1px solid #ccdcd5;
-  border-radius: 16px;
-  background: #fcfdfb;
-}
-.ew-workspace article.fs-food-card:nth-child(3n + 2) { border-color: #cbd6eb; }
-.ew-workspace article.fs-food-card:nth-child(3n) { border-color: #dacde4; }
 .ew-workspace .saved-drafts-grid { display: grid; gap: 20px; margin-top: 24px; }
 .ew-workspace .saved-draft-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-block: 16px; }
 .ew-workspace .saved-draft-actions p { flex-basis: 100%; margin: 0; }
-.ew-workspace button.draft-delete { background: #fff6f4; border-color: #e7c6c0; color: #943c32; }
-.ew-workspace button.draft-delete:hover:not(:disabled) { background: #f8e4df; border-color: #bd766a; color: #7b2e26; box-shadow: none; }
 .ew-workspace .saved-drafts-grid details ul { list-style: none; padding: 0; }
 .ew-workspace .saved-drafts-grid details li { padding: 16px; margin-block: 12px; border: 1px solid var(--ws-border); border-radius: 12px; background: #fff; }
-@media (max-width: 480px) {
-  .ew-workspace article.fs-food-card { padding: 18px; }
-}

@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import SaveFoodPlanForm from './SaveFoodPlanForm.jsx'
 import { foodDisplayName } from '../foodDisplayName.js'
+import { foodImageFor } from '../foodImages.js'
 import {
   DEFAULT_DEMO_SUGGESTION,
   getDemoStorage,
@@ -18,6 +19,14 @@ const nutrients = [
   { key: 'carbohydrateGrams', label: 'Carbohydrates', unit: 'g' },
   { key: 'fatGrams', label: 'Fat', unit: 'g' },
 ]
+
+function FoodDraftIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 11h18a9 9 0 0 1-18 0Zm4 10h10M8 3v4m4-4v4m4-4v4" />
+    </svg>
+  )
+}
 
 function displayNumber(value) {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
@@ -68,6 +77,8 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
   const [generating, setGenerating] = useState(false)
   const [savingDraft, setSavingDraft] = useState(false)
   const [error, setError] = useState('')
+  const [expandedFoodId, setExpandedFoodId] = useState(null)
+  const foodListId = useId()
 
   const requestRef = useRef(null)
   const savingRef = useRef(false)
@@ -83,6 +94,7 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
 
   async function generateSuggestion() {
     if (requestRef.current || savingRef.current) return
+    setExpandedFoodId(null)
 
     if (isDemo) {
       setGenerating(true)
@@ -160,7 +172,7 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
 
   return (
     <section
-      className="profile-section fs-section"
+      className="profile-section fs-section" data-workspace-section="food"
       aria-labelledby="food-suggestions-heading"
       aria-busy={generating}
     >
@@ -175,7 +187,8 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
         </div>
 
         <button
-          className="fs-generate"
+          className="fs-generate ew-action ew-action--primary"
+          aria-busy={generating}
           type="button"
           onClick={generateSuggestion}
           disabled={generating || savingDraft}
@@ -183,7 +196,7 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
           {generating ? (
             <span className="fs-spinner" aria-hidden="true" />
           ) : (
-            <span aria-hidden="true">✦</span>
+            <FoodDraftIcon />
           )}
 
           {generating
@@ -209,7 +222,7 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
 
       {!suggestion && !generating && !error && (
         <div className="fs-empty">
-          <span className="fs-empty-icon" aria-hidden="true">✦</span>
+          <span className="fs-empty-icon"><FoodDraftIcon /></span>
           <h4>Your next draft starts here.</h4>
           <p>
             Save your profile and preferences, then generate a draft to
@@ -229,50 +242,79 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
             <div>
               <h4>Your quantities for one day</h4>
               <p>
-                {suggestion.calculation.items.length} foods · Daily totals
+                {suggestion.calculation.items.length} foods · Tap a food to see its nutrition.
               </p>
             </div>
             <span className="fs-badge fs-badge-neutral">Draft</span>
           </div>
 
-          <div className="fs-food-grid">
-            {suggestion.calculation.items.map((item, index) => (
-              <article className="fs-food-card" key={item.foodId}>
-                <div className="fs-food-top">
-                  <span className="fs-food-index">
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                  <span className="fs-food-label">DAILY QUANTITY</span>
-                </div>
-
-                <h4>{foodDisplayName(item.name)}</h4>
-
-                <p className="fs-quantity">
-                  <strong>{displayNumber(item.quantity)}</strong>
-                  <span>{item.unit}</span>
-                </p>
-
-                <div className="fs-food-details">
-                  <p>
-                    <span>Edible weight</span>
-                    <strong>{displayNumber(item.grams)} g</strong>
-                  </p>
-                  <p>
-                    <span>Preparation</span>
-                    <strong>{item.preparationState || 'Not specified'}</strong>
-                  </p>
-                </div>
-                <dl className="fs-item-macros" aria-label={`Nutrition for ${foodDisplayName(item.name)}, ${displayNumber(item.quantity)} ${item.unit}`}>
-                  {nutrients.map(({ key, label, unit }) => (
-                    <div key={key}>
-                      <dt>{label}</dt>
-                      <dd>{displayNumber(item.nutrition?.[key])} <span>{unit}</span></dd>
-                    </div>
-                  ))}
-                </dl>
-              </article>
-            ))}
+          <div className="fs-food-list-heading" aria-hidden="true">
+            <span>Food</span>
+            <span>Daily weight</span>
           </div>
+          <ul className="fs-food-list" aria-label="Suggested daily food quantities">
+            {suggestion.calculation.items.map((item, index) => {
+              const expanded = expandedFoodId === item.foodId
+              const nameId = `${foodListId}-food-${index}`
+              const panelId = `${nameId}-nutrition`
+              const foodName = foodDisplayName(item.name)
+              const photo = foodImageFor(foodName)
+              const hasPortion = typeof item.unit === 'string' &&
+                !['g', 'gram', 'grams'].includes(item.unit.toLowerCase())
+
+              return (
+                <li className="fs-food-row" key={item.foodId} data-food-image={photo.key} style={{ '--food-photo-position': photo.position }}>
+                  <button
+                    className="fs-food-toggle"
+                    type="button"
+                    aria-expanded={expanded}
+                    aria-controls={panelId}
+                    disabled={generating}
+                    onClick={() => setExpandedFoodId(expanded ? null : item.foodId)}
+                  >
+                    <span className="food-photo fs-food-photo" aria-hidden="true" />
+                    <span className="fs-food-name" id={nameId}>{foodName}</span>
+                    <span className="fs-food-weight">
+                      <strong>{displayNumber(item.grams)}</strong>
+                      <span>g</span>
+                    </span>
+                    <svg className="fs-food-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                  <div
+                    className="fs-food-panel"
+                    id={panelId}
+                    role="region"
+                    aria-labelledby={nameId}
+                    hidden={!expanded}
+                  >
+                    <p className="fs-food-panel-caption">Nutrition for this {displayNumber(item.grams)} g quantity</p>
+                    <dl className="fs-food-nutrients">
+                      {nutrients.map(({ key, label, unit }) => (
+                        <div key={key}>
+                          <dt>{label}</dt>
+                          <dd>{displayNumber(item.nutrition?.[key])} <span>{unit}</span></dd>
+                        </div>
+                      ))}
+                    </dl>
+                    <dl className="fs-food-preparation">
+                      {hasPortion && (
+                        <div>
+                          <dt>Portion</dt>
+                          <dd>{displayNumber(item.quantity)} {item.unit}</dd>
+                        </div>
+                      )}
+                      <div>
+                        <dt>Preparation</dt>
+                        <dd>{item.preparationState || 'Not specified'}</dd>
+                      </div>
+                    </dl>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
 
           <div className="fs-nutrition-heading">
             <div>

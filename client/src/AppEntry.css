@@ -1,0 +1,401 @@
+/* App entry screen sharing the workspace's green and sage theme. */
+.ew-app-entry {
+  position: relative;
+  isolation: isolate;
+  max-width: none;
+  margin: 0 auto;
+  min-height: 100svh;
+  padding: 0 40px 48px;
+  background: transparent;
+}
+
+.ew-app-entry::before {
+  content: '';
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  background: #e2e9dd url('./assets/app-welcome-background.png') center bottom / cover no-repeat;
+  pointer-events: none;
+}
+
+.ew-app-entry .ew-header {
+  justify-content: center;
+  min-height: 80px;
+  border: 0;
+}
+
+.ew-app-entry .ew-logo-frame {
+  width: 164px;
+}
+
+.ew-entry-content {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 40px 0 32px;
+}
+
+.ew-entry-heading {
+  text-align: center;
+  margin: 0 0 28px;
+}
+
+.ew-entry-heading h1 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(28px, 3.4vw, 36px);
+  letter-spacing: -.025em;
+  line-height: 1.25;
+  text-wrap: balance;
+  color: var(--ui-text);
+}
+
+.ew-entry-heading p {
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ui-muted);
+}
+
+.ew-login,
+.ew-entry-return {
+  padding: 32px;
+  border: 1px solid var(--ui-border);
+  border-radius: 16px;
+  background: var(--ui-panel);
+  color: var(--ui-text);
+  box-shadow: none;
+  animation: ew-entry-settle 380ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.ew-login h2,
+.ew-entry-return h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 24px;
+  line-height: 1.3;
+  letter-spacing: -.02em;
+  overflow-wrap: anywhere;
+}
+
+.ew-login-description,
+.ew-entry-return > p {
+  margin-top: 8px;
+  color: var(--ui-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.ew-login-form {
+  display: grid;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.ew-login-field {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.ew-login-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ui-text);
+}
+
+.ew-login-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ew-login-label span {
+  font-size: 12px;
+  color: var(--ui-muted);
+}
+
+.ew-login-field input {
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  padding: 10px 14px;
+  font-size: 15px;
+  color: var(--ui-text);
+  background: #ffffff;
+  border: 1px solid #7f9687;
+  border-radius: 10px;
+  caret-color: var(--ui-accent);
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.ew-login-field input::placeholder {
+  color: var(--ui-muted);
+  opacity: 1;
+}
+
+.ew-login-field input:hover {
+  border-color: var(--ui-accent);
+}
+
+.ew-login-field input:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+  border-color: var(--ui-accent);
+}
+
+.ew-login-password {
+  position: relative;
+}
+
+.ew-login-password input {
+  padding-right: 50px;
+}
+
+.ew-login-password button {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ui-muted);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.ew-login-password button:hover {
+  background: var(--ui-soft);
+  color: var(--ui-text);
+}
+
+.ew-login-password button:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+
+.ew-login-primary {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.ew-login input:disabled {
+  background: var(--ui-soft);
+  color: var(--ui-muted);
+  border-color: #cad5ce;
+  opacity: .7;
+}
+
+.ew-login-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: 6px;
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--ui-muted);
+}
+
+.ew-login-guest {
+  border-top: 1px solid var(--ui-border);
+  margin-top: 18px;
+  padding-top: 20px;
+  text-align: center;
+}
+
+.ew-login-guest button {
+  width: 100%;
+}
+
+.ew-login-guest p {
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ui-muted);
+}
+
+.ew-login-message {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--ui-soft);
+  border: 1px solid var(--ui-border);
+  color: var(--ui-text);
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.ew-login-message.is-error {
+  background: #fcefeb;
+  color: #913826;
+  border: 1px solid #bc887e;
+}
+
+.ew-entry-help {
+  margin: 18px auto 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ui-muted);
+}
+
+.ew-entry-help summary {
+  width: fit-content;
+  margin: 0 auto;
+  min-height: 44px;
+  padding: 10px 14px;
+  cursor: pointer;
+  color: #354e3e;
+  font-weight: 600;
+  text-underline-offset: 4px;
+  transition: color 150ms ease;
+}
+
+.ew-entry-help summary:hover {
+  color: var(--ui-text);
+  text-decoration: underline;
+}
+
+.ew-entry-help summary:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.ew-entry-help[open] {
+  padding: 0 20px 18px;
+  border-radius: 14px;
+  background: var(--ui-panel);
+  border: 1px solid var(--ui-border);
+}
+
+.ew-entry-help ol {
+  padding-left: 20px;
+  margin: 12px 0 16px;
+  color: var(--ui-text);
+}
+
+.ew-entry-help li {
+  margin: 8px 0;
+}
+
+.ew-entry-help p {
+  border-top: 1px solid var(--ui-border);
+  padding-top: 14px;
+  font-size: 12px;
+  color: var(--ui-muted);
+}
+
+.ew-entry-return .ew-login-primary {
+  margin-top: 24px;
+}
+
+.ew-entry-logout {
+  display: inline-flex;
+  margin: 10px auto 0;
+  font-size: 13px;
+  color: var(--ui-muted);
+}
+
+.ew-entry-loading {
+  padding: 32px;
+  text-align: center;
+  background: var(--ui-panel);
+  border: 1px solid var(--ui-border);
+  border-radius: 16px;
+  font-size: 14px;
+  color: var(--ui-muted);
+}
+
+@keyframes ew-entry-settle {
+  from { transform: translateY(6px); }
+  to { transform: translateY(0); }
+}
+
+@media (max-width: 1099px) {
+  .ew-app-entry {
+    padding-inline: 28px;
+  }
+}
+
+/* Keep the original photo anchored to the bottom corners on mobile.
+   Fit its full width so neither bowl is cropped out of a narrow viewport. */
+@media (max-width: 900px) {
+  .ew-app-entry { --entry-image-height: 66.666667vw; background: #e2e9dd; }
+  html:has(.ew-app-entry), body:has(.ew-app-entry) { background: #e2e9dd; }
+  .ew-app-entry::before {
+    position: fixed;
+    inset: 0;
+    height: auto;
+    background-image: linear-gradient(180deg, #e2e9dd, #e2e9dd00 65%), url('./assets/app-welcome-background.png');
+    background-position: center bottom;
+    background-size: 100% var(--entry-image-height), 100% auto;
+    background-repeat: no-repeat;
+  }
+}
+@media (max-width: 600px) {
+  .ew-app-entry {
+    padding: 0 16px 32px;
+  }
+  .ew-app-entry .ew-header {
+    min-height: 72px;
+    flex-direction: row;
+    gap: 0;
+  }
+  .ew-app-entry .ew-header .ew-logo-frame {
+    width: 148px;
+  }
+  .ew-entry-content {
+    padding: 24px 0 32px;
+  }
+  .ew-entry-heading {
+    margin-bottom: 20px;
+  }
+  .ew-entry-heading h1 {
+    font-size: 26px;
+  }
+  .ew-entry-heading p {
+    font-size: 14px;
+  }
+  .ew-login,
+  .ew-entry-return {
+    padding: 24px 18px;
+  }
+}
+
+@media (max-width: 360px) {
+  .ew-app-entry {
+    padding-inline: 12px;
+  }
+  .ew-login,
+  .ew-entry-return {
+    padding: 20px 14px;
+  }
+  .ew-entry-heading h1 {
+    font-size: 23px;
+  }
+}
+
+@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+  .ew-app-entry::before {
+    position: fixed;
+    inset: 0;
+    height: auto;
+    background-image: url('./assets/app-welcome-background.png');
+    background-size: cover;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ew-login,
+  .ew-entry-return {
+    animation: none;
+  }
+  .ew-login *,
+  .ew-entry-return * {
+    transition: none;
+  }
+}

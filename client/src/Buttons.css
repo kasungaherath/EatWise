@@ -1,0 +1,199 @@
+/* Shared action controls: one geometry, an explicit hierarchy. */
+:root {
+  --button-primary: #245840;
+  --button-primary-hover: #183f2d;
+  --button-primary-ink: #ffffff;
+  --button-secondary: #fcfdfb;
+  --button-secondary-hover: #eaf2ec;
+  --button-border: #849b8e;
+  --button-danger: #963b30;
+  --button-radius: 10px;
+}
+:is(.ew-workspace, .ew-app-entry) .ew-action {
+  --action-bg: var(--button-secondary);
+  --action-hover: var(--button-secondary-hover);
+  --action-ink: #245840;
+  --action-line: var(--button-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 46px;
+  min-width: 44px;
+  max-width: 100%;
+  padding: 11px 18px;
+  border: 1px solid var(--action-line);
+  border-radius: var(--button-radius);
+  background: var(--action-bg);
+  color: var(--action-ink);
+  box-shadow: none;
+  font: 600 14px/1.5 'DM Sans', sans-serif;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+:is(.ew-workspace, .ew-app-entry) .ew-action--primary {
+  --action-bg: var(--button-primary);
+  --action-hover: var(--button-primary-hover);
+  --action-ink: var(--button-primary-ink);
+  --action-line: #245840;
+  font-weight: 600;
+}
+:is(.ew-workspace, .ew-app-entry) .ew-action--primary:hover:not(:disabled) {
+  border-color: #183f2d;
+}
+:is(.ew-workspace, .ew-app-entry) .ew-action--quiet {
+  --action-bg: transparent;
+  --action-line: transparent;
+  --action-ink: #245840;
+}
+:is(.ew-workspace, .ew-app-entry) .ew-action--quiet:hover:not(:disabled) {
+  --action-ink: #245840;
+}
+:is(.ew-workspace, .ew-app-entry) .ew-action--link {
+  --action-bg: transparent;
+  --action-line: transparent;
+  --action-ink: #316965;
+  min-height: 44px;
+  padding: 8px 3px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+:is(.ew-workspace, .ew-app-entry) .ew-action--danger {
+  --action-bg: #fff8f6;
+  --action-hover: #fae8e3;
+  --action-ink: var(--button-danger);
+  --action-line: #bc887e;
+}
+:is(.ew-workspace, .ew-app-entry) .ew-action--danger-confirm {
+  --action-bg: var(--button-danger);
+  --action-hover: #742b23;
+  --action-ink: #ffffff;
+  --action-line: transparent;
+}
+:is(.ew-workspace, .ew-app-entry) .ew-action:hover:not(:disabled) {
+  background: var(--action-hover);
+  color: var(--action-ink);
+  border-color: var(--action-line);
+  box-shadow: none;
+  transform: none;
+}
+:is(.ew-workspace, .ew-app-entry) .ew-action:active:not(:disabled) { filter: brightness(.94); }
+:is(.ew-workspace, .ew-app-entry) .ew-action:focus-visible,
+.ew-section-button:focus-visible {
+  outline: 2px solid #316965;
+  outline-offset: 2px;
+}
+:is(.ew-workspace, .ew-app-entry) .ew-action:disabled {
+  background: #e7ede8;
+  color: #657369;
+  border-color: #cad5ce;
+  opacity: 1;
+  box-shadow: none;
+  cursor: not-allowed;
+  filter: none;
+}
+:is(.ew-workspace, .ew-app-entry) .ew-action[aria-busy='true'] { cursor: progress; }
+.ew-action[aria-busy='true']:not(.fs-generate)::before {
+  content: '';
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ew-button-loading 700ms linear infinite;
+}
+:is(.ew-workspace, .ew-app-entry) .ew-action svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  transform: none;
+}
+.ew-profile-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 20px; }
+.ew-workspace .ew-profile-actions .profile-save { margin: 0; }
+.ew-workspace .saved-draft-actions .ew-action { margin: 0; }
+.ew-workspace .ew-workspace-topbar-actions { gap: 8px; }
+.ew-workspace .ew-workspace-topbar-actions .ew-action { margin: 0; }
+.ew-app-entry .ew-login-password .ew-action {
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+}
+.ew-app-entry .ew-login-switch .ew-action { font-size: 13px; }
+.ew-app-entry .ew-entry-logout { display: flex; }
+
+/* Section navigation is separate from form actions. */
+.ew-section-nav {
+  position: sticky;
+  top: 12px;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto 28px;
+  padding: 6px;
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  background: var(--ui-panel);
+  overflow: visible;
+  scroll-padding-inline: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #849b8e var(--ui-soft);
+}
+.ew-section-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  min-height: 48px;
+  padding: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #4d6356;
+  font: 600 14px/1.5 'DM Sans', sans-serif;
+  white-space: nowrap;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+.ew-section-button svg { width: 22px; height: 22px; flex-shrink: 0; }
+.ew-section-button:hover { background: var(--ui-soft); color: var(--ui-text); }
+.ew-section-button[aria-current='location'] {
+  background: var(--button-primary);
+  color: #ffffff;
+  font-weight: 700;
+}
+.ew-section-button[aria-current='location']::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: calc(50% - 7px);
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.ew-section-button:focus-visible { outline-offset: -3px; }
+.ew-section-button[aria-current='location']:focus-visible { outline-color: #ffffff; }
+.ew-section-button:active { filter: brightness(.94); }
+.ew-workspace .ew-workspace-content > section { scroll-margin-top: 100px; }
+@keyframes ew-button-loading { to { transform: rotate(360deg); } }
+@media (max-width: 600px) {
+  .ew-section-nav { top: 8px; margin-bottom: 20px; }
+  .ew-section-button { padding: 12px 8px; }
+
+  .ew-profile-actions { flex-direction: column; align-items: stretch; gap: 10px; }
+  .ew-profile-actions .ew-action { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.ew-workspace, .ew-app-entry) .ew-action, .ew-section-button { transition: none; }
+  .ew-action[aria-busy='true']::before { animation: none; }
+}

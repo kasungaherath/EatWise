@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ProfileForm from './ProfileForm.jsx'
 import PreferencesForm from './PreferencesForm.jsx'
 import NutritionSummary from './NutritionSummary.jsx'
@@ -6,11 +6,11 @@ import FoodSuggestions from './FoodSuggestions.jsx'
 import SavedFoodPlans from './SavedFoodPlans.jsx'
 
 const WORKSPACE_SECTIONS = [
-  { id: 'profile-heading', num: '01', label: 'Personal Profile' },
-  { id: 'nutrition-heading', num: '02', label: 'Nutrition Targets' },
-  { id: 'preferences-heading', num: '03', label: 'Dietary Preferences' },
-  { id: 'food-suggestions-heading', num: '04', label: 'Food Quantity Draft' },
-  { id: 'saved-food-plans-heading', num: '05', label: 'Saved Drafts' },
+  { id: 'profile-heading', label: 'Profile', icon: 'M20 21v-2a7 7 0 0 0-14 0v2M17 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0' },
+  { id: 'nutrition-heading', label: 'Nutrition targets', icon: 'M21 12a9 9 0 1 1-9-9m5 9a5 5 0 1 1-5-5m0 5 9-9m-5 0h5v5' },
+  { id: 'preferences-heading', label: 'Preferences', icon: 'M4 7h9m4 0h3M4 17h3m4 0h9M13 4v6m-6 4v6' },
+  { id: 'food-suggestions-heading', label: 'Food draft', icon: 'M3 11h18a9 9 0 0 1-18 0Zm4 10h10M8 3v4m4-4v4m4-4v4' },
+  { id: 'saved-food-plans-heading', label: 'Saved drafts', icon: 'M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16l-6-4-6 4Z' },
 ]
 
 export default function WorkspaceView({ user, onLogout, onGoHome }) {
@@ -18,13 +18,15 @@ export default function WorkspaceView({ user, onLogout, onGoHome }) {
   const [preferencesRevision, setPreferencesRevision] = useState(0)
   const [savedPlansRevision, setSavedPlansRevision] = useState(0)
   const [activeSection, setActiveSection] = useState('profile-heading')
+  const navRef = useRef(null)
+  const contentRef = useRef(null)
 
   function scrollToSection(id) {
-    setActiveSection(id)
     const headingEl = document.getElementById(id)
     if (headingEl) {
       const card = headingEl.closest('section') || headingEl
-      card.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      card.scrollIntoView({ behavior: reducedMotion ? 'instant' : 'smooth', block: 'start' })
 
       card.classList.remove('ew-section-highlight')
       void card.offsetWidth
@@ -36,31 +38,60 @@ export default function WorkspaceView({ user, onLogout, onGoHome }) {
   }
 
   useEffect(() => {
-    const handleIntersect = (entries) => {
-      const visible = entries.find((entry) => entry.isIntersecting)
-      if (visible && visible.target) {
-        const heading = visible.target.querySelector('h3[id]')
-        if (heading && heading.id) {
-          setActiveSection(heading.id)
-        }
+    let frame = 0
+
+    function updateActiveSection() {
+      frame = 0
+      const sections = WORKSPACE_SECTIONS.flatMap(({ id }) => {
+        const heading = document.getElementById(id)
+        const element = heading?.closest('section')
+        return element ? [{ id, top: element.getBoundingClientRect().top }] : []
+      })
+      if (!sections.length) return
+
+      // Use every section's current position. Intersection callbacks only report
+      // changed entries and can leave a tall, still-visible section unselected.
+      const activationLine = (navRef.current?.getBoundingClientRect().bottom ?? 68) + 40
+      let current = sections[0].id
+      for (const section of sections) {
+        if (section.top > activationLine) break
+        current = section.id
       }
+
+      // The final section may be too short to reach the activation line.
+      const atPageEnd = window.scrollY > 0 &&
+        window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2
+      if (atPageEnd) current = sections[sections.length - 1].id
+      setActiveSection(current)
     }
 
-    const observer = new IntersectionObserver(handleIntersect, {
-      rootMargin: '-80px 0px -50% 0px',
-      threshold: [0.1, 0.4]
-    })
+    function scheduleUpdate() {
+      if (!frame) frame = window.requestAnimationFrame(updateActiveSection)
+    }
 
-    WORKSPACE_SECTIONS.forEach(({ id }) => {
-      const el = document.getElementById(id)
-      if (el) {
-        const card = el.closest('section') || el
-        observer.observe(card)
-      }
-    })
+    const resizeObserver = new ResizeObserver(scheduleUpdate)
+    if (contentRef.current) resizeObserver.observe(contentRef.current)
+    if (navRef.current) resizeObserver.observe(navRef.current)
+    window.addEventListener('scroll', scheduleUpdate, { passive: true })
+    window.addEventListener('resize', scheduleUpdate)
+    scheduleUpdate()
 
-    return () => observer.disconnect()
+    return () => {
+      window.cancelAnimationFrame(frame)
+      resizeObserver.disconnect()
+      window.removeEventListener('scroll', scheduleUpdate)
+      window.removeEventListener('resize', scheduleUpdate)
+    }
   }, [profileRevision, preferencesRevision, savedPlansRevision])
+
+  useEffect(() => {
+    const nav = navRef.current
+    const activeButton = nav?.querySelector('[aria-current="location"]')
+    if (!nav || !activeButton || nav.scrollWidth <= nav.clientWidth) return
+    const left = activeButton.offsetLeft - nav.offsetLeft - (nav.clientWidth - activeButton.offsetWidth) / 2
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    nav.scrollTo({ left, behavior: reducedMotion ? 'instant' : 'smooth' })
+  }, [activeSection])
 
   return (
     <div className="ew-workspace ew-workspace-page" id="workspace-screen">
@@ -80,7 +111,7 @@ export default function WorkspaceView({ user, onLogout, onGoHome }) {
 
         <div className="ew-workspace-topbar-actions">
           <button
-            className="ew-nav-button"
+            className="ew-nav-button ew-action"
             type="button"
             onClick={onGoHome}
           >
@@ -91,7 +122,7 @@ export default function WorkspaceView({ user, onLogout, onGoHome }) {
           </button>
 
           <button
-            className="ew-logout-button"
+            className="ew-logout-button ew-action ew-action--quiet"
             type="button"
             onClick={onLogout}
           >
@@ -106,23 +137,26 @@ export default function WorkspaceView({ user, onLogout, onGoHome }) {
           Manage your personal measurements, calculate targets, set dietary preferences, generate AI food quantities, and save your daily meal drafts.
         </p>
 
-        <nav className="ew-workspace-nav-pills" aria-label="Workspace sections">
-          {WORKSPACE_SECTIONS.map((sec) => (
-            <button
-              key={sec.id}
-              type="button"
-              className={`ew-workspace-pill ${activeSection === sec.id ? 'is-active' : ''}`}
-              onClick={() => scrollToSection(sec.id)}
-              aria-current={activeSection === sec.id ? 'true' : undefined}
-            >
-              <span className="ew-pill-idx">{sec.num}</span>
-              <span>{sec.label}</span>
-            </button>
-          ))}
-        </nav>
       </div>
 
-      <div className="ew-workspace-content">
+      <nav className="ew-section-nav" aria-label="Workspace sections" ref={navRef}>
+        {WORKSPACE_SECTIONS.map((section) => (
+          <button
+            key={section.id}
+            type="button"
+            className="ew-section-button"
+            onClick={() => scrollToSection(section.id)}
+            aria-label={section.label}
+            title={section.label}
+            aria-controls={section.id}
+            aria-current={activeSection === section.id ? 'location' : undefined}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={section.icon} /></svg>
+          </button>
+        ))}
+      </nav>
+
+      <div className="ew-workspace-content" ref={contentRef}>
         <ProfileForm
           key={`profile-${user.id}`}
           isDemo={user.isDemo}

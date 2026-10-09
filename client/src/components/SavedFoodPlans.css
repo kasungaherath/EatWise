@@ -1,0 +1,34 @@
+/* Saved snapshots use the same food photography and portion hierarchy. */
+.ew-workspace [data-workspace-section='saved'] .saved-food-list { margin: 0; padding: 0 14px; }
+.ew-workspace [data-workspace-section='saved'] .saved-food-row {
+  position: relative;
+  overflow: hidden;
+  min-height: 104px;
+  padding: 16px 16px 16px 112px;
+  margin-block: 12px;
+}
+.saved-food-photo { --food-photo-size: 92px; }
+.saved-food-content { position: relative; min-width: 0; }
+.saved-food-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.saved-food-heading > strong { min-width: 0; color: var(--section-ink); font-size: 15px; overflow-wrap: anywhere; }
+.saved-food-weight { flex-shrink: 0; color: var(--section-ink); font-size: 18px; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.saved-food-weight > span { color: var(--section-muted); font-size: 13px; font-weight: 400; }
+.saved-food-content :is(.saved-food-preparation, .saved-food-macros) { margin: 6px 0 0; color: var(--section-muted); font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .ew-workspace [data-workspace-section='saved'] .saved-food-list { padding-inline: 10px; }
+  .ew-workspace [data-workspace-section='saved'] .saved-food-row {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 8px 12px;
+    padding: 14px 12px;
+  }
+  .saved-food-photo { --food-photo-size: 76px; position: static; transform: none; align-self: center; }
+  .saved-food-content { display: contents; }
+  .saved-food-heading { grid-column: 2; min-height: 76px; flex-direction: column; align-items: flex-start; justify-content: center; gap: 4px; }
+  .saved-food-heading > strong { font-size: 14px; }
+  .saved-food-content :is(.saved-food-preparation, .saved-food-macros) { grid-column: 1 / -1; margin: 0; }
+}
+@media (max-width: 600px) and (forced-colors: active) {
+  .ew-workspace [data-workspace-section='saved'] .saved-food-row { grid-template-columns: minmax(0, 1fr); }
+  .saved-food-heading { grid-column: 1; min-height: 0; }
+}

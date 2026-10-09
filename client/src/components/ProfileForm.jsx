@@ -43,7 +43,8 @@ async function profileRequest(options = {}) {
     if (error.name === 'AbortError') throw error
 
     throw new Error(
-      'Cannot connect to EatWise. Check that the backend is running.'
+      'Cannot connect to EatWise. Check that the backend is running.',
+      { cause: error }
     )
   }
 
@@ -228,33 +229,35 @@ export default function ProfileForm({ onSaved, isDemo = false }) {
 
   if (loading) {
     return (
-      <div className="profile-section">
+      <section className="profile-section ew-section-state" data-workspace-section="profile" aria-labelledby="profile-heading" aria-busy={loading}>
+        <h3 id="profile-heading">Your personal profile</h3>
         <p role="status">Loading your profile…</p>
-      </div>
+      </section>
     )
   }
 
   if (loadFailed) {
     return (
-      <div className="profile-section">
+      <section className="profile-section ew-section-state" data-workspace-section="profile" aria-labelledby="profile-heading" aria-busy={loading}>
+        <h3 id="profile-heading">Your personal profile</h3>
         <p className="account-message account-error" role="alert">
           {error}
         </p>
 
         <button
-          className="profile-save"
+          className="profile-save ew-action"
           type="button"
           onClick={() => setRetry((current) => current + 1)}
         >
           Try again
         </button>
-      </div>
+      </section>
     )
   }
 
   return (
     <section
-      className="profile-section"
+      className="profile-section" data-workspace-section="profile"
       aria-labelledby="profile-heading"
     >
       <h3 id="profile-heading">Your personal profile</h3>
@@ -394,23 +397,14 @@ export default function ProfileForm({ onSaved, isDemo = false }) {
             EatWise currently supports adults aged 18 and over.
           </p>
 
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', marginTop: '16px' }}>
-            <button className="profile-save" type="submit">
+          <div className="ew-profile-actions">
+            <button className="profile-save ew-action ew-action--primary" type="submit" aria-busy={saving}>
               {saving ? 'Saving…' : 'Save profile'}
             </button>
             <button
+              className="ew-action"
               type="button"
               onClick={handleQuickFill}
-              style={{
-                background: 'rgba(235, 243, 233, 0.9)',
-                border: '1px solid rgba(56, 123, 84, 0.25)',
-                color: 'var(--ew-ink, #183c30)',
-                padding: '11px 18px',
-                borderRadius: '10px',
-                fontSize: '13.5px',
-                fontWeight: '600',
-                cursor: 'pointer',
-              }}
             >
               Fill Sample Measurements
             </button>

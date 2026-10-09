@@ -185,7 +185,7 @@ export default function SaveFoodPlanForm({ suggestion, onSaved, onSavingChange, 
           />
         </div>
 
-        <button className="profile-save" type="submit">
+        <button className="profile-save ew-action ew-action--primary" type="submit" aria-busy={saving}>
           {saving ? 'Saving…' : saved ? 'Draft saved' : 'Save draft'}
         </button>
       </fieldset>

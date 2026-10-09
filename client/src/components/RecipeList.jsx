@@ -75,7 +75,8 @@ export default function RecipeList({ refreshKey = 0 }) {
           }
 
           throw new Error(
-            'The server returned an unexpected response.'
+            'The server returned an unexpected response.',
+            { cause: error }
           )
         }
 

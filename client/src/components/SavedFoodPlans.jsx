@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { foodDisplayName } from '../foodDisplayName.js'
+import { foodImageFor } from '../foodImages.js'
+import './SavedFoodPlans.css'
 import {
   DEFAULT_DEMO_DRAFTS,
   getDemoStorage,
@@ -156,7 +158,7 @@ export default function SavedFoodPlans({ refreshKey = 0, isDemo = false }) {
 
   return (
     <section
-      className="profile-section"
+      className="profile-section" data-workspace-section="saved"
       aria-labelledby="saved-food-plans-heading"
     >
       <h3 id="saved-food-plans-heading">Saved food-plan drafts</h3>
@@ -167,7 +169,8 @@ export default function SavedFoodPlans({ refreshKey = 0, isDemo = false }) {
       </p>
 
       <button
-        className="profile-save"
+        className="profile-save ew-action"
+        aria-busy={loading}
         type="button"
         disabled={loading || deleting !== null}
         onClick={() => setRetry((current) => current + 1)}
@@ -195,25 +198,27 @@ export default function SavedFoodPlans({ refreshKey = 0, isDemo = false }) {
 
             return (
               <article className="account-card" key={draft.id}>
-                <h4>{draft.title}</h4>
-                <div className="saved-draft-actions">
-                  {confirmDelete === draft.id ? (
-                    <>
-                      <p>Delete this draft permanently?</p>
-                      <button className="draft-delete" type="button" disabled={deleting !== null}
-                        onClick={() => deleteDraft(draft)}>
-                        {deleting === draft.id ? 'Deleting…' : 'Confirm delete'}
+                <div className="saved-draft-heading">
+                  <h4>{draft.title}</h4>
+                  <div className="saved-draft-actions">
+                    {confirmDelete === draft.id ? (
+                      <>
+                        <p>Delete this draft permanently?</p>
+                        <button className="draft-delete ew-action ew-action--danger-confirm" aria-busy={deleting === draft.id} type="button" disabled={deleting !== null}
+                          onClick={() => deleteDraft(draft)}>
+                          {deleting === draft.id ? 'Deleting…' : 'Confirm delete'}
+                        </button>
+                        <button className="account-switch ew-action" type="button" disabled={deleting !== null}
+                          onClick={() => setConfirmDelete(null)}>Cancel</button>
+                      </>
+                    ) : (
+                      <button className="draft-delete ew-action ew-action--danger" type="button" disabled={deleting !== null}
+                        aria-label={`Delete draft: ${draft.title}`}
+                        onClick={() => { setConfirmDelete(draft.id); setDeleteError('') }}>
+                        Delete draft
                       </button>
-                      <button className="account-switch" type="button" disabled={deleting !== null}
-                        onClick={() => setConfirmDelete(null)}>Cancel</button>
-                    </>
-                  ) : (
-                    <button className="draft-delete" type="button" disabled={deleting !== null}
-                      aria-label={`Delete draft: ${draft.title}`}
-                      onClick={() => { setConfirmDelete(draft.id); setDeleteError('') }}>
-                      Delete draft
-                    </button>
-                  )}
+                    )}
+                  </div>
                 </div>
 
                 <p>
@@ -243,25 +248,36 @@ export default function SavedFoodPlans({ refreshKey = 0, isDemo = false }) {
                   <summary>View food quantities</summary>
 
                   {Array.isArray(items) && items.length > 0 ? (
-                    <ul>
-                      {items.map((item) => (
-                        <li key={`${item.foodId}-${item.portionId}`}>
-                          <strong>{foodDisplayName(item.name)}</strong>
-                          {' — '}
-                          {displayNumber(item.quantity)} {item.unit}
-                          {' ('}
-                          {displayNumber(item.grams)} g edible weight
-                          {')'}
-                          {item.preparationState
-                            ? ` · ${item.preparationState}`
-                            : ''}
-                          <p>
-                            {displayNumber(item.nutrition?.calories)} kcal · Protein {displayNumber(item.nutrition?.proteinGrams)} g
-                            {' · '}Carbohydrates {displayNumber(item.nutrition?.carbohydrateGrams)} g
-                            {' · '}Fat {displayNumber(item.nutrition?.fatGrams)} g
-                          </p>
-                        </li>
-                      ))}
+                    <ul className="saved-food-list">
+                      {items.map((item) => {
+                        const foodName = foodDisplayName(item.name)
+                        const photo = foodImageFor(foodName)
+                        const hasPortion = typeof item.unit === 'string' &&
+                          !['g', 'gram', 'grams'].includes(item.unit.toLowerCase())
+
+                        return (
+                          <li className="saved-food-row" key={`${item.foodId}-${item.portionId}`} data-food-image={photo.key} style={{ '--food-photo-position': photo.position }}>
+                            <span className="food-photo saved-food-photo" aria-hidden="true" />
+                            <div className="saved-food-content">
+                              <div className="saved-food-heading">
+                                <strong>{foodName}</strong>
+                                <span className="saved-food-weight">{displayNumber(item.grams)} <span>g</span></span>
+                              </div>
+                              {(hasPortion || item.preparationState) && (
+                                <p className="saved-food-preparation">
+                                  {hasPortion && <>{displayNumber(item.quantity)} {item.unit}{item.preparationState ? ' · ' : ''}</>}
+                                  {item.preparationState || ''}
+                                </p>
+                              )}
+                              <p className="saved-food-macros">
+                                {displayNumber(item.nutrition?.calories)} kcal · Protein {displayNumber(item.nutrition?.proteinGrams)} g
+                                {' · '}Carbohydrates {displayNumber(item.nutrition?.carbohydrateGrams)} g
+                                {' · '}Fat {displayNumber(item.nutrition?.fatGrams)} g
+                              </p>
+                            </div>
+                          </li>
+                        )
+                      })}
                     </ul>
                   ) : (
                     <p>Food quantities are unavailable.</p>
