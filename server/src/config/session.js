@@ -1,10 +1,13 @@
+import 'dotenv/config'
 import session from 'express-session'
 import MySQLStoreFactory from 'express-mysql-session'
 import pool from './db.js'
-import 'dotenv/config'
 
-if (!process.env.SESSION_SECRET) {
-  throw new Error('SESSION_SECRET is missing from .env')
+const isProduction = process.env.NODE_ENV === 'production'
+const sessionSecret = process.env.SESSION_SECRET
+
+if (!sessionSecret) {
+  throw new Error('SESSION_SECRET environment variable is missing')
 }
 
 const MySQLStore = MySQLStoreFactory(session)
@@ -19,14 +22,14 @@ export const sessionStore = new MySQLStore(
 
 export const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
+  secure: isProduction,
+  sameSite: isProduction ? 'none' : 'lax',
   path: '/',
 }
 
 export const sessionMiddleware = session({
   name: 'eatwise.sid',
-  secret: process.env.SESSION_SECRET,
+  secret: sessionSecret,
   store: sessionStore,
   resave: false,
   saveUninitialized: false,
