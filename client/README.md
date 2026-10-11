@@ -1,16 +1,24 @@
-# React + Vite
+# EatWise app interface
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The React and Vite frontend for EatWise. See the
+[project README](../README.md) for features, local setup, environment
+configuration, deployment, and security guidance.
 
-Currently, two official plugins are available:
+From the repository root:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```sh
+npm --prefix client ci
+npm --prefix client run dev
+```
 
-## React Compiler
+For account features, start the backend separately as described in the project
+README. The frontend uses `http://localhost:5000` by default; an ignored
+`client/.env.local` can set a different public `VITE_API_URL`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```sh
+npm --prefix client run lint
+npm --prefix client run build
+```
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The build output is `client/dist`. Production uses the root Dockerfile to build
+the frontend with `VITE_API_URL=/` and serve it alongside the API.
