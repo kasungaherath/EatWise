@@ -1,0 +1,15 @@
+#!/bin/sh
+set -eu
+
+scanner_path=$(command -v gitleaks || true)
+if [ -z "$scanner_path" ]; then
+  repository_root=$(git rev-parse --show-toplevel)
+  scanner_path="$repository_root/.tools/gitleaks/gitleaks.exe"
+fi
+
+if [ ! -f "$scanner_path" ]; then
+  echo "Commit stopped: install Gitleaks to check for exposed credentials. See SECURITY.md." >&2
+  exit 1
+fi
+
+exec "$scanner_path" git --staged --redact=100 --no-banner --ignore-gitleaks-allow --max-decode-depth=2 .

@@ -1,0 +1,11 @@
+title = "EatWise secret protection"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "eatwise-hardcoded-credential"
+description = "Hardcoded EatWise API, database, or session credential"
+regex = '''(?i)\b(?:VITE_)?(?:GEMINI_API_KEY|USDA_API_KEY|SESSION_SECRET|DB_PASSWORD)\b[ \t]*[:=][ \t]*["']?([A-Za-z0-9_+/=.-]{4,})'''
+secretGroup = 1
+keywords = ["GEMINI_API_KEY", "USDA_API_KEY", "SESSION_SECRET", "DB_PASSWORD"]
