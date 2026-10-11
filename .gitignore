@@ -15,6 +15,9 @@ Thumbs.db
 deployment-checks/
 .tools/
 
+# Local standalone logo export; the app uses its bundled asset.
+/EatWise-teal-mint-logo.svg
+
 # Private credentials, signing keys, and local database copies.
 *.pem
 *.key

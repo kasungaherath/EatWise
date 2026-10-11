@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="client/src/assets/eatwise-logo.png" alt="EatWise" width="280">
-</p>
-
 # EatWise
 
 **Your nutrition, simplified. Food quantities that fit your goals.**
@@ -11,7 +7,6 @@ and dietary preferences into daily food quantities. Google Gemini suggests foods
 from an approved catalogue, while the server calculates their calories and
 macros from stored nutrition data and compares the totals with your targets.
 
-**[Open EatWise](https://eatwise-production.up.railway.app/)** ·
 [Local setup](#run-locally) ·
 [Deployment](DEPLOYMENT.md) ·
 [Security](SECURITY.md)
@@ -42,8 +37,8 @@ macros from stored nutrition data and compares the totals with your targets.
 
 ## Using EatWise
 
-1. Open the [live app](https://eatwise-production.up.railway.app/), create an
-   account, and sign in. Choose **Try guest workspace** for a sample preview.
+1. Open EatWise, create an account, and sign in. Choose **Try guest workspace**
+   for a sample preview.
 2. Complete **Profile**, select your goal, and save your changes.
 3. Open **Nutrition targets** to review your estimates.
 4. Save your diet, allergies, and foods to avoid under **Preferences**.
