@@ -99,7 +99,7 @@ export default function App() {
   function handleLogin(sessionUser) {
     void prepareFoodImages()
     setUser(sessionUser)
-    setOpeningWorkspace(!sessionUser.isDemo)
+    setOpeningWorkspace(true)
     navigate('workspace')
   }
 
