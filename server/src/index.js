@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+import { fileURLToPath } from 'node:url'
 import pool from './config/db.js'
 import {
   sessionMiddleware,
@@ -116,6 +117,14 @@ app.get('/api/health', async (req, res) => {
     })
   }
 })
+
+if (isProduction) {
+  // The production container includes the built app at the same origin as the API.
+  const clientDist = fileURLToPath(
+    new URL('../../client/dist/', import.meta.url)
+  )
+  app.use(express.static(clientDist))
+}
 
 app.use((req, res) => {
   res.status(404).json({

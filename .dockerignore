@@ -1,0 +1,12 @@
+**/node_modules
+**/dist
+**/.env
+**/.env.*
+**/*.log
+.git
+.agents
+.codex
+.gemini
+.idea
+.vscode
+deployment-checks

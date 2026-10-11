@@ -12,3 +12,4 @@ Thumbs.db
 .agents/
 .codex/
 .gemini/
+deployment-checks/

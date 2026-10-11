@@ -1,0 +1,756 @@
+{
+  "version": 1,
+  "foods": [
+    {
+      "food": {
+        "name": "Rice, white, long-grain, regular, enriched, cooked",
+        "preparation_state": "cooked",
+        "calories_per_100g": "130.00",
+        "protein_per_100g": "2.69",
+        "carbohydrate_per_100g": "28.17",
+        "fat_per_100g": "0.28",
+        "fiber_per_100g": "0.40",
+        "is_vegan": 1,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": null,
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "168878",
+        "source_url": "https://fdc.nal.usda.gov/food-details/168878/nutrients",
+        "source_accessed_at": "2026-09-27",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g edible portion",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "EatWise",
+          "source_reference": "metric-weight-100g",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "800.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Lentils, mature seeds, cooked, boiled, without salt",
+        "preparation_state": "cooked, boiled, without salt",
+        "calories_per_100g": "116.00",
+        "protein_per_100g": "9.02",
+        "carbohydrate_per_100g": "20.13",
+        "fat_per_100g": "0.38",
+        "fiber_per_100g": "7.90",
+        "is_vegan": 1,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": null,
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "172421",
+        "source_url": "https://fdc.nal.usda.gov/food-details/172421/nutrients",
+        "source_accessed_at": "2026-09-27",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g edible portion",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "EatWise",
+          "source_reference": "metric-weight-100g",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "600.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Egg, whole, cooked, hard-boiled",
+        "preparation_state": "cooked, hard-boiled",
+        "calories_per_100g": "155.00",
+        "protein_per_100g": "12.58",
+        "carbohydrate_per_100g": "1.12",
+        "fat_per_100g": "10.61",
+        "fiber_per_100g": "0.00",
+        "is_vegan": 0,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": [
+          "egg"
+        ],
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "173424",
+        "source_url": "https://fdc.nal.usda.gov/food-details/173424/nutrients",
+        "source_accessed_at": "2026-09-27",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g edible portion",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "EatWise",
+          "source_reference": "metric-weight-100g",
+          "review_status": "approved"
+        },
+        {
+          "portion_key": "usda-92500",
+          "label": "1 large hard-boiled egg, shell removed",
+          "amount": "1.00",
+          "unit_singular": "large egg",
+          "unit_plural": "large eggs",
+          "gram_weight": "50.000",
+          "source_name": "USDA FoodData Central",
+          "source_reference": "fdc:173424/portion:92500",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "250.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Oil, olive, salad or cooking",
+        "preparation_state": "salad or cooking",
+        "calories_per_100g": "884.00",
+        "protein_per_100g": "0.00",
+        "carbohydrate_per_100g": "0.00",
+        "fat_per_100g": "100.00",
+        "fiber_per_100g": "0.00",
+        "is_vegan": 1,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": null,
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "171413",
+        "source_url": "https://fdc.nal.usda.gov/food-details/171413/nutrients",
+        "source_accessed_at": "2026-09-28",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g edible portion",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "EatWise",
+          "source_reference": "metric-weight-100g",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "30.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Tofu, raw, firm, prepared with calcium sulfate",
+        "preparation_state": "raw, firm",
+        "calories_per_100g": "144.00",
+        "protein_per_100g": "17.27",
+        "carbohydrate_per_100g": "2.78",
+        "fat_per_100g": "8.72",
+        "fiber_per_100g": "2.30",
+        "is_vegan": 1,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": [
+          "soy"
+        ],
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "172475",
+        "source_url": "https://fdc.nal.usda.gov/food-details/172475/nutrients",
+        "source_accessed_at": "2026-09-28",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g edible portion",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "EatWise",
+          "source_reference": "metric-weight-100g",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "500.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Nuts, almonds",
+        "preparation_state": "raw",
+        "calories_per_100g": "579.00",
+        "protein_per_100g": "21.15",
+        "carbohydrate_per_100g": "21.55",
+        "fat_per_100g": "49.93",
+        "fiber_per_100g": "12.50",
+        "is_vegan": 1,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": [
+          "almond"
+        ],
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "170567",
+        "source_url": "https://fdc.nal.usda.gov/food-details/170567/nutrients",
+        "source_accessed_at": "2026-09-28",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g edible portion",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "EatWise",
+          "source_reference": "metric-weight-100g",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "60.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt",
+        "preparation_state": "cooked, boiled, without salt",
+        "calories_per_100g": "164.00",
+        "protein_per_100g": "8.86",
+        "carbohydrate_per_100g": "27.42",
+        "fat_per_100g": "2.59",
+        "fiber_per_100g": "7.60",
+        "is_vegan": 1,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": null,
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "173757",
+        "source_url": "https://fdc.nal.usda.gov/food-details/173757/nutrients",
+        "source_accessed_at": "2026-09-30",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "USDA FoodData Central",
+          "source_reference": "173757",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "400.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Broccoli, cooked, boiled, drained, without salt",
+        "preparation_state": "cooked, boiled, drained, without salt",
+        "calories_per_100g": "35.00",
+        "protein_per_100g": "2.38",
+        "carbohydrate_per_100g": "7.18",
+        "fat_per_100g": "0.41",
+        "fiber_per_100g": "3.30",
+        "is_vegan": 1,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": null,
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "169967",
+        "source_url": "https://fdc.nal.usda.gov/food-details/169967/nutrients",
+        "source_accessed_at": "2026-10-06",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "USDA FoodData Central",
+          "source_reference": "169967",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "400.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Sweet potato, cooked, baked in skin, flesh, without salt",
+        "preparation_state": "cooked, baked in skin, flesh, without salt",
+        "calories_per_100g": "90.00",
+        "protein_per_100g": "2.01",
+        "carbohydrate_per_100g": "20.71",
+        "fat_per_100g": "0.15",
+        "fiber_per_100g": "3.30",
+        "is_vegan": 1,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": null,
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "168483",
+        "source_url": "https://fdc.nal.usda.gov/food-details/168483/nutrients",
+        "source_accessed_at": "2026-10-06",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "USDA FoodData Central",
+          "source_reference": "168483",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "400.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Yogurt, Greek, plain, nonfat (Includes foods for USDA's Food Distribution Program)",
+        "preparation_state": "plain, nonfat",
+        "calories_per_100g": "59.00",
+        "protein_per_100g": "10.19",
+        "carbohydrate_per_100g": "3.60",
+        "fat_per_100g": "0.39",
+        "fiber_per_100g": "0.00",
+        "is_vegan": 0,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": null,
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "170894",
+        "source_url": "https://fdc.nal.usda.gov/food-details/170894/nutrients",
+        "source_accessed_at": "2026-10-06",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "USDA FoodData Central",
+          "source_reference": "170894",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "400.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Milk, whole, 3.25% milkfat, with added vitamin D",
+        "preparation_state": "whole milk, 3.25% fat",
+        "calories_per_100g": "61.00",
+        "protein_per_100g": "3.15",
+        "carbohydrate_per_100g": "4.80",
+        "fat_per_100g": "3.25",
+        "fiber_per_100g": "0.00",
+        "is_vegan": 0,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": null,
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "171265",
+        "source_url": "https://fdc.nal.usda.gov/food-details/171265/nutrients",
+        "source_accessed_at": "2026-10-06",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "USDA FoodData Central",
+          "source_reference": "171265",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "500.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Peanuts, all types, dry-roasted, without salt",
+        "preparation_state": "dry-roasted, unsalted",
+        "calories_per_100g": "587.00",
+        "protein_per_100g": "24.35",
+        "carbohydrate_per_100g": "21.26",
+        "fat_per_100g": "49.66",
+        "fiber_per_100g": "8.40",
+        "is_vegan": 1,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": null,
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "173806",
+        "source_url": "https://fdc.nal.usda.gov/food-details/173806/nutrients",
+        "source_accessed_at": "2026-10-06",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "USDA FoodData Central",
+          "source_reference": "173806",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "60.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Quinoa, cooked",
+        "preparation_state": "cooked",
+        "calories_per_100g": "120.00",
+        "protein_per_100g": "4.40",
+        "carbohydrate_per_100g": "21.30",
+        "fat_per_100g": "1.92",
+        "fiber_per_100g": "2.80",
+        "is_vegan": 1,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": null,
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "168917",
+        "source_url": "https://fdc.nal.usda.gov/food-details/168917/nutrients",
+        "source_accessed_at": "2026-10-06",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "USDA FoodData Central",
+          "source_reference": "168917",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "500.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Avocados, raw, all commercial varieties",
+        "preparation_state": "raw",
+        "calories_per_100g": "160.00",
+        "protein_per_100g": "2.00",
+        "carbohydrate_per_100g": "8.53",
+        "fat_per_100g": "14.66",
+        "fiber_per_100g": "6.70",
+        "is_vegan": 1,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": null,
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "171705",
+        "source_url": "https://fdc.nal.usda.gov/food-details/171705/nutrients",
+        "source_accessed_at": "2026-10-06",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "USDA FoodData Central",
+          "source_reference": "171705",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "200.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Spinach, cooked, boiled, drained, without salt",
+        "preparation_state": "cooked, boiled, drained, without salt",
+        "calories_per_100g": "23.00",
+        "protein_per_100g": "2.97",
+        "carbohydrate_per_100g": "3.75",
+        "fat_per_100g": "0.26",
+        "fiber_per_100g": "2.40",
+        "is_vegan": 1,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": null,
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "168463",
+        "source_url": "https://fdc.nal.usda.gov/food-details/168463/nutrients",
+        "source_accessed_at": "2026-10-06",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "USDA FoodData Central",
+          "source_reference": "168463",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "300.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Fish, salmon, Atlantic, farmed, cooked, dry heat",
+        "preparation_state": "cooked, dry heat",
+        "calories_per_100g": "206.00",
+        "protein_per_100g": "22.10",
+        "carbohydrate_per_100g": "0.00",
+        "fat_per_100g": "12.35",
+        "fiber_per_100g": "0.00",
+        "is_vegan": 0,
+        "is_vegetarian": 0,
+        "is_pescatarian": 1,
+        "allergens": null,
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "175168",
+        "source_url": "https://fdc.nal.usda.gov/food-details/175168/nutrients",
+        "source_accessed_at": "2026-10-06",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "USDA FoodData Central",
+          "source_reference": "175168",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "300.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Bulgur, cooked",
+        "preparation_state": "cooked",
+        "calories_per_100g": "83.00",
+        "protein_per_100g": "3.08",
+        "carbohydrate_per_100g": "18.58",
+        "fat_per_100g": "0.24",
+        "fiber_per_100g": "4.50",
+        "is_vegan": 1,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": null,
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "170287",
+        "source_url": "https://fdc.nal.usda.gov/food-details/170287/nutrients",
+        "source_accessed_at": "2026-10-06",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "USDA FoodData Central",
+          "source_reference": "170287",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "500.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Apples, raw, with skin (Includes foods for USDA's Food Distribution Program)",
+        "preparation_state": "raw, with skin",
+        "calories_per_100g": "52.00",
+        "protein_per_100g": "0.26",
+        "carbohydrate_per_100g": "13.81",
+        "fat_per_100g": "0.17",
+        "fiber_per_100g": "2.40",
+        "is_vegan": 1,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": null,
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "171688",
+        "source_url": "https://fdc.nal.usda.gov/food-details/171688/nutrients",
+        "source_accessed_at": "2026-10-06",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "USDA FoodData Central",
+          "source_reference": "171688",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "300.00",
+        "policy_label": "demo-v1"
+      }
+    }
+  ],
+  "recipes": [
+    {
+      "recipe": {
+        "slug": "rice-lentils-and-egg",
+        "name": "Rice, lentils and egg bowl",
+        "description": "A sample recipe assembled from prepared ingredients.",
+        "meal_type": "lunch",
+        "servings": "1.00",
+        "preparation_minutes": null,
+        "cooking_minutes": null,
+        "instructions": [
+          "Use cooked rice, boiled lentils, and a hard-boiled egg.",
+          "Weigh 150 g cooked rice and 100 g cooked lentils.",
+          "Remove the egg shell and weigh 50 g of the edible egg.",
+          "Arrange the rice and lentils in a bowl and add the sliced egg.",
+          "Nutrition includes only the listed ingredients; added oil or sauces must be recorded separately."
+        ],
+        "review_status": "approved"
+      },
+      "ingredients": [
+        {
+          "quantity_grams": "150.00",
+          "preparation_note": "Weigh after cooking.",
+          "sort_order": 1,
+          "food": {
+            "source_name": "USDA FoodData Central",
+            "source_reference": "168878"
+          }
+        },
+        {
+          "quantity_grams": "100.00",
+          "preparation_note": "Boiled without salt; weigh cooked lentils.",
+          "sort_order": 2,
+          "food": {
+            "source_name": "USDA FoodData Central",
+            "source_reference": "172421"
+          }
+        },
+        {
+          "quantity_grams": "50.00",
+          "preparation_note": "Hard-boiled; remove shell before weighing.",
+          "sort_order": 3,
+          "food": {
+            "source_name": "USDA FoodData Central",
+            "source_reference": "173424"
+          }
+        }
+      ]
+    }
+  ]
+}
