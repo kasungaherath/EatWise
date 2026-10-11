@@ -280,10 +280,10 @@ export default function PreferencesForm({ onSaved, isDemo = false }) {
               required
             >
               <option value="">Select your diet type</option>
-              <option value="omnivore">Omnivore</option>
-              <option value="vegetarian">Vegetarian</option>
-              <option value="vegan">Vegan</option>
-              <option value="pescatarian">Pescatarian</option>
+              <option value="omnivore">Omnivore (plant and animal foods)</option>
+              <option value="vegetarian">Vegetarian (no meat or fish; eggs and dairy allowed)</option>
+              <option value="vegan">Vegan (plant foods only; no animal products)</option>
+              <option value="pescatarian">Pescatarian (fish allowed; no poultry or red meat)</option>
             </select>
           </div>
 

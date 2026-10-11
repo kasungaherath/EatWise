@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import foodAtlas from '../assets/food-photography-atlas.webp'
+import { foodAtlas } from '../foodImageLoader.js'
 
 export default function FoodPhoto({ photo, className = '' }) {
   const cropId = useId()

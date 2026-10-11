@@ -2,6 +2,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import SaveFoodPlanForm from './SaveFoodPlanForm.jsx'
 import { foodDisplayName } from '../foodDisplayName.js'
 import { foodImageFor } from '../foodImages.js'
+import { prepareFoodImages } from '../foodImageLoader.js'
 import FoodPhoto from './FoodPhoto.jsx'
 import WorkspaceIcon from './WorkspaceIcon.jsx'
 import WorkspaceSectionTitle from './WorkspaceSectionTitle.jsx'
@@ -89,6 +90,7 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
 
   async function generateSuggestion() {
     if (requestRef.current || savingRef.current) return
+    void prepareFoodImages()
     setExpandedFoodId(null)
 
     if (isDemo) {

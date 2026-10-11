@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import eatwiseLogo from './assets/eatwise-logo.png'
 import { checkSession, logoutUser } from './auth.js'
 import InlineAuth from './components/InlineAuth.jsx'
 import WorkspaceView from './components/WorkspaceView.jsx'
+import SignInTransition from './components/SignInTransition.jsx'
+import { prepareFoodImages } from './foodImageLoader.js'
 import './App.css'
 import './Workspace.css'
 import './LivingHomepage.css'
@@ -21,7 +23,21 @@ export default function App() {
   const [user, setUser] = useState(null)
   const [checkingSession, setCheckingSession] = useState(true)
   const [pageVisible, setPageVisible] = useState(true)
-  const showingWorkspace = route === 'workspace' && user
+  const [openingWorkspace, setOpeningWorkspace] = useState(false)
+  const transitionWasVisible = useRef(false)
+  const showingWorkspace = route === 'workspace' && Boolean(user)
+  const finishSignIn = useCallback(() => setOpeningWorkspace(false), [])
+
+  useEffect(() => {
+    if (showingWorkspace) void prepareFoodImages()
+  }, [showingWorkspace])
+
+  useEffect(() => {
+    if (transitionWasVisible.current && !openingWorkspace && showingWorkspace) {
+      document.getElementById('workspace-title')?.focus({ preventScroll: true })
+    }
+    transitionWasVisible.current = openingWorkspace
+  }, [openingWorkspace, showingWorkspace])
 
   useEffect(() => {
     document.documentElement.dataset.theme = 'light'
@@ -68,6 +84,7 @@ export default function App() {
   }, [])
 
   function navigate(newRoute) {
+    if (newRoute !== 'workspace') setOpeningWorkspace(false)
     setRoute(newRoute)
     window.location.hash = newRoute === 'home' ? '' : `/${newRoute}`
     window.scrollTo({ top: 0, behavior: 'instant' })
@@ -80,12 +97,15 @@ export default function App() {
   }
 
   function handleLogin(sessionUser) {
+    void prepareFoodImages()
     setUser(sessionUser)
+    setOpeningWorkspace(!sessionUser.isDemo)
     navigate('workspace')
   }
 
   return (
-    <div className={`app ${showingWorkspace ? 'ew-workspace-shell' : 'ew-app-entry'}`} id="top">
+    <>
+    <div className={`app ${showingWorkspace ? 'ew-workspace-shell' : 'ew-app-entry'}`} id="top" inert={openingWorkspace || undefined} aria-hidden={openingWorkspace || undefined}>
       {showingWorkspace && (
         <div className="ew-alive-canvas ew-alive-fullscreen" aria-hidden="true" data-motion={pageVisible ? 'running' : 'paused'}>
           <div className="ew-alive-aura ew-aura-mint" />
@@ -137,5 +157,7 @@ export default function App() {
         )}
       </main>
     </div>
+    {openingWorkspace && <SignInTransition onComplete={finishSignIn} />}
+    </>
   )
 }

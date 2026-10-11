@@ -123,6 +123,12 @@ if (isProduction) {
   const clientDist = fileURLToPath(
     new URL('../../client/dist/', import.meta.url)
   )
+  // Vite gives bundled images, scripts, and styles content-hashed filenames.
+  // Cache those versions; keep the entry HTML fresh for future deployments.
+  const clientAssets = fileURLToPath(
+    new URL('../../client/dist/assets/', import.meta.url)
+  )
+  app.use('/assets', express.static(clientAssets, { maxAge: '1y', immutable: true }))
   app.use(express.static(clientDist))
 }
 

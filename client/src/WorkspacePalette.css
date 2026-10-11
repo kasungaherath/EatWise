@@ -1,43 +1,45 @@
 /* Shared Profile sage palette for every workspace section.
    Primary actions and success/error meanings remain shared across the app. */
-/* The workspace canvas has its own quiet, continuous colour field. */
-.ew-workspace-shell { --workspace-canvas: #d4e2d8; }
-html:has(.ew-workspace-shell), body:has(.ew-workspace-shell) { background: #d4e2d8; }
+/* Cool sage and eucalyptus give the working canvas a clear, quiet hierarchy. */
+.ew-workspace-shell { --workspace-canvas: #e4eee9; }
+html:has(.ew-workspace-shell), body:has(.ew-workspace-shell) {
+  background: #e4eee9;
+  scrollbar-color: #718977 #e4eee9;
+}
 .ew-workspace-shell .ew-alive-fullscreen {
   background:
-    radial-gradient(ellipse at 48% 8%, #f1f3e7 0%, #f1f3e700 58%),
-    radial-gradient(ellipse at 0% 55%, #bbd2bf80 0%, #bbd2bf00 62%),
-    linear-gradient(145deg, #d1e0d1 0%, #e3eadd 44%, #c6dcd2 100%);
+    radial-gradient(ellipse at 0% 0%, #c5ded7 0%, #c5ded700 62%),
+    linear-gradient(135deg, #dcebe4 0%, #edf3ed 50%, #d4e6e0 100%);
 }
 .ew-workspace-shell .ew-alive-aura { display: none; mix-blend-mode: normal; filter: none; -webkit-filter: none; }
 .ew-workspace-shell :is(.ew-aura-mint, .ew-aura-emerald) {
   display: block;
   width: clamp(420px, 72vw, 1120px);
   height: clamp(420px, 90vh, 900px);
-  opacity: .55;
+  opacity: .3;
   animation: ew-workspace-breathe 32s ease-in-out infinite alternate;
 }
 .ew-workspace-shell .ew-aura-mint {
   left: -24%;
   top: -32%;
-  background: radial-gradient(ellipse, #aec99099 0%, #aec99000 68%);
+  background: radial-gradient(ellipse, #a5c9be80 0%, #a5c9be00 68%);
 }
 .ew-workspace-shell .ew-aura-emerald {
   right: -22%;
   bottom: -32%;
-  background: radial-gradient(ellipse, #78ae9a80 0%, #78ae9a00 70%);
+  background: radial-gradient(ellipse, #8db4a780 0%, #8db4a700 70%);
   animation-direction: alternate-reverse;
 }
 .ew-workspace-shell .ew-alive-frost { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
 @keyframes ew-workspace-breathe {
-  from { transform: translate3d(0, 0, 0) scale(1); opacity: .45; }
-  to { transform: translate3d(5%, 3%, 0) scale(1.08); opacity: .65; }
+  from { transform: translate3d(0, 0, 0) scale(1); opacity: .2; }
+  to { transform: translate3d(5%, 3%, 0) scale(1.08); opacity: .35; }
 }
 @media (max-width: 600px) {
   .ew-workspace-shell .ew-alive-fullscreen {
     background:
-      radial-gradient(ellipse at 50% 0%, #eef2e4 0%, #eef2e400 65%),
-      linear-gradient(155deg, #d1e0d1 0%, #dce7d9 48%, #c6dcd2 100%);
+      radial-gradient(ellipse at 0% 0%, #c5ded7 0%, #c5ded700 65%),
+      linear-gradient(155deg, #dcebe4 0%, #edf3ed 48%, #d4e6e0 100%);
   }
   .ew-workspace-shell .ew-aura-mint { left: -70%; top: -30%; }
   .ew-workspace-shell .ew-aura-emerald { right: -65%; bottom: -25%; }
@@ -46,27 +48,35 @@ html:has(.ew-workspace-shell), body:has(.ew-workspace-shell) { background: #d4e2
   .ew-workspace-shell .ew-alive-fullscreen { background: Canvas; }
   .ew-workspace-shell .ew-alive-aura { display: none; }
 }
-.ew-workspace-shell .ew-header { border-color: #bccdbf; }
+.ew-workspace-shell .ew-header { border-color: #b8cec3; }
 .ew-workspace .ew-workspace-topbar, .ew-workspace .ew-section-nav {
-  background: #eaf1e7;
-  border-color: #b8cbbd;
+  background: #eaf3ee;
+  border-color: #b8cec3;
   box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 .ew-workspace .ew-workspace-topbar { border-radius: 14px; margin: 0 0 24px; padding: 16px 20px; }
-.ew-workspace .ew-workspace-subtitle, .ew-workspace .ew-user-details > span { color: #4e6255; }
+.ew-workspace .ew-workspace-subtitle, .ew-workspace .ew-user-details > span { color: #496258; }
+.ew-workspace .ew-user-details,
+.ew-workspace .ew-user-details :is(strong, span, a) { text-decoration: none; }
+/* iOS may insert contact links inside otherwise plain account text. */
+.ew-workspace .ew-user-details a {
+  color: inherit !important;
+  font: inherit !important;
+  text-decoration: none !important;
+}
 .ew-workspace .ew-section-button:hover:not([aria-current]) { background: #dce9dd; }
-.ew-workspace .ew-workspace-topbar .ew-action { --button-secondary: #f0f5ed; }
+.ew-workspace .ew-workspace-topbar .ew-action { --button-secondary: #f0f6f2; }
 
 .ew-workspace [data-workspace-section] {
-  --section-surface: #dcebdd;
-  --section-field: #eff6ed;
-  --section-soft: #cfdfd0;
-  --section-ink: #203f2d;
-  --section-muted: #4c6252;
-  --section-line: #b4cbb7;
-  --section-control: #718977;
+  --section-surface: #deebe3;
+  --section-field: #f0f6f2;
+  --section-soft: #d1e2d8;
+  --section-ink: #203f32;
+  --section-muted: #496258;
+  --section-line: #adc7b9;
+  --section-control: #6b8778;
   --section-accent: #356447;
 }
 .ew-workspace-content > [data-workspace-section] {
@@ -150,7 +160,7 @@ html:has(.ew-workspace-shell), body:has(.ew-workspace-shell) { background: #d4e2
 .ew-workspace [data-workspace-section='saved'] summary { color: var(--section-ink); }
 .ew-workspace [data-workspace-section='saved'] summary:hover { background: var(--section-soft); }
 .ew-workspace [data-workspace-section='saved'] :is(.account-card > p:not(.profile-note), .saved-drafts-grid details li) { color: var(--section-muted); }
-.ew-workspace .ew-guidance { color: #4e6255; border-color: #b8cbbd; }
+.ew-workspace .ew-guidance { color: #496258; border-color: #b8cec3; }
 
 @media (max-width: 600px) {
   .ew-workspace-content > [data-workspace-section] { padding: 20px 16px; }
@@ -181,7 +191,7 @@ html:has(.ew-workspace-shell), body:has(.ew-workspace-shell) { background: #d4e2
 .ew-workspace [data-workspace-section] :is(.profile-description, .nutrition-description) { margin: 8px 0 24px; max-width: 70ch; }
 .ew-workspace .profile-fields { gap: 20px; }
 .ew-workspace .profile-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-.ew-workspace .account-field { margin: 0; gap: 7px; }
+.ew-workspace .account-field { min-width: 0; margin: 0; gap: 7px; align-content: start; }
 .ew-workspace small { margin-top: 0; font-size: 13px; line-height: 1.6; }
 .ew-workspace label { font-size: 14px; }
 .ew-workspace :is(input:not([type='checkbox']):not([type='radio']), select, textarea) { font-size: 16px; }
@@ -209,7 +219,34 @@ html:has(.ew-workspace-shell), body:has(.ew-workspace-shell) { background: #d4e2
 .ew-workspace .fs-table :is(th, td) { padding: 14px 16px; }
 .ew-workspace .fs-save-panel { margin-top: 28px; padding: 20px; border-radius: 12px; }
 .ew-workspace .fs-save-panel form > .profile-note { margin: 12px 0 20px; }
-.ew-workspace .fs-save-panel .profile-fields { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 20px; }
+.ew-workspace .fs-save-panel .profile-fields { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.ew-workspace .fs-save-panel .account-field input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  min-height: 48px;
+  padding: 11px 14px;
+  line-height: 24px;
+  box-sizing: border-box;
+}
+/* Native date values have their own intrinsic size and alignment in WebKit. */
+.ew-workspace input[type='date'] {
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 48px;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+.ew-workspace input[type='date']::-webkit-date-and-time-value {
+  min-height: 24px;
+  line-height: 24px;
+  text-align: left;
+}
+.ew-workspace input[type='date']::-webkit-datetime-edit { padding: 0; }
+.ew-workspace input[type='date']::-webkit-calendar-picker-indicator { margin: 0; padding: 0; }
 .ew-workspace .fs-save-panel .profile-save { grid-column: 1 / -1; justify-self: start; width: auto; }
 .ew-workspace [data-workspace-section='saved'] .saved-drafts-grid { gap: 16px; margin-top: 20px; }
 .ew-workspace [data-workspace-section='saved'] .account-card { padding: 20px; border-radius: 12px; }
@@ -241,9 +278,14 @@ html:has(.ew-workspace-shell), body:has(.ew-workspace-shell) { background: #d4e2
   .ew-workspace-shell .ew-logo-frame { width: 148px; }
   .ew-workspace-shell .ew-workspace-page { padding-top: 16px; }
   .ew-workspace .ew-workspace-topbar { padding: 16px; gap: 16px; margin-bottom: 24px; }
-  .ew-workspace .ew-workspace-user-info { flex-basis: 100%; }
+  .ew-workspace .ew-workspace-user-info {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 8px 12px;
+    flex-basis: 100%;
+  }
   .ew-workspace .ew-user-details { flex: 1; }
-  .ew-workspace .ew-demo-tag { margin-left: 52px; }
+  .ew-workspace .ew-demo-tag { grid-column: 2; justify-self: start; margin: 0; }
   .ew-workspace .ew-workspace-topbar-actions { width: 100%; }
   .ew-workspace .ew-workspace-topbar-actions .ew-action { flex: 1; }
   .ew-workspace .ew-workspace-title { font-size: 24px; }

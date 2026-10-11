@@ -133,7 +133,7 @@ export default function WorkspaceView({ user, onLogout, onGoHome }) {
       </div>
 
       <div className="ew-workspace-heading-block">
-        <h1 className="ew-workspace-title">Your EatWise Workspace</h1>
+        <h1 className="ew-workspace-title" id="workspace-title" tabIndex={-1}>Your EatWise Workspace</h1>
         <p className="ew-workspace-subtitle">
           Manage your personal measurements, calculate targets, set dietary preferences, generate AI food quantities, and save your daily meal drafts.
         </p>

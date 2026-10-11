@@ -1,0 +1,36 @@
+html:has(.ew-signin-transition) { overflow: hidden; }
+
+.ew-signin-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(ellipse at 0% 0%, #c5ded7 0%, #c5ded700 62%),
+    linear-gradient(135deg, #dcebe4 0%, #edf3ed 50%, #d4e6e0 100%);
+  color: #203f32;
+  animation: ew-signin-dismiss 200ms ease-in 1800ms both;
+}
+
+.ew-signin-brand { display: grid; justify-items: center; gap: 24px; }
+.ew-signin-brand .ew-logo-frame {
+  width: clamp(200px, 55vw, 280px);
+  animation: ew-signin-arrive 450ms cubic-bezier(.16, 1, .3, 1) both;
+}
+.ew-signin-brand p { color: #496258; font-size: 14px; text-align: center; }
+
+@keyframes ew-signin-arrive {
+  from { transform: scale(.96); opacity: .5; }
+  to { transform: scale(1); opacity: 1; }
+}
+@keyframes ew-signin-dismiss { to { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ew-signin-transition, .ew-signin-brand .ew-logo-frame { animation: none; }
+}
+@media (forced-colors: active) {
+  .ew-signin-transition { background: Canvas; color: CanvasText; }
+  .ew-signin-brand p { color: CanvasText; }
+}
