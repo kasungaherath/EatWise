@@ -5,10 +5,10 @@ import { calculateEnergy } from '../services/nutritionService.js'
 import { calculateNutritionTargets } from '../services/nutritionTargets.js'
 import { evaluateFoodEligibility } from '../services/foodEligibilityService.js'
 import { generateFoodSuggestion } from '../services/foodSuggestionService.js'
+import { foodGroup } from '../services/foodGoalSelectionService.js'
 import {
   readDailyLimit,
   maximumWholeQuantity,
-  applyDailyQuantityLimits,
 } from '../services/foodQuantityLimitService.js'
 
 const router = Router()
@@ -150,6 +150,8 @@ async function loadContext(userId) {
 
       return {
         foodId: Number(food.id),
+        sourceReference: String(food.source_reference),
+        group: foodGroup(food),
         name: food.name,
         preparationState: food.preparation_state,
         maxDailyGrams,
@@ -234,8 +236,9 @@ router.post('/generate', async (req, res, next) => {
     const context = await loadContext(userId)
     const generated = await generateFoodSuggestion(context)
 
-    // Enforce configured limits and recalculate before returning.
-    const suggestion = applyDailyQuantityLimits(generated, context)
+    // The goal planner has already enforced the daily bounds and recalculated
+    // every candidate. Re-running a second search would discard its floors.
+    const suggestion = generated
 
     const latestContext = await loadContext(userId)
 

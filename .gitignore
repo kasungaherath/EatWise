@@ -13,6 +13,7 @@ Thumbs.db
 .codex/
 .gemini/
 deployment-checks/
+.impeccable/review/
 .tools/
 
 # Local standalone logo export; the app uses its bundled asset.

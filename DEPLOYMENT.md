@@ -19,6 +19,10 @@ approved catalogue. It supports Railway's default database name and preserves
 existing accounts, drafts, review decisions, and quantity limits on repeated runs.
 The session table is created automatically by the session store.
 
+The two original pending chicken breast and banana records receive the verified
+USDA nutrition and diet classifications. This completes only their pending food
+reviews; existing approved/rejected decisions and allergen reviews are retained.
+
 Set these variables on the EatWise service, with the database service named `MySQL`:
 
 ```dotenv
@@ -37,8 +41,9 @@ Set `SESSION_SECRET` to a strong random value and configure `GEMINI_API_KEY` and
 `GEMINI_MODEL` using the working AI configuration. Store them as service variables;
 never commit secrets or put them in variables beginning with `VITE_`.
 
-The catalogue snapshot contains 18 approved foods, their approved portions and
-daily quantity limits, and one approved recipe. It contains no user accounts,
+The base catalogue snapshot and the 20-food expansion seed 40 approved foods,
+their approved portions and daily quantity limits, and one approved recipe.
+They contain no user accounts,
 passwords, sessions, profiles, or saved drafts. To intentionally refresh this
 public reference snapshot from the configured local database:
 

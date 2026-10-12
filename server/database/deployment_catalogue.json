@@ -701,6 +701,93 @@
         "max_daily_grams": "300.00",
         "policy_label": "demo-v1"
       }
+    },
+    {
+      "food": {
+        "name": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
+        "preparation_state": "cooked, roasted, skin removed",
+        "calories_per_100g": "165.00",
+        "protein_per_100g": "31.00",
+        "carbohydrate_per_100g": "0.00",
+        "fat_per_100g": "3.57",
+        "fiber_per_100g": "0.00",
+        "is_vegan": 0,
+        "is_vegetarian": 0,
+        "is_pescatarian": 0,
+        "allergens": [],
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "171477",
+        "source_url": "https://fdc.nal.usda.gov/food-details/171477/nutrients",
+        "source_accessed_at": "2026-10-12",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "100g",
+          "label": "100 g edible portion",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "EatWise",
+          "source_reference": "metric-weight-100g",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "400.00",
+        "policy_label": "demo-v1"
+      }
+    },
+    {
+      "food": {
+        "name": "Bananas, raw",
+        "preparation_state": "raw, peeled edible portion",
+        "calories_per_100g": "89.00",
+        "protein_per_100g": "1.09",
+        "carbohydrate_per_100g": "22.80",
+        "fat_per_100g": "0.33",
+        "fiber_per_100g": "2.60",
+        "is_vegan": 1,
+        "is_vegetarian": 1,
+        "is_pescatarian": 1,
+        "allergens": [],
+        "allergen_reviewed_at": null,
+        "source_name": "USDA FoodData Central",
+        "source_reference": "173944",
+        "source_url": "https://fdc.nal.usda.gov/food-details/173944/nutrients",
+        "source_accessed_at": "2026-10-12",
+        "review_status": "approved"
+      },
+      "portions": [
+        {
+          "portion_key": "medium",
+          "label": "1 medium banana",
+          "amount": "1.00",
+          "unit_singular": "medium banana",
+          "unit_plural": "medium bananas",
+          "gram_weight": "118.000",
+          "source_name": "USDA FoodData Central",
+          "source_reference": "173944-medium",
+          "review_status": "approved"
+        },
+        {
+          "portion_key": "100g",
+          "label": "100 g edible portion",
+          "amount": "100.00",
+          "unit_singular": "gram",
+          "unit_plural": "grams",
+          "gram_weight": "100.000",
+          "source_name": "EatWise",
+          "source_reference": "metric-weight-100g",
+          "review_status": "approved"
+        }
+      ],
+      "limit": {
+        "max_daily_grams": "300.00",
+        "policy_label": "demo-v1"
+      }
     }
   ],
   "recipes": [

@@ -8,9 +8,12 @@ import WorkspaceIcon from './WorkspaceIcon.jsx'
 import WorkspaceSectionTitle from './WorkspaceSectionTitle.jsx'
 import {
   DEFAULT_DEMO_SUGGESTION,
+  DEFAULT_DEMO_PROFILE,
+  DEFAULT_DEMO_PREFERENCES,
   getDemoStorage,
   setDemoStorage,
 } from '../demoWorkspace.js'
+import { generateDemoFoodSuggestion } from '../demoPlanning.js'
 import './FoodSuggestions.css'
 
 const API_URL = (
@@ -96,11 +99,25 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
     if (isDemo) {
       setGenerating(true)
       setError('')
-      setTimeout(() => {
-        setSuggestion(DEFAULT_DEMO_SUGGESTION)
-        setDemoStorage('suggestion', DEFAULT_DEMO_SUGGESTION)
+      const controller = new AbortController()
+      requestRef.current = controller
+      try {
+        const result = generateDemoFoodSuggestion(
+          getDemoStorage('profile', DEFAULT_DEMO_PROFILE),
+          getDemoStorage('preferences', DEFAULT_DEMO_PREFERENCES),
+        )
+        setTimeout(() => {
+          if (controller.signal.aborted) return
+          setSuggestion(result)
+          setDemoStorage('suggestion', result)
+          requestRef.current = null
+          setGenerating(false)
+        }, 500)
+      } catch (error) {
+        setError(error.message)
+        requestRef.current = null
         setGenerating(false)
-      }, 500)
+      }
       return
     }
 
@@ -244,6 +261,12 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
             </div>
             <span className="fs-badge fs-badge-neutral">Draft</span>
           </div>
+
+          {suggestion.goalSelection && (
+            <p className="fs-description">
+              <strong>{suggestion.goalSelection.label}:</strong> {suggestion.goalSelection.focus}
+            </p>
+          )}
 
           <div className="fs-food-list-heading" aria-hidden="true">
             <span>Food</span>

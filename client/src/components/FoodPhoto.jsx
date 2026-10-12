@@ -1,8 +1,9 @@
 import { useId } from 'react'
-import { foodAtlas } from '../foodImageLoader.js'
+import { foodAtlases } from '../foodImageLoader.js'
 
 export default function FoodPhoto({ photo, className = '' }) {
   const cropId = useId()
+  const atlas = foodAtlases[photo.atlas ?? 'default']
   const [x, y, width, height] = photo.viewBox.split(' ').map(Number)
   return (
     <span className={'food-photo ' + className} aria-hidden="true">
@@ -10,7 +11,7 @@ export default function FoodPhoto({ photo, className = '' }) {
         <defs>
           <clipPath id={cropId}><rect x={x} y={y} width={width} height={height} /></clipPath>
         </defs>
-        <image href={foodAtlas} width="1536" height="1024" clipPath={'url(#' + cropId + ')'} />
+        <image href={atlas.source} width={atlas.width} height={atlas.height} clipPath={'url(#' + cropId + ')'} />
       </svg>
     </span>
   )

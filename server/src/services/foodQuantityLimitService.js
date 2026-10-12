@@ -121,6 +121,7 @@ export function applyDailyQuantityLimits(suggestion, context) {
 
   const selectedFoods = new Set()
   const maxima = []
+  const minima = []
   const appliedLimits = []
 
   let current = proposedItems.map((item) => {
@@ -155,6 +156,10 @@ export function applyDailyQuantityLimits(suggestion, context) {
     }
 
     maxima.push(maximum)
+    const minimum = Math.min(maximum, Math.max(1, Math.ceil(
+      (Number(food.minDailyGrams) || 0) / portion.gramWeight * portion.amount,
+    )))
+    minima.push(minimum)
 
     appliedLimits.push({
       foodId: food.foodId,
@@ -183,7 +188,7 @@ export function applyDailyQuantityLimits(suggestion, context) {
         unit_singular: portion.unitSingular,
         unit_plural: portion.unitPlural,
       },
-      quantity: Math.min(item.quantity, maximum),
+      quantity: Math.max(minimum, Math.min(item.quantity, maximum)),
     }
   })
 
@@ -205,7 +210,7 @@ export function applyDailyQuantityLimits(suggestion, context) {
           const quantity =
             current[index].quantity + step * direction
 
-          if (quantity < 1 || quantity > maxima[index]) {
+          if (quantity < minima[index] || quantity > maxima[index]) {
             continue
           }
 

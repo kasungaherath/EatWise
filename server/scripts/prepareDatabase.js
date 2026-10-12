@@ -44,6 +44,24 @@ async function foodId(reference) {
   return row?.review_status === 'approved' ? row.id : null
 }
 
+async function completeStapleReview(food) {
+  // These two old starter records were pending with unknown diet flags.
+  // Their nutrition and classifications are now verified in the public seed.
+  // Complete only pending reviews; preserve approved/rejected decisions and
+  // separately reviewed allergen metadata.
+  if (food.source_name !== 'USDA FoodData Central'
+    || !['171477', '173944'].includes(food.source_reference)
+    || food.review_status !== 'approved') return
+  const columns = ['name', 'preparation_state', 'calories_per_100g', 'protein_per_100g',
+    'carbohydrate_per_100g', 'fat_per_100g', 'fiber_per_100g', 'is_vegan',
+    'is_vegetarian', 'is_pescatarian', 'source_url', 'source_accessed_at']
+  await db.execute(
+    `UPDATE foods SET ${columns.map(column => `\`${column}\` = ?`).join(', ')}, review_status = 'approved'
+     WHERE source_name = ? AND source_reference = ? AND review_status = 'pending'`,
+    [...columns.map(column => food[column]), food.source_name, food.source_reference],
+  )
+}
+
 try {
   db = await pool.getConnection()
   const [[lock]] = await db.query(
@@ -69,9 +87,20 @@ try {
   )
   if (catalogue.version !== 1) throw new Error('Unsupported catalogue version')
 
+  const expansion = JSON.parse(await readFile(new URL('../database/twenty_more_foods.json', import.meta.url), 'utf8'))
+  const knownFoods = new Set(catalogue.foods.map(({ food }) => `${food.source_name}:${food.source_reference}`))
+  for (const entry of expansion) {
+    const key = `${entry.food.source_name}:${entry.food.source_reference}`
+    if (!knownFoods.has(key)) {
+      catalogue.foods.push(entry)
+      knownFoods.add(key)
+    }
+  }
+
   await db.beginTransaction()
   for (const { food, portions, limit } of catalogue.foods) {
     await insertMissing('foods', food)
+    await completeStapleReview(food)
     const id = await foodId(food)
     // Never reverse a review decision already made in the deployed database.
     if (!id) continue

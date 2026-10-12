@@ -1,6 +1,5 @@
 import { GoogleGenAI } from '@google/genai'
-import { calculateFoodPortions } from './foodPortionService.js'
-import { assessNutritionMatch } from './nutritionMatchService.js'
+import { goalFoodSelection, planGoalFoodQuantities } from './foodGoalSelectionService.js'
 
 function suggestionError(message, status = 502) {
   const error = new Error(message)
@@ -8,122 +7,11 @@ function suggestionError(message, status = 502) {
   return error
 }
 
-function matchScore(assessment) {
-  return Object.values(assessment.comparison).reduce(
-    (sum, row) => {
-      const distance =
-        Math.abs(row.actual - row.target) / row.target
-
-      const excess = Math.max(
-        0,
-        distance - row.tolerancePercent / 100
-      )
-
-      return sum + excess ** 2 + 0.001 * distance ** 2
-    },
-    0
-  )
-}
-
-function adjustQuantities(items, targets) {
-  let current = items.map((item) => ({ ...item }))
-  let calculation = calculateFoodPortions(current)
-  let assessment = assessNutritionMatch(
-    calculation.totals,
-    targets
-  )
-
-  let bestScore = matchScore(assessment)
-
-  // Search bounds only: these are not validated serving limits.
-  // Never increase a quantity beyond twice the AI proposal.
-  const maxima = current.map((item) =>
-    Math.min(
-      item.quantity * 2,
-      Math.floor(
-        (10000 * item.portion.amount) /
-          item.portion.gram_weight
-      )
-    )
-  )
-
-  const result = () => ({
-    calculation,
-    ...assessment,
-    adjusted: current.some(
-      (item, index) => item.quantity !== items[index].quantity
-    ),
-  })
-
-  // Coarse adjustments first, then progressively smaller changes.
-  // Counts and gram quantities remain whole numbers.
-  for (const step of [100, 25, 5, 1]) {
-    for (let pass = 0; pass < 80; pass++) {
-      if (
-        assessment.targetMatch.status === 'within_tolerance'
-      ) {
-        return result()
-      }
-
-      let improved = false
-
-      for (let index = 0; index < current.length; index++) {
-        for (const direction of [-1, 1]) {
-          const quantity =
-            current[index].quantity + step * direction
-
-          if (quantity < 1 || quantity > maxima[index]) {
-            continue
-          }
-
-          const candidate = current.map((item, itemIndex) =>
-            itemIndex === index
-              ? { ...item, quantity }
-              : item
-          )
-
-          const nextCalculation =
-            calculateFoodPortions(candidate)
-
-          const nextAssessment = assessNutritionMatch(
-            nextCalculation.totals,
-            targets
-          )
-
-          const nextScore = matchScore(nextAssessment)
-          const matches =
-            nextAssessment.targetMatch.status ===
-            'within_tolerance'
-
-          if (
-            matches ||
-            nextScore < bestScore - 1e-12
-          ) {
-            current = candidate
-            calculation = nextCalculation
-            assessment = nextAssessment
-            bestScore = nextScore
-            improved = true
-
-            if (matches) {
-              return result()
-            }
-          }
-        }
-      }
-
-      if (!improved) break
-    }
-  }
-
-  return result()
-}
-
-export async function generateFoodSuggestion(context) {
+export async function generateFoodSuggestion(context, { requestProposal } = {}) {
   const apiKey = process.env.GEMINI_API_KEY?.trim()
   const model = process.env.GEMINI_MODEL?.trim()
 
-  if (!apiKey || !model) {
+  if (!requestProposal && (!apiKey || !model)) {
     throw suggestionError(
       'The AI service is not configured on the server.',
       503
@@ -184,7 +72,8 @@ export async function generateFoodSuggestion(context) {
     }
   }
 
-  const ai = new GoogleGenAI({ apiKey })
+  const ai = requestProposal ? null : new GoogleGenAI({ apiKey })
+  const selection = goalFoodSelection(context)
 
   const input = `
 You propose daily food quantities for the EatWise prototype.
@@ -210,6 +99,16 @@ Rules:
 - Propose totals for ONE DAY, not quantities per meal.
 - Aim close to ALL supplied targets: calories, protein, carbohydrates, and fat.
 - Do not focus only on matching calories.
+- Follow the goalSelection focus and prefer the ranked catalogue choices.
+- Prefer everyday healthy staples such as chicken breast, eggs, lentils, rice,
+  oats, milk, peanuts, and common vegetables and fruit when eligible.
+- Give chicken breast first place for omnivores when it is eligible. Do not
+  choose turkey breast when eligible chicken breast is supplied.
+- Use less common foods only when needed for the targets or saved preferences.
+- Include every requiredFoodId using an eligible portion. For Gain muscle,
+  boiled eggs are required only when they are present in the eligible catalogue.
+- Aim for 6–10 foods, covering protein, carbohydrates, fats, vegetables, and fruit
+  when those groups are available. Do not list every food in the catalogue.
 - Prefer a varied selection of minimally processed foods: vegetables, fruit,
   whole grains or starchy vegetables, legumes, and suitable protein sources.
 - Include vegetables and fruit when the eligible catalogue supports them.
@@ -234,18 +133,20 @@ Data:
 ${JSON.stringify({
   goal: context.goal,
   dietType: context.dietType,
+  goalSelection: { focus: selection.focus, foodPreference: 'common_first', requiredFoodIds: selection.required.map(food => food.foodId) },
   targets,
-  foods: context.foods,
+  foods: selection.ranked,
 })}
 `
 
   let result
 
   try {
-    result = await ai.interactions.create({
+    const request = {
       model,
       input,
-    })
+    }
+    result = requestProposal ? await requestProposal(request) : await ai.interactions.create(request)
   } catch (error) {
     const status =
       Number(error?.status ?? error?.statusCode) || null
@@ -417,38 +318,21 @@ ${JSON.stringify({
     }
   })
 
-  const {
-    calculation,
-    comparison,
-    targetMatch,
-    adjusted,
-  } = adjustQuantities(calculationItems, targets)
-
-  const matched =
-    targetMatch.status === 'within_tolerance'
+  const planned = planGoalFoodQuantities(context, calculationItems.map(item => ({
+    portionId: item.portion.id,
+    quantity: item.quantity,
+  })))
 
   return {
+    ...planned,
     status: 'draft',
     generatedBy: 'gemini',
     model,
     scope: 'daily_totals',
-    calculation,
-    comparison,
-    targetMatch,
-    quantityAdjustment: {
-      method: 'bounded_local_search',
-      applied: adjusted,
-      status: matched
-        ? 'within_tolerance'
-        : 'needs_adjustment',
-      message: matched
-        ? 'The calculated totals meet the configured target tolerances.'
-        : 'The quantity adjustment did not find a match within its search bounds. Different foods or quantities may be needed.',
-    },
     requiresReview: true,
     limitations: [
-      'Gemini selected foods and proposed initial quantities.',
-      'The server searched for improved whole-number quantities.',
+      'Gemini proposed a food selection and initial quantities.',
+      'The server compared it with a goal-based catalogue candidate and adjusted whole-number quantities.',
       'Nutrition totals were recalculated from the food database.',
       'Target matching uses configurable prototype tolerances.',
       'The search does not prove whether a matching combination exists.',

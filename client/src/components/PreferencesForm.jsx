@@ -303,8 +303,9 @@ export default function PreferencesForm({ onSaved, isDemo = false }) {
             />
 
             <small id="preferences-allergies-hint">
-              Separate items with commas. Leave empty if you have
-              none. Allergy filtering is not available yet.
+              Separate items with commas. Leave empty if you have none.
+              Catalogue checks do not establish allergy safety. Unsupported
+              terms or unreviewed allergen data can prevent a draft.
             </small>
           </div>
 
@@ -325,7 +326,8 @@ export default function PreferencesForm({ onSaved, isDemo = false }) {
 
             <small id="preferences-avoided-hint">
               Separate items with commas. These preferences are
-              saved, but avoided-food filtering is not available yet.
+              excluded from suggestions when recognized. Unrecognized
+              terms can prevent a draft.
             </small>
           </div>
 

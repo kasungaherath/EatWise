@@ -1,3 +1,5 @@
+import extraFoods from '../../database/twenty_more_foods.json' with { type: 'json' }
+
 const dietColumns = {
   omnivore: null,
   vegetarian: 'is_vegetarian',
@@ -6,6 +8,21 @@ const dietColumns = {
 }
 
 const aliases = new Map([
+  ['oat', 'oat'], ['oats', 'oat'], ['oatmeal', 'oat'],
+  ['potato', 'potato'], ['potatoes', 'potato'],
+  ['kidney bean', 'kidney_bean'], ['kidney beans', 'kidney_bean'], ['red kidney beans', 'kidney_bean'],
+  ['black bean', 'black_bean'], ['black beans', 'black_bean'],
+  ['pea', 'pea'], ['peas', 'pea'], ['green peas', 'pea'],
+  ['edamame', 'edamame'], ['turkey', 'turkey'], ['turkey breast', 'turkey'],
+  ['tuna', 'tuna'], ['cottage cheese', 'cottage_cheese'],
+  ['peanut butter', 'peanut'], ['walnut', 'walnut'], ['walnuts', 'walnut'],
+  ['pumpkin seed', 'pumpkin_seed'], ['pumpkin seeds', 'pumpkin_seed'], ['pepitas', 'pumpkin_seed'],
+  ['seed', 'seed'], ['seeds', 'seed'], ['chia', 'chia'], ['chia seeds', 'chia'],
+  ['flax', 'flax'], ['flaxseed', 'flax'], ['flaxseeds', 'flax'],
+  ['orange', 'orange'], ['oranges', 'orange'],
+  ['strawberry', 'strawberry'], ['strawberries', 'strawberry'],
+  ['carrot', 'carrot'], ['carrots', 'carrot'], ['cauliflower', 'cauliflower'],
+  ['whole-wheat bread', 'wheat'], ['whole wheat bread', 'wheat'], ['brown rice', 'rice'],
   ['peanut', 'peanut'], ['peanuts', 'peanut'],
   ['groundnut', 'peanut'], ['groundnuts', 'peanut'],
   ['quinoa', 'quinoa'], ['bulgur', 'bulgur'], ['wheat', 'wheat'],
@@ -21,6 +38,7 @@ const aliases = new Map([
   ['banana', 'banana'],
   ['bananas', 'banana'],
   ['chicken', 'chicken'],
+  ['chicken breast', 'chicken'],
   ['tofu', 'tofu'],
   ['soy', 'soy'],
   ['soya', 'soy'],
@@ -52,6 +70,7 @@ const aliases = new Map([
 // Explicit classifications for the imported USDA records.
 // Unknown records remain excluded when exclusions are present.
 const foodTags = new Map([
+  ...extraFoods.map(({ food, presentation }) => [food.source_reference, presentation.tags]),
   ['171265', ['milk']],
   ['173806', ['peanut']],
   ['168917', ['quinoa']],

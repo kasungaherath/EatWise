@@ -1,0 +1,190 @@
+[
+  {
+    "sourceName": "Cereals, oats, regular and quick, not fortified, dry",
+    "key": "oats",
+    "displayName": "Dry rolled oats",
+    "group": "carbohydrate",
+    "tags": [
+      "oat"
+    ]
+  },
+  {
+    "sourceName": "Rice, brown, long-grain, cooked (Includes foods for USDA's Food Distribution Program)",
+    "key": "brown-rice",
+    "displayName": "Cooked brown rice",
+    "group": "carbohydrate",
+    "tags": [
+      "rice"
+    ]
+  },
+  {
+    "sourceName": "Bread, whole-wheat, commercially prepared",
+    "key": "whole-wheat-bread",
+    "displayName": "Whole-wheat bread",
+    "group": "carbohydrate",
+    "tags": [
+      "wheat",
+      "gluten"
+    ]
+  },
+  {
+    "sourceName": "Potatoes, baked, flesh and skin, without salt",
+    "key": "potato",
+    "displayName": "Baked potato",
+    "group": "carbohydrate",
+    "tags": [
+      "potato"
+    ]
+  },
+  {
+    "sourceName": "Beans, kidney, red, mature seeds, cooked, boiled, without salt",
+    "key": "kidney-beans",
+    "displayName": "Cooked kidney beans",
+    "group": "protein",
+    "tags": [
+      "kidney_bean"
+    ]
+  },
+  {
+    "sourceName": "Beans, black, mature seeds, cooked, boiled, without salt",
+    "key": "black-beans",
+    "displayName": "Cooked black beans",
+    "group": "protein",
+    "tags": [
+      "black_bean"
+    ]
+  },
+  {
+    "sourceName": "Peas, green, cooked, boiled, drained, without salt",
+    "key": "peas",
+    "displayName": "Cooked green peas",
+    "group": "vegetable",
+    "tags": [
+      "pea"
+    ]
+  },
+  {
+    "sourceName": "Edamame, frozen, prepared",
+    "key": "edamame",
+    "displayName": "Cooked edamame",
+    "group": "protein",
+    "tags": [
+      "soy",
+      "edamame"
+    ]
+  },
+  {
+    "sourceName": "Turkey, whole, breast, meat only, cooked, roasted",
+    "key": "turkey",
+    "displayName": "Roasted turkey breast",
+    "group": "protein",
+    "tags": [
+      "turkey"
+    ]
+  },
+  {
+    "sourceName": "Fish, tuna, light, canned in water, drained solids (Includes foods for USDA's Food Distribution Program)",
+    "key": "tuna",
+    "displayName": "Tuna in water",
+    "group": "protein",
+    "tags": [
+      "tuna",
+      "fish"
+    ]
+  },
+  {
+    "sourceName": "Cheese, cottage, lowfat, 2% milkfat",
+    "key": "cottage-cheese",
+    "displayName": "Low-fat cottage cheese",
+    "group": "protein",
+    "tags": [
+      "milk",
+      "cottage_cheese"
+    ]
+  },
+  {
+    "sourceName": "Peanut butter, smooth style, without salt",
+    "key": "peanut-butter",
+    "displayName": "Unsalted peanut butter",
+    "group": "fat",
+    "tags": [
+      "peanut"
+    ]
+  },
+  {
+    "sourceName": "Nuts, walnuts, english",
+    "key": "walnuts",
+    "displayName": "Walnuts",
+    "group": "fat",
+    "tags": [
+      "walnut",
+      "tree_nut"
+    ]
+  },
+  {
+    "sourceName": "Seeds, pumpkin and squash seed kernels, roasted, without salt",
+    "key": "pumpkin-seeds",
+    "displayName": "Roasted pumpkin seeds",
+    "group": "fat",
+    "tags": [
+      "pumpkin_seed",
+      "seed"
+    ]
+  },
+  {
+    "sourceName": "Seeds, chia seeds, dried",
+    "key": "chia",
+    "displayName": "Chia seeds",
+    "group": "fat",
+    "tags": [
+      "chia",
+      "seed"
+    ]
+  },
+  {
+    "sourceName": "Seeds, flaxseed",
+    "key": "flax",
+    "displayName": "Flaxseeds",
+    "group": "fat",
+    "tags": [
+      "flax",
+      "seed"
+    ]
+  },
+  {
+    "sourceName": "Oranges, raw, all commercial varieties",
+    "key": "orange",
+    "displayName": "Orange",
+    "group": "fruit",
+    "tags": [
+      "orange"
+    ]
+  },
+  {
+    "sourceName": "Strawberries, raw",
+    "key": "strawberries",
+    "displayName": "Strawberries",
+    "group": "fruit",
+    "tags": [
+      "strawberry"
+    ]
+  },
+  {
+    "sourceName": "Carrots, cooked, boiled, drained, without salt",
+    "key": "carrots",
+    "displayName": "Cooked carrots",
+    "group": "vegetable",
+    "tags": [
+      "carrot"
+    ]
+  },
+  {
+    "sourceName": "Cauliflower, cooked, boiled, drained, without salt",
+    "key": "cauliflower",
+    "displayName": "Cooked cauliflower",
+    "group": "vegetable",
+    "tags": [
+      "cauliflower"
+    ]
+  }
+]

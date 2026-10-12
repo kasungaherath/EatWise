@@ -1,0 +1,943 @@
+[
+  {
+    "food": {
+      "name": "Cereals, oats, regular and quick, not fortified, dry",
+      "preparation_state": "dry; weigh before cooking",
+      "calories_per_100g": "379.00",
+      "protein_per_100g": "13.20",
+      "carbohydrate_per_100g": "67.70",
+      "fat_per_100g": "6.52",
+      "fiber_per_100g": "10.10",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "173904",
+      "source_url": "https://fdc.nal.usda.gov/food-details/173904/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "120.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "oats",
+      "displayName": "Dry rolled oats",
+      "group": "carbohydrate",
+      "tags": [
+        "oat"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Rice, brown, long-grain, cooked (Includes foods for USDA's Food Distribution Program)",
+      "preparation_state": "cooked",
+      "calories_per_100g": "123.00",
+      "protein_per_100g": "2.74",
+      "carbohydrate_per_100g": "25.60",
+      "fat_per_100g": "0.97",
+      "fiber_per_100g": "1.60",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "169704",
+      "source_url": "https://fdc.nal.usda.gov/food-details/169704/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "600.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "brown-rice",
+      "displayName": "Cooked brown rice",
+      "group": "carbohydrate",
+      "tags": [
+        "rice"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Bread, whole-wheat, commercially prepared",
+      "preparation_state": "ready to eat",
+      "calories_per_100g": "252.00",
+      "protein_per_100g": "12.40",
+      "carbohydrate_per_100g": "42.70",
+      "fat_per_100g": "3.50",
+      "fiber_per_100g": "6.00",
+      "is_vegan": null,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [
+        "wheat",
+        "gluten"
+      ],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "172688",
+      "source_url": "https://fdc.nal.usda.gov/food-details/172688/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "180.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "whole-wheat-bread",
+      "displayName": "Whole-wheat bread",
+      "group": "carbohydrate",
+      "tags": [
+        "wheat",
+        "gluten"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Potatoes, baked, flesh and skin, without salt",
+      "preparation_state": "baked, skin included",
+      "calories_per_100g": "93.00",
+      "protein_per_100g": "2.50",
+      "carbohydrate_per_100g": "21.20",
+      "fat_per_100g": "0.13",
+      "fiber_per_100g": "2.20",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "170093",
+      "source_url": "https://fdc.nal.usda.gov/food-details/170093/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "450.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "potato",
+      "displayName": "Baked potato",
+      "group": "carbohydrate",
+      "tags": [
+        "potato"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Beans, kidney, red, mature seeds, cooked, boiled, without salt",
+      "preparation_state": "boiled, without salt",
+      "calories_per_100g": "127.00",
+      "protein_per_100g": "8.67",
+      "carbohydrate_per_100g": "22.80",
+      "fat_per_100g": "0.50",
+      "fiber_per_100g": "7.40",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "175194",
+      "source_url": "https://fdc.nal.usda.gov/food-details/175194/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "400.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "kidney-beans",
+      "displayName": "Cooked kidney beans",
+      "group": "protein",
+      "tags": [
+        "kidney_bean"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Beans, black, mature seeds, cooked, boiled, without salt",
+      "preparation_state": "boiled, without salt",
+      "calories_per_100g": "132.00",
+      "protein_per_100g": "8.86",
+      "carbohydrate_per_100g": "23.70",
+      "fat_per_100g": "0.54",
+      "fiber_per_100g": "8.70",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "173735",
+      "source_url": "https://fdc.nal.usda.gov/food-details/173735/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "400.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "black-beans",
+      "displayName": "Cooked black beans",
+      "group": "protein",
+      "tags": [
+        "black_bean"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Peas, green, cooked, boiled, drained, without salt",
+      "preparation_state": "boiled, without salt",
+      "calories_per_100g": "84.00",
+      "protein_per_100g": "5.36",
+      "carbohydrate_per_100g": "15.60",
+      "fat_per_100g": "0.22",
+      "fiber_per_100g": "5.50",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "170420",
+      "source_url": "https://fdc.nal.usda.gov/food-details/170420/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "300.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "peas",
+      "displayName": "Cooked green peas",
+      "group": "vegetable",
+      "tags": [
+        "pea"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Edamame, frozen, prepared",
+      "preparation_state": "cooked, shelled",
+      "calories_per_100g": "121.00",
+      "protein_per_100g": "11.90",
+      "carbohydrate_per_100g": "8.91",
+      "fat_per_100g": "5.20",
+      "fiber_per_100g": "5.20",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [
+        "soy"
+      ],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "168411",
+      "source_url": "https://fdc.nal.usda.gov/food-details/168411/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "300.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "edamame",
+      "displayName": "Cooked edamame",
+      "group": "protein",
+      "tags": [
+        "soy",
+        "edamame"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Turkey, whole, breast, meat only, cooked, roasted",
+      "preparation_state": "roasted, skin removed",
+      "calories_per_100g": "147.00",
+      "protein_per_100g": "30.10",
+      "carbohydrate_per_100g": "0.00",
+      "fat_per_100g": "2.08",
+      "fiber_per_100g": "0.00",
+      "is_vegan": 0,
+      "is_vegetarian": 0,
+      "is_pescatarian": 0,
+      "allergens": [],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "171496",
+      "source_url": "https://fdc.nal.usda.gov/food-details/171496/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "350.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "turkey",
+      "displayName": "Roasted turkey breast",
+      "group": "protein",
+      "tags": [
+        "turkey"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Fish, tuna, light, canned in water, drained solids (Includes foods for USDA's Food Distribution Program)",
+      "preparation_state": "canned in water, drained",
+      "calories_per_100g": "86.00",
+      "protein_per_100g": "19.40",
+      "carbohydrate_per_100g": "0.00",
+      "fat_per_100g": "0.96",
+      "fiber_per_100g": "0.00",
+      "is_vegan": 0,
+      "is_vegetarian": 0,
+      "is_pescatarian": 1,
+      "allergens": [
+        "fish"
+      ],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "173709",
+      "source_url": "https://fdc.nal.usda.gov/food-details/173709/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "200.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "tuna",
+      "displayName": "Tuna in water",
+      "group": "protein",
+      "tags": [
+        "tuna",
+        "fish"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Cheese, cottage, lowfat, 2% milkfat",
+      "preparation_state": "ready to eat, 2% milkfat",
+      "calories_per_100g": "81.00",
+      "protein_per_100g": "10.40",
+      "carbohydrate_per_100g": "4.76",
+      "fat_per_100g": "2.27",
+      "fiber_per_100g": "0.00",
+      "is_vegan": 0,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [
+        "milk"
+      ],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "172182",
+      "source_url": "https://fdc.nal.usda.gov/food-details/172182/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "300.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "cottage-cheese",
+      "displayName": "Low-fat cottage cheese",
+      "group": "protein",
+      "tags": [
+        "milk",
+        "cottage_cheese"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Peanut butter, smooth style, without salt",
+      "preparation_state": "ready to eat",
+      "calories_per_100g": "598.00",
+      "protein_per_100g": "22.20",
+      "carbohydrate_per_100g": "22.30",
+      "fat_per_100g": "51.40",
+      "fiber_per_100g": "5.00",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [
+        "peanut"
+      ],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "172470",
+      "source_url": "https://fdc.nal.usda.gov/food-details/172470/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "50.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "peanut-butter",
+      "displayName": "Unsalted peanut butter",
+      "group": "fat",
+      "tags": [
+        "peanut"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Nuts, walnuts, english",
+      "preparation_state": "raw",
+      "calories_per_100g": "654.00",
+      "protein_per_100g": "15.20",
+      "carbohydrate_per_100g": "13.70",
+      "fat_per_100g": "65.20",
+      "fiber_per_100g": "6.70",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [
+        "tree nuts"
+      ],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "170187",
+      "source_url": "https://fdc.nal.usda.gov/food-details/170187/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "50.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "walnuts",
+      "displayName": "Walnuts",
+      "group": "fat",
+      "tags": [
+        "walnut",
+        "tree_nut"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Seeds, pumpkin and squash seed kernels, roasted, without salt",
+      "preparation_state": "roasted kernels, without salt",
+      "calories_per_100g": "574.00",
+      "protein_per_100g": "29.80",
+      "carbohydrate_per_100g": "14.70",
+      "fat_per_100g": "49.00",
+      "fiber_per_100g": "6.50",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "170557",
+      "source_url": "https://fdc.nal.usda.gov/food-details/170557/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "50.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "pumpkin-seeds",
+      "displayName": "Roasted pumpkin seeds",
+      "group": "fat",
+      "tags": [
+        "pumpkin_seed",
+        "seed"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Seeds, chia seeds, dried",
+      "preparation_state": "dried; use in prepared food",
+      "calories_per_100g": "486.00",
+      "protein_per_100g": "16.50",
+      "carbohydrate_per_100g": "42.10",
+      "fat_per_100g": "30.70",
+      "fiber_per_100g": "34.40",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "170554",
+      "source_url": "https://fdc.nal.usda.gov/food-details/170554/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "30.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "chia",
+      "displayName": "Chia seeds",
+      "group": "fat",
+      "tags": [
+        "chia",
+        "seed"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Seeds, flaxseed",
+      "preparation_state": "raw; use in prepared food",
+      "calories_per_100g": "534.00",
+      "protein_per_100g": "18.30",
+      "carbohydrate_per_100g": "28.90",
+      "fat_per_100g": "42.20",
+      "fiber_per_100g": "27.30",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "169414",
+      "source_url": "https://fdc.nal.usda.gov/food-details/169414/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "30.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "flax",
+      "displayName": "Flaxseeds",
+      "group": "fat",
+      "tags": [
+        "flax",
+        "seed"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Oranges, raw, all commercial varieties",
+      "preparation_state": "raw, peeled edible portion",
+      "calories_per_100g": "47.00",
+      "protein_per_100g": "0.94",
+      "carbohydrate_per_100g": "11.80",
+      "fat_per_100g": "0.12",
+      "fiber_per_100g": "2.40",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "169097",
+      "source_url": "https://fdc.nal.usda.gov/food-details/169097/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "300.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "orange",
+      "displayName": "Orange",
+      "group": "fruit",
+      "tags": [
+        "orange"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Strawberries, raw",
+      "preparation_state": "raw, stems removed",
+      "calories_per_100g": "32.00",
+      "protein_per_100g": "0.67",
+      "carbohydrate_per_100g": "7.68",
+      "fat_per_100g": "0.30",
+      "fiber_per_100g": "2.00",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "167762",
+      "source_url": "https://fdc.nal.usda.gov/food-details/167762/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "300.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "strawberries",
+      "displayName": "Strawberries",
+      "group": "fruit",
+      "tags": [
+        "strawberry"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Carrots, cooked, boiled, drained, without salt",
+      "preparation_state": "boiled, without salt",
+      "calories_per_100g": "35.00",
+      "protein_per_100g": "0.76",
+      "carbohydrate_per_100g": "8.22",
+      "fat_per_100g": "0.18",
+      "fiber_per_100g": "3.00",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "170394",
+      "source_url": "https://fdc.nal.usda.gov/food-details/170394/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "300.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "carrots",
+      "displayName": "Cooked carrots",
+      "group": "vegetable",
+      "tags": [
+        "carrot"
+      ]
+    }
+  },
+  {
+    "food": {
+      "name": "Cauliflower, cooked, boiled, drained, without salt",
+      "preparation_state": "boiled, without salt",
+      "calories_per_100g": "23.00",
+      "protein_per_100g": "1.84",
+      "carbohydrate_per_100g": "4.11",
+      "fat_per_100g": "0.45",
+      "fiber_per_100g": "2.30",
+      "is_vegan": 1,
+      "is_vegetarian": 1,
+      "is_pescatarian": 1,
+      "allergens": [],
+      "allergen_reviewed_at": null,
+      "source_name": "USDA FoodData Central",
+      "source_reference": "170397",
+      "source_url": "https://fdc.nal.usda.gov/food-details/170397/nutrients",
+      "source_accessed_at": "2026-10-12",
+      "review_status": "approved"
+    },
+    "portions": [
+      {
+        "portion_key": "100g",
+        "label": "100 g edible portion",
+        "amount": "100.00",
+        "unit_singular": "gram",
+        "unit_plural": "grams",
+        "gram_weight": "100.000",
+        "source_name": "EatWise",
+        "source_reference": "metric-weight-100g",
+        "review_status": "approved"
+      }
+    ],
+    "limit": {
+      "max_daily_grams": "350.00",
+      "policy_label": "demo-v1"
+    },
+    "presentation": {
+      "key": "cauliflower",
+      "displayName": "Cooked cauliflower",
+      "group": "vegetable",
+      "tags": [
+        "cauliflower"
+      ]
+    }
+  }
+]

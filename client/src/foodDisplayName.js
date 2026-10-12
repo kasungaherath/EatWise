@@ -1,5 +1,8 @@
 // Presentation names only. Keep source names and nutrition records unchanged.
+import additionalFoods from './additionalFoodPresentation.json'
+
 const names = new Map([
+  ...additionalFoods.map(food => [food.sourceName, food.displayName]),
   ['Milk, whole, 3.25% milkfat, with added vitamin D', 'Fresh whole milk'],
   ['Peanuts, all types, dry-roasted, without salt', 'Unsalted peanuts'],
   ['Quinoa, cooked', 'Cooked quinoa'],

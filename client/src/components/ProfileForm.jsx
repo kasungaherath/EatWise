@@ -1,4 +1,5 @@
 import WorkspaceSectionTitle from './WorkspaceSectionTitle.jsx'
+import { demoNutrition } from '../demoPlanning.js'
 import { useEffect, useState } from 'react'
 import {
   DEFAULT_DEMO_PROFILE,
@@ -163,6 +164,13 @@ export default function ProfileForm({ onSaved, isDemo = false }) {
         weightKg: Number(form.weightKg),
         activityLevel: form.activityLevel || 'active',
         goal: form.goal || 'maintain_weight',
+      }
+      try {
+        setDemoStorage('nutrition', demoNutrition(demoSaved))
+      } catch (error) {
+        setError(error.message)
+        setSaving(false)
+        return
       }
       setDemoStorage('profile', demoSaved)
       setForm(toForm(demoSaved))
