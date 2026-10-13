@@ -218,6 +218,13 @@ Targets, portion limits, and comparison tolerances use configurable app
 defaults; they are not individualized nutrition prescriptions. Automatic
 energy estimates currently support ages 19–78 with the required profile fields.
 
+Protein estimates use saved body weight, goal, and activity level instead of a
+fixed percentage of calories. The dashboard explains the calculation. If an
+AI response contains unusable portions or quantities, the app can produce a
+labelled draft from the verified eligible catalogue. See
+[`docs/goal-based-food-selection.md`](docs/goal-based-food-selection.md) for
+the defaults, sources, and recovery rules.
+
 Diet and exclusion checks cover supported catalogue classifications and terms.
 They do not establish allergy safety, medical suitability, or the nutritional
 completeness of a daily plan. Guest results are illustrative sample data.

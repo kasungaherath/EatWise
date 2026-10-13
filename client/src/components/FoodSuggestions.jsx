@@ -252,6 +252,11 @@ export default function FoodSuggestions({ onSaved, isDemo = false }) {
 
       {suggestion && (
         <div className="fs-result">
+          {suggestion.generatedBy === 'catalogue_fallback' && (
+            <p className="fs-description" role="status">
+              This draft uses verified foods matched to your saved preferences because the AI selection could not be used.
+            </p>
+          )}
           <div className="fs-result-heading">
             <div>
               <h4>Your quantities for one day</h4>

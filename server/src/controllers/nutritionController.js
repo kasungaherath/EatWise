@@ -46,6 +46,8 @@ export async function getEnergyEstimate(req, res, next) {
     const targets = calculateNutritionTargets({
       maintenanceCalories: estimate.maintenanceCalories,
       goal: profile.goal,
+      weightKg: profile.weightKg,
+      activityLevel: profile.activityLevel,
     })
 
     return res.json({

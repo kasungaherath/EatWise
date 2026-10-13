@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import {
-  DEFAULT_DEMO_NUTRITION,
+  DEFAULT_DEMO_PROFILE,
   getDemoStorage,
 } from '../demoWorkspace.js'
+import { demoNutrition } from '../demoPlanning.js'
 import './NutritionSummary.css'
 import WorkspaceIcon from './WorkspaceIcon.jsx'
 import WorkspaceSectionTitle from './WorkspaceSectionTitle.jsx'
@@ -38,8 +39,11 @@ export default function NutritionSummary({ refreshKey = 0, isDemo = false }) {
       setResult(null)
 
       if (isDemo) {
-        const demoNut = getDemoStorage('nutrition', DEFAULT_DEMO_NUTRITION)
-        setResult(demoNut)
+        try {
+          setResult(demoNutrition(getDemoStorage('profile', DEFAULT_DEMO_PROFILE)))
+        } catch (error) {
+          setError(error.message)
+        }
         setLoading(false)
         return
       }
@@ -234,6 +238,13 @@ export default function NutritionSummary({ refreshKey = 0, isDemo = false }) {
           </div>
 
           <p className="nutrition-note">
+            {targets.proteinBasis && <>
+              Protein uses {numberFormat.format(targets.proteinBasis.gramsPerKg)} g/kg
+              {' of your saved body weight ('}{numberFormat.format(targets.proteinBasis.weightKg)} kg)
+              {' for your goal and activity level.'}
+              {targets.proteinBasis.calorieCapApplied && ' An energy limit was applied to keep the macro split balanced.'}
+              {' '}
+            </>}
             These estimates use adjustable app defaults and are
             not individualized nutrition prescriptions. Suitability
             needs to be checked before generating a meal plan.

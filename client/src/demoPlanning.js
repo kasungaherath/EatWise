@@ -10,7 +10,8 @@ import { planGoalFoodQuantities } from '../../server/src/services/foodGoalSelect
 
 export function demoNutrition(profile) {
   const estimate = calculateEnergy(profile)
-  return { estimate, targets: calculateNutritionTargets({maintenanceCalories:estimate.maintenanceCalories,goal:profile.goal}) }
+  return { estimate, targets: calculateNutritionTargets({maintenanceCalories:estimate.maintenanceCalories,
+    goal:profile.goal,weightKg:profile.weightKg,activityLevel:profile.activityLevel}) }
 }
 
 export function generateDemoFoodSuggestion(profile, preferences) {

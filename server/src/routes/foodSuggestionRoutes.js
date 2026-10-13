@@ -68,6 +68,8 @@ async function loadContext(userId) {
   const targets = calculateNutritionTargets({
     maintenanceCalories: estimate.maintenanceCalories,
     goal: profile.goal,
+    weightKg: profile.weightKg,
+    activityLevel: profile.activityLevel,
   })
 
   const [foodRows] = await pool.execute(

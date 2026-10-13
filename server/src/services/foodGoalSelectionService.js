@@ -36,17 +36,17 @@ const policies = {
   gain_muscle: {
     label: 'Gain muscle',
     focus: 'Protein sources, enough energy, and a varied mix of grains, fruit, and vegetables.',
-    counts: { protein: 3, carbohydrate: 2, fat: 2, vegetable: 2, fruit: 1 },
+    counts: { protein: 2, carbohydrate: 3, fat: 2, vegetable: 2, fruit: 1 },
   },
   lose_weight: {
     label: 'Lose weight',
     focus: 'Lean protein, fibre-rich foods, fruit, and vegetables within your calorie target.',
-    counts: { protein: 2, carbohydrate: 2, fat: 2, vegetable: 2, fruit: 1 },
+    counts: { protein: 2, carbohydrate: 3, fat: 2, vegetable: 2, fruit: 1 },
   },
   maintain_weight: {
     label: 'Maintain weight',
     focus: 'A balanced mix of protein, grains, healthy fats, fruit, and vegetables.',
-    counts: { protein: 2, carbohydrate: 2, fat: 2, vegetable: 2, fruit: 1 },
+    counts: { protein: 2, carbohydrate: 3, fat: 2, vegetable: 2, fruit: 1 },
   },
 }
 
@@ -222,10 +222,12 @@ export function planGoalFoodQuantities(context, proposal = null) {
   const useAI = best === fromAI
   let changedFoods = false
   if (best.targetMatch.status !== 'within_tolerance') {
-    const initialItems = best.calculation.items
     // One bounded comparison pass over alternative foods. Keep required eggs
     // and every existing food group, and never accept a worse macro match.
-    for (let index = 0; index < initialItems.length; index++) {
+    for (let index = 0; index < best.calculation.items.length; index++) {
+      // Carry earlier improvements forward so complementary swaps can work
+      // together, rather than repeatedly returning to the original candidate.
+      const initialItems = best.calculation.items
       const current = context.foods.find(food => food.foodId === initialItems[index].foodId)
       if (selection.required.some(food => food.foodId === current.foodId)) continue
       const alternatives = selection.ranked.filter(food => foodGroup(food) === foodGroup(current)

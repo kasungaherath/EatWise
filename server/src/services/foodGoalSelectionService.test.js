@@ -20,7 +20,7 @@ function contextFor(goal, dietType = 'omnivore', avoidedFoods = []) {
       portions:portions.map((p,n)=>({portionId:index*10+n+1,amount:Number(p.amount),gramWeight:Number(p.gram_weight),unitSingular:p.unit_singular,unitPlural:p.unit_plural,maxQuantity:maximumWholeQuantity(maxDailyGrams,p.amount,p.gram_weight)})),
     }]
   })
-  return {goal,dietType,foods,targets:calculateNutritionTargets({maintenanceCalories,goal})}
+  return {goal,dietType,foods,targets:calculateNutritionTargets({maintenanceCalories,goal,weightKg:75,activityLevel:'active'})}
 }
 
 test('expansion contains exactly 20 distinct new USDA foods with usable portions and full macros',()=>{
@@ -166,4 +166,71 @@ test('candidate comparison keeps the better macro fit after clamping and adjustm
   const rice=context.foods.find(x=>x.sourceReference==='168878')
   const chosen=planGoalFoodQuantities(context,[{portionId:rice.portions[0].portionId,quantity:5}])
   assert.ok(nutritionDistance(chosen.comparison)<=nutritionDistance(template.comparison)+1e-12)
+})
+
+test('oversized AI egg counts are bounded before gram conversion instead of failing generation', async () => {
+  const context = contextFor('gain_muscle')
+  const egg = context.foods.find(food => food.sourceReference === '173424')
+  const countPortion = egg.portions.find(portion => portion.unitSingular.includes('egg'))
+  const result = await generateFoodSuggestion(context, { requestProposal: async () => ({
+    output_text: JSON.stringify({ status: 'candidate', items: [{ portionId: countPortion.portionId, quantity: 300 }] }),
+  }) })
+  assert.equal(result.status, 'draft')
+  for (const item of result.calculation.items) {
+    const food = context.foods.find(food => food.foodId === item.foodId)
+    assert.ok(item.grams > 0 && item.grams <= food.maxDailyGrams)
+  }
+  assert.equal(result.targetMatch.status, 'within_tolerance')
+})
+
+test('invalid AI portion IDs and quantities recover using only the eligible catalogue', async () => {
+  const context = contextFor('gain_muscle', 'vegan', ['peanuts'])
+  const portionId = context.foods[0].portions[0].portionId
+  for (const items of [
+    [{portionId:999999,quantity:100}],
+    [{portionId,quantity:-5}],
+    [{portionId,quantity:1.5}],
+    [{portionId,quantity:'100'}],
+    [{portionId,quantity:100},{portionId,quantity:200}],
+  ]) {
+    const result = await generateFoodSuggestion(context, { requestProposal: async () => ({ output_text: JSON.stringify({status:'candidate',items}) }) })
+    assert.equal(result.generatedBy, 'catalogue_fallback')
+    assert.equal(result.proposalRecovery.applied, true)
+    assert.equal(result.model, null)
+    for (const item of result.calculation.items) {
+      const food = context.foods.find(food => food.foodId === item.foodId)
+      assert.ok(food)
+      assert.ok(item.grams > 0 && item.grams <= food.maxDailyGrams)
+      assert.ok(!/chicken|egg|peanut/i.test(item.name))
+    }
+  }
+})
+
+test('empty, malformed or insufficient AI output recovers to a labelled catalogue draft', async () => {
+  const context = contextFor('gain_muscle')
+  for (const output_text of ['', 'not json', '{"status":"candidate","items":[]}', '{"status":"insufficient_catalogue","items":[]}']) {
+    const result = await generateFoodSuggestion(context, { requestProposal: async () => ({output_text}) })
+    assert.equal(result.generatedBy, 'catalogue_fallback')
+    assert.equal(result.targetMatch.status, 'within_tolerance')
+    assert.equal(result.calculation.items[0].foodId, context.foods.find(food => food.sourceReference === '171477').foodId)
+  }
+})
+
+test('invalid catalogue measurements remain a configuration error rather than an AI fallback', async () => {
+  const context = contextFor('gain_muscle')
+  const food = context.foods[0]
+  const portion = food.portions[0]
+  portion.amount = 0
+  await assert.rejects(() => generateFoodSuggestion(context, { requestProposal: async () => ({
+    output_text: JSON.stringify({status:'candidate',items:[{portionId:portion.portionId,quantity:100}]}),
+  }) }), {status:422})
+})
+
+test('provider quota failures are not disguised as catalogue-generated AI results', async t => {
+  t.mock.method(console, 'error', () => {})
+  await assert.rejects(() => generateFoodSuggestion(contextFor('gain_muscle'), { requestProposal: async () => {
+    const error = new Error('Quota exceeded')
+    error.status = 429
+    throw error
+  } }), error => error.status === 502 && /quota or rate limit/i.test(error.message))
 })

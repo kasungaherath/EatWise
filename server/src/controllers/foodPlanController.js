@@ -173,6 +173,8 @@ export async function saveFoodPlan(req, res, next) {
     const nutritionTargets = calculateNutritionTargets({
       maintenanceCalories: estimate.maintenanceCalories,
       goal: profile.goal,
+      weightKg: profile.weightKg,
+      activityLevel: profile.activityLevel,
     })
 
     const targets = {

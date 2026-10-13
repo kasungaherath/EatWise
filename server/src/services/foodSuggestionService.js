@@ -1,10 +1,135 @@
 import { GoogleGenAI } from '@google/genai'
 import { goalFoodSelection, planGoalFoodQuantities } from './foodGoalSelectionService.js'
+import { maximumWholeQuantity } from './foodQuantityLimitService.js'
 
 function suggestionError(message, status = 502) {
   const error = new Error(message)
   error.status = status
   return error
+}
+
+function readProposalItems(result, portionsById, foodCount) {
+  const responseText = result?.output_text
+
+  if (
+    typeof responseText !== 'string' ||
+    responseText.trim().length === 0
+  ) {
+    throw suggestionError(
+      'The AI returned no text response.'
+    )
+  }
+
+  let proposal
+
+  try {
+    proposal = JSON.parse(responseText)
+  } catch {
+    throw suggestionError(
+      'The AI returned invalid JSON. Please generate again.'
+    )
+  }
+
+  if (
+    !proposal ||
+    typeof proposal !== 'object' ||
+    Array.isArray(proposal) ||
+    !Array.isArray(proposal.items)
+  ) {
+    throw suggestionError(
+      'The AI returned an invalid suggestion.'
+    )
+  }
+
+  if (proposal.status === 'insufficient_catalogue') {
+    throw suggestionError(
+      'The AI could not propose a combination from the available foods. The catalogue may need more variety.',
+      502
+    )
+  }
+
+  if (
+    proposal.status !== 'candidate' ||
+    proposal.items.length === 0 ||
+    proposal.items.length > Math.min(foodCount, 50)
+  ) {
+    throw suggestionError(
+      'The AI returned an invalid food selection.'
+    )
+  }
+
+  const selectedFoods = new Set()
+
+  return proposal.items.map((item) => {
+    if (
+      !item ||
+      !Number.isSafeInteger(item.portionId) ||
+      !Number.isSafeInteger(item.quantity) ||
+      item.quantity <= 0
+    ) {
+      throw suggestionError(
+        'The AI returned an invalid quantity.'
+      )
+    }
+
+    const selected = portionsById.get(item.portionId)
+
+    if (!selected) {
+      throw suggestionError(
+        'The AI selected a portion outside the eligible catalogue.'
+      )
+    }
+
+    const { food, portion } = selected
+
+    if (selectedFoods.has(food.foodId)) {
+      throw suggestionError(
+        'The AI returned a duplicate food.'
+      )
+    }
+
+    selectedFoods.add(food.foodId)
+
+    const amount = Number(portion.amount)
+    const gramWeight = Number(portion.gramWeight)
+
+    if (
+      !Number.isFinite(amount) ||
+      amount <= 0 ||
+      !Number.isFinite(gramWeight) ||
+      gramWeight <= 0
+    ) {
+      throw suggestionError(
+        'The selected food has invalid portion data.',
+        422
+      )
+    }
+
+    // Provider quantities are hints. Bound approved portions before computing
+    // grams, including when the model confuses egg counts with gram weights.
+    const maximum = maximumWholeQuantity(food.maxDailyGrams, amount, gramWeight)
+    if (maximum < 1) {
+      throw suggestionError('The selected food has no usable daily quantity limit.', 422)
+    }
+    const quantity = Math.min(item.quantity, maximum)
+    const grams = (quantity / amount) * gramWeight
+
+    // Technical rejection bound, not a serving recommendation.
+    if (
+      !Number.isFinite(grams) ||
+      grams <= 0 ||
+      grams > 10000
+    ) {
+      throw suggestionError(
+        'The AI returned an invalid food weight.'
+      )
+    }
+
+    return {
+      portionId: portion.portionId,
+      quantity,
+    }
+  })
 }
 
 export async function generateFoodSuggestion(context, { requestProposal } = {}) {
@@ -181,157 +306,33 @@ ${JSON.stringify({
     )
   }
 
-  const responseText = result?.output_text
-
-  if (
-    typeof responseText !== 'string' ||
-    responseText.trim().length === 0
-  ) {
-    throw suggestionError(
-      'The AI returned no text response.'
-    )
-  }
-
-  let proposal
-
+  let proposalItems = null
+  let recoveredProposal = false
   try {
-    proposal = JSON.parse(responseText)
-  } catch {
-    throw suggestionError(
-      'The AI returned invalid JSON. Please generate again.'
-    )
+    proposalItems = readProposalItems(result, portionsById, context.foods.length)
+  } catch (error) {
+    // Never use invented IDs or invalid quantities. Recover from an unusable
+    // provider response by planning only from the already eligible catalogue.
+    // Catalogue configuration errors remain visible rather than being hidden.
+    if (error.status !== 502) throw error
+    proposalItems = null
+    recoveredProposal = true
   }
 
-  if (
-    !proposal ||
-    typeof proposal !== 'object' ||
-    Array.isArray(proposal) ||
-    !Array.isArray(proposal.items)
-  ) {
-    throw suggestionError(
-      'The AI returned an invalid suggestion.'
-    )
-  }
-
-  if (proposal.status === 'insufficient_catalogue') {
-    throw suggestionError(
-      'The AI could not propose a combination from the available foods. The catalogue may need more variety.',
-      422
-    )
-  }
-
-  if (
-    proposal.status !== 'candidate' ||
-    proposal.items.length === 0 ||
-    proposal.items.length > Math.min(context.foods.length, 50)
-  ) {
-    throw suggestionError(
-      'The AI returned an invalid food selection.'
-    )
-  }
-
-  const selectedFoods = new Set()
-
-  const calculationItems = proposal.items.map((item) => {
-    if (
-      !item ||
-      !Number.isSafeInteger(item.portionId) ||
-      !Number.isSafeInteger(item.quantity) ||
-      item.quantity <= 0
-    ) {
-      throw suggestionError(
-        'The AI returned an invalid quantity.'
-      )
-    }
-
-    const selected = portionsById.get(item.portionId)
-
-    if (!selected) {
-      throw suggestionError(
-        'The AI selected a portion outside the eligible catalogue.'
-      )
-    }
-
-    const { food, portion } = selected
-
-    if (selectedFoods.has(food.foodId)) {
-      throw suggestionError(
-        'The AI returned a duplicate food.'
-      )
-    }
-
-    selectedFoods.add(food.foodId)
-
-    const amount = Number(portion.amount)
-    const gramWeight = Number(portion.gramWeight)
-
-    if (
-      !Number.isFinite(amount) ||
-      amount <= 0 ||
-      !Number.isFinite(gramWeight) ||
-      gramWeight <= 0
-    ) {
-      throw suggestionError(
-        'The selected food has invalid portion data.',
-        422
-      )
-    }
-
-    const grams = (item.quantity / amount) * gramWeight
-
-    // Technical rejection bound, not a serving recommendation.
-    if (
-      !Number.isFinite(grams) ||
-      grams <= 0 ||
-      grams > 10000
-    ) {
-      throw suggestionError(
-        'The AI returned an invalid food weight.'
-      )
-    }
-
-    return {
-      food: {
-        id: food.foodId,
-        name: food.name,
-        preparation_state: food.preparationState,
-        calories_per_100g:
-          food.nutritionPer100g.calories,
-        protein_per_100g:
-          food.nutritionPer100g.proteinGrams,
-        carbohydrate_per_100g:
-          food.nutritionPer100g.carbohydrateGrams,
-        fat_per_100g:
-          food.nutritionPer100g.fatGrams,
-        fiber_per_100g:
-          food.nutritionPer100g.fiberGrams,
-      },
-      portion: {
-        id: portion.portionId,
-        food_id: food.foodId,
-        amount,
-        gram_weight: gramWeight,
-        unit_singular: portion.unitSingular,
-        unit_plural: portion.unitPlural,
-      },
-      quantity: item.quantity,
-    }
-  })
-
-  const planned = planGoalFoodQuantities(context, calculationItems.map(item => ({
-    portionId: item.portion.id,
-    quantity: item.quantity,
-  })))
+  const planned = planGoalFoodQuantities(context, proposalItems)
 
   return {
     ...planned,
     status: 'draft',
-    generatedBy: 'gemini',
-    model,
+    generatedBy: recoveredProposal ? 'catalogue_fallback' : 'gemini',
+    model: recoveredProposal ? null : model,
+    proposalRecovery: { applied: recoveredProposal },
     scope: 'daily_totals',
     requiresReview: true,
     limitations: [
-      'Gemini proposed a food selection and initial quantities.',
+      recoveredProposal
+        ? 'The AI response was unusable; the draft was selected from the eligible food catalogue.'
+        : 'Gemini proposed a food selection and initial quantities.',
       'The server compared it with a goal-based catalogue candidate and adjusted whole-number quantities.',
       'Nutrition totals were recalculated from the food database.',
       'Target matching uses configurable prototype tolerances.',
