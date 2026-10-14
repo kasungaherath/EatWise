@@ -2,12 +2,19 @@
 // Resolve by name, never database ID: guest IDs differ from catalogue IDs.
 import additionalFoods from './additionalFoodPresentation.json'
 
+// The photographed tiles are not an equal grid. Use their actual boundaries,
+// and trim only the empty table space below the final row's dishes.
+const expansionColumns = [0, 279, 561, 845, 1129, 1402]
+const expansionRows = [0, 279, 551, 819, 1102]
+
 const extraPhotos = new Map(additionalFoods.flatMap((food, index) => {
-  const cellWidth = 1402 / 5
-  const cellHeight = 1122 / 4
-  const size = Math.min(cellWidth, cellHeight) - 12
-  const x = index % 5 * cellWidth + (cellWidth - size) / 2
-  const y = Math.floor(index / 5) * cellHeight + (cellHeight - size) / 2
+  const column = index % 5
+  const row = Math.floor(index / 5)
+  const cellWidth = expansionColumns[column + 1] - expansionColumns[column]
+  const cellHeight = expansionRows[row + 1] - expansionRows[row]
+  const size = Math.min(cellWidth, cellHeight)
+  const x = expansionColumns[column] + (cellWidth - size) / 2
+  const y = expansionRows[row]
   const photo = { key: food.key, atlas: 'expansion', viewBox: `${x} ${y} ${size} ${size}` }
   return [food.sourceName, food.displayName].map(name => [name.toLowerCase(), photo])
 }))

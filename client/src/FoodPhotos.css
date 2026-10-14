@@ -2,6 +2,9 @@
 .food-photo {
   display: block;
   width: var(--food-photo-size, 80px);
+  flex-shrink: 0;
+  align-self: center;
+  justify-self: start;
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: 8px;
