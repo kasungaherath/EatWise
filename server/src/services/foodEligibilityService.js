@@ -1,4 +1,5 @@
 import extraFoods from '../../database/twenty_more_foods.json' with { type: 'json' }
+import { foodReferenceForDisplayName } from './foodPresentationService.js'
 
 const dietColumns = {
   omnivore: null,
@@ -122,11 +123,13 @@ function readList(value) {
   return [...new Set(list.map(normalize))]
 }
 
-function canonicalTerms(terms) {
+function canonicalTerms(terms, matchCatalogueFoods = false) {
   const result = []
 
   for (const term of terms) {
-    const canonical = aliases.get(term)
+    const reference = matchCatalogueFoods ? foodReferenceForDisplayName(term) : null
+    // Keep every existing category alias's meaning for saved preferences.
+    const canonical = aliases.get(term) ?? (reference ? `catalogue:${reference}` : null)
 
     if (!canonical) {
       return null
@@ -181,7 +184,7 @@ export function evaluateFoodEligibility(food, preferences) {
   }
 
   const allergyTerms = canonicalTerms(allergies)
-  const avoidedTerms = canonicalTerms(avoidedFoods)
+  const avoidedTerms = canonicalTerms(avoidedFoods, true)
 
   if (allergyTerms === null || avoidedTerms === null) {
     return excluded('unsupported_exclusion_term')
@@ -196,7 +199,9 @@ export function evaluateFoodEligibility(food, preferences) {
     return excluded('food_classification_unknown')
   }
 
-  if (avoidedTerms.some((term) => tags.includes(term))) {
+  if (avoidedTerms.some((term) => term.startsWith('catalogue:')
+    ? food.source_name === 'USDA FoodData Central' && term === `catalogue:${food.source_reference}`
+    : tags.includes(term))) {
     return excluded('avoided_food')
   }
 

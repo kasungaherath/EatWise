@@ -8,6 +8,13 @@ import { evaluateFoodEligibility } from '../../server/src/services/foodEligibili
 import { maximumWholeQuantity } from '../../server/src/services/foodQuantityLimitService.js'
 import { planGoalFoodQuantities } from '../../server/src/services/foodGoalSelectionService.js'
 
+const catalogueRecords = [...new Map([...catalogue.foods, ...expansion].map(entry => [entry.food.source_reference, entry])).values()]
+
+export function getDemoFoodCatalogue() {
+  return catalogueRecords.filter(({ food, portions }) => food.review_status === 'approved' &&
+    portions.some(portion => portion.review_status === 'approved')).map(({ food }) => ({ name: food.name }))
+}
+
 export function demoNutrition(profile) {
   const estimate = calculateEnergy(profile)
   return { estimate, targets: calculateNutritionTargets({maintenanceCalories:estimate.maintenanceCalories,
@@ -16,8 +23,7 @@ export function demoNutrition(profile) {
 
 export function generateDemoFoodSuggestion(profile, preferences) {
   const { targets } = demoNutrition(profile)
-  const records = [...new Map([...catalogue.foods, ...expansion].map(entry => [entry.food.source_reference, entry])).values()]
-  const foods = records.flatMap(({food, portions, limit}, index) => {
+  const foods = catalogueRecords.flatMap(({food, portions, limit}, index) => {
     if (!limit || !evaluateFoodEligibility(food, {
       diet_type:preferences.dietType,
       allergies:preferences.allergies,

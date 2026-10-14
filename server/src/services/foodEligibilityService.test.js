@@ -1,6 +1,9 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { evaluateFoodEligibility } from './foodEligibilityService.js'
+import { foodDisplayName } from './foodPresentationService.js'
+import catalogue from '../../database/deployment_catalogue.json' with { type: 'json' }
+import extraFoods from '../../database/twenty_more_foods.json' with { type: 'json' }
 
 const egg = {
   source_name: 'USDA FoodData Central',
@@ -135,4 +138,54 @@ test('eight-food expansion excludes allergens and respects fish and dairy diets'
   assert.equal(evaluateFoodEligibility(salmon, { ...preferences, diet_type: 'vegetarian' }).eligible, false)
   assert.equal(evaluateFoodEligibility(salmon, { ...preferences, diet_type: 'pescatarian' }).eligible, true)
   assert.equal(evaluateFoodEligibility({ ...egg, source_reference: '171265' }, { ...preferences, diet_type: 'vegan' }).eligible, false)
+})
+
+test('every catalogue suggestion name can be saved and excludes its food', () => {
+  const foods = [...new Map([...catalogue.foods, ...extraFoods].map(({ food }) => [food.source_reference, food])).values()]
+  assert.equal(foods.length, 40)
+  for (const food of foods) {
+    const label = foodDisplayName(food.name)
+    assert(label.length <= 80 && !label.includes(','), `${label} must fit the preferences field`)
+    assert.equal(evaluateFoodEligibility(food, {
+      ...preferences, avoided_foods: [label],
+    }).reason, 'avoided_food', `${label} must be recognized`)
+  }
+})
+
+test('selecting cooked brown rice excludes that food while a broad rice entry excludes both rice types', () => {
+  const whiteRice = catalogue.foods.find(({ food }) => food.source_reference === '168878').food
+  const brownRice = extraFoods.find(({ food }) => food.source_reference === '169704').food
+  const selected = { ...preferences, avoided_foods: ['Cooked brown rice'] }
+  assert.equal(evaluateFoodEligibility(brownRice, selected).reason, 'avoided_food')
+  assert.equal(evaluateFoodEligibility(whiteRice, selected).eligible, true)
+  for (const food of [whiteRice, brownRice]) {
+    assert.equal(evaluateFoodEligibility(food, { ...preferences, avoided_foods: ['rice'] }).reason, 'avoided_food')
+  }
+})
+
+test('selecting milk keeps other dairy choices available without weakening milk allergy matching', () => {
+  const milk = catalogue.foods.find(({ food }) => food.source_reference === '171265').food
+  const yogurt = catalogue.foods.find(({ food }) => food.source_reference === '170894').food
+  const selected = { ...preferences, avoided_foods: ['Fresh whole milk'] }
+  assert.equal(evaluateFoodEligibility(milk, selected).reason, 'avoided_food')
+  assert.equal(evaluateFoodEligibility(yogurt, selected).eligible, true)
+  for (const food of [milk, yogurt]) {
+    assert.equal(evaluateFoodEligibility(food, { ...preferences, avoided_foods: ['milk'] }).reason, 'avoided_food')
+    assert.equal(evaluateFoodEligibility(food, { ...preferences, allergies: ['milk'] }).reason, 'allergy_match')
+  }
+  assert.equal(evaluateFoodEligibility(milk, { ...preferences, allergies: ['Fresh whole milk'] }).reason, 'unsupported_exclusion_term')
+})
+
+test('catalogue selections accept case and spacing differences, and unknown entries remain unsupported', () => {
+  const chicken = catalogue.foods.find(({ food }) => food.source_reference === '171477').food
+  assert.equal(evaluateFoodEligibility(chicken, { ...preferences, avoided_foods: ['  ROASTED  Chicken breast '] }).reason, 'avoided_food')
+  assert.equal(evaluateFoodEligibility(chicken, { ...preferences, avoided_foods: ['unreviewed mystery food'] }).reason, 'unsupported_exclusion_term')
+})
+
+test('existing whole-wheat bread category exclusions keep their broader wheat meaning', () => {
+  const bulgur = catalogue.foods.find(({ food }) => food.source_reference === '170287').food
+  const bread = extraFoods.find(({ presentation }) => presentation.key === 'whole-wheat-bread').food
+  for (const food of [bulgur, bread]) {
+    assert.equal(evaluateFoodEligibility(food, { ...preferences, avoided_foods: ['Whole-wheat bread'] }).reason, 'avoided_food')
+  }
 })

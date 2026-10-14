@@ -6,6 +6,7 @@ import {
   setDemoStorage,
 } from '../demoWorkspace.js'
 import './ProfileForm.css'
+import AvoidedFoodInput from './AvoidedFoodInput.jsx'
 
 const API_URL = (
   import.meta.env.VITE_API_URL || 'http://localhost:5000'
@@ -314,20 +315,17 @@ export default function PreferencesForm({ onSaved, isDemo = false }) {
               Foods you prefer to avoid
             </label>
 
-            <input
-              id="preferences-avoided"
-              name="avoidedFoods"
-              type="text"
+            <AvoidedFoodInput
               value={form.avoidedFoods}
-              onChange={updateField}
-              placeholder="For example: mushrooms, broccoli"
-              aria-describedby="preferences-avoided-hint"
+              isDemo={isDemo}
+              disabled={saving}
+              onChange={value => updateField({ target: { name: 'avoidedFoods', value } })}
             />
 
             <small id="preferences-avoided-hint">
-              Separate items with commas. These preferences are
-              excluded from suggestions when recognized. Unrecognized
-              terms can prevent a draft.
+              Type a food name and choose a catalogue suggestion, or enter foods
+              separated by commas. Use the arrow keys and Enter to select.
+              Save preferences to apply your exclusions. Unrecognized entries can prevent a draft.
             </small>
           </div>
 
