@@ -189,7 +189,7 @@ EatWise/
 │   ├── src/                 API routes, controllers, services, and configuration
 │   ├── database/            Schema, catalogue snapshot, and food/portion data
 │   └── scripts/             Database preparation and catalogue tools
-├── docs/                    Interface design notes
+├── docs/                    Food selection rules and nutrition sources
 ├── scripts/                 Secret-scanner installation
 ├── .githooks/               Local checks before commits and pushes
 ├── .github/workflows/       Automatic secret scanning
@@ -197,6 +197,11 @@ EatWise/
 ├── DEPLOYMENT.md            Railway deployment guide
 └── SECURITY.md              Credential handling and secret protection
 ```
+
+Unused interface prototypes, old images, internal design notes, and superseded
+setup and diagnostic helpers are kept locally and ignored by Git and Docker.
+The repository retains the app source, required images, catalogue and schema,
+automated tests, setup commands, and security checks needed for a fresh checkout.
 
 ## Security
 
